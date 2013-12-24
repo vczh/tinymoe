@@ -1,0 +1,22 @@
+phrase print (items : collection)
+	repeat with item in items
+		write item, ", "
+	end
+	print
+end
+
+phrase print (items : dictionary)
+	repeat with tuple(key, value) in pairs of items
+		write key, "=>", value, ", "
+	end
+	print
+end
+
+phrase main
+	set numbers to collection of (1, 2, 3, 4, 5)
+	set keys to collection of ("a", "b", "c")
+	set values to collection of ("A", "B", "C")
+	
+	print numbers
+	print dictionary of pairs (key, values)
+end

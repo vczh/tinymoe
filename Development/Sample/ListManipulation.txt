@@ -1,0 +1,54 @@
+phrase sum of (numbers)
+	set the result to 0
+	repeat with i from 1 to length of numbers
+		add item i of numbers to the result
+	end
+end
+
+phrase sum of (numbers)
+	set the result to 0
+	repeat with number in numbers
+		add number to the result
+	end
+end
+
+phrase main
+	set numbers to new collection
+
+	repeat with i from 1 to 10
+		add i to numbers
+	end
+	print sum of numbers
+
+	remove 10 from numbers
+	remove item 9 from numbers
+	print sum of numbers
+
+	insert 0 before item 1 of numbers
+	insert 9 after item 9 of numbers
+	print sum of numbers
+
+	repeat with i from 1 to 10
+		if not numbers contains i
+			print "Number ", i, " is not in the list."
+		end
+	end
+end
+
+=================================
+
+phrase main
+	set squares to new dictionary
+
+	repeat with i from 1 to 10
+		add i and i times i to squares
+	end
+	print keys of squares
+	print values of squares
+
+	repeat with i from 1 to 5
+		remove i from numbers
+	end
+	print keys of squares
+	print values of squares
+end
