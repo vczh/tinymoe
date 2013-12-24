@@ -26,12 +26,75 @@ namespace tinymoe
 
 		auto AddToken = [=, &begin](int length, CodeTokenType type)
 		{
+			string value(reading, reading + length);
+
+			switch (type)
+			{
+			case CodeTokenType::Identifier:
+				type =
+					value == "module" ? CodeTokenType::Module :
+					value == "using" ? CodeTokenType::Using :
+					value == "phrase" ? CodeTokenType::Phrase :
+					value == "sentence" ? CodeTokenType::Sentence :
+					value == "block" ? CodeTokenType::Block :
+					value == "symbol" ? CodeTokenType::Symbol :
+					value == "type" ? CodeTokenType::Type :
+					value == "cps" ? CodeTokenType::CPS :
+					value == "category" ? CodeTokenType::Category :
+					value == "expression" ? CodeTokenType::Expression :
+					value == "argument" ? CodeTokenType::Argument :
+					value == "and" ? CodeTokenType::And :
+					value == "or" ? CodeTokenType::Or :
+					value == "not" ? CodeTokenType::Not :
+					CodeTokenType::Identifier;
+				break;
+			case CodeTokenType::String:
+				{
+					stringstream ss;
+					bool escaping = false;
+					for (auto c : value)
+					{
+						if (escaping)
+						{
+							escaping = false;
+							switch (c)
+							{
+							case 'n':
+								ss << '\n';
+								break;
+							case 'r':
+								ss << '\r';
+								break;
+							case 't':
+								ss << '\t';
+								break;
+							default:
+								ss << c;
+							}
+						}
+						else
+						{
+							if (c == '\\')
+							{
+								escaping = true;
+							}
+							else
+							{
+								ss << c;
+							}
+						}
+					}
+					ss >> value;
+				}
+				break;
+			}
+
 			CodeToken token =
 			{
 				type,
 				rowNumber,
 				reading - rowBegin,
-				string(reading, reading + length),
+				value,
 			};
 
 			int lineCount = codeFile->lines.size();
@@ -70,41 +133,41 @@ namespace tinymoe
 			case State::Begin:
 				switch (c)
 				{
-				case L'(':
+				case '(':
 					AddToken(1, CodeTokenType::OpenBracket);
 					break;
-				case L')':
+				case ')':
 					AddToken(1, CodeTokenType::CloseBracket);
 					break;
-				case L',':
+				case ',':
 					AddToken(1, CodeTokenType::Comma);
 					break;
-				case L':':
+				case ':':
 					AddToken(1, CodeTokenType::Colon);
 					break;
-				case L'&':
+				case '&':
 					AddToken(1, CodeTokenType::Concat);
 					break;
-				case L'+':
+				case '+':
 					AddToken(1, CodeTokenType::Add);
 					break;
-				case L'-':
+				case '-':
 					AddToken(1, CodeTokenType::Sub);
 					break;
-				case L'*':
+				case '*':
 					AddToken(1, CodeTokenType::Mul);
 					break;
-				case L'/':
+				case '/':
 					AddToken(1, CodeTokenType::Div);
 					break;
-				case L'<':
+				case '<':
 					switch (reading[1])
 					{
-					case L'=':
+					case '=':
 						AddToken(2, CodeTokenType::LE);
 						reading++;
 						break;
-					case L'>':
+					case '>':
 						AddToken(1, CodeTokenType::NE);
 						reading++;
 						break;
@@ -112,10 +175,10 @@ namespace tinymoe
 						AddToken(1, CodeTokenType::LT);
 					}
 					break;
-				case L'>':
+				case '>':
 					switch (reading[1])
 					{
-					case L'=':
+					case '=':
 						AddToken(2, CodeTokenType::GE);
 						reading++;
 						break;
@@ -123,25 +186,25 @@ namespace tinymoe
 						AddToken(1, CodeTokenType::GT);
 					}
 					break;
-				case L'=':
+				case '=':
 					AddToken(1, CodeTokenType::EQ);
 					break;
-				case L' ':case L'\t':case L'\r':
+				case ' ':case '\t':case '\r':
 					break;
-				case L'\n':
+				case '\n':
 					rowNumber++;
 					rowBegin = reading + 1;
 					break;
-				case L'\"':
+				case '\"':
 					begin = reading;
 					state = State::InString;
 				default:
-					if (L'0' <= c && c <= L'9')
+					if ('0' <= c && c <= '9')
 					{
 						begin = reading;
 						state = State::InInteger;
 					}
-					else if (L'a' <= c && c <= L'z' || L'A' <= c && c <= L'Z' || c == L'_')
+					else if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_')
 					{
 						begin = reading;
 						state = State::InIdentifier;
@@ -153,11 +216,11 @@ namespace tinymoe
 				}
 				break;
 			case State::InInteger:
-				if (L'0' <= c && c <= L'9')
+				if ('0' <= c && c <= '9')
 				{
 					// stay still
 				}
-				else if (c == L'.' && L'0' <= reading[1] && reading[1] <= L'9')
+				else if (c == '.' && '0' <= reading[1] && reading[1] <= '9')
 				{
 					state = State::InFloat;
 				}
@@ -169,7 +232,7 @@ namespace tinymoe
 				}
 				break;
 			case State::InFloat:
-				if (L'0' <= c && c <= L'9')
+				if ('0' <= c && c <= '9')
 				{
 					// stay still
 				}
@@ -183,14 +246,15 @@ namespace tinymoe
 			case State::InString:
 				switch (c)
 				{
-				case L'\"':
-					AddToken(reading - begin + 1, CodeTokenType::String);
+				case '\"':
+					begin++;
+					AddToken(reading - begin - 1, CodeTokenType::String);
 					begin = nullptr;
 					break;
-				case L'\\':
+				case '\\':
 					state = State::InStringEscaping;
 					break;
-				case L'\n':
+				case '\n':
 					AddError(reading - begin, "String literal should be single-lined.");
 					state = State::Begin;
 					begin = nullptr;
@@ -201,7 +265,7 @@ namespace tinymoe
 			case State::InStringEscaping:
 				switch (c)
 				{
-				case L'\n':
+				case '\n':
 					AddError(reading - begin, "String literal should be single-lined.");
 					state = State::Begin;
 					begin = nullptr;
@@ -212,7 +276,7 @@ namespace tinymoe
 				}
 				break;
 			case State::InIdentifier:
-				if (L'a' <= c && c <= L'z' || L'A' <= c && c <= L'Z' || c == L'_' || c == L'.' || c == L'-')
+				if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_' || c == '.' || c == '-')
 				{
 					// stay still
 				}

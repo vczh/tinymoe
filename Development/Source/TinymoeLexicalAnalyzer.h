@@ -13,6 +13,7 @@ namespace tinymoe
 		Identifier,
 
 		Module,				// module declaration
+		Using,				// import module declaration
 		Phrase,				// phrase declaration
 		Sentence,			// sentence declaration
 		Block,				// block declaration
