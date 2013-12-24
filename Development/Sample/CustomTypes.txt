@@ -1,7 +1,5 @@
-enum gender
-	male
-	female
-end
+symbol male
+symbol female
 
 type person
 	name
@@ -20,9 +18,9 @@ phrase initielize (people)
 
 	repeat with tuple (the name, the age, the gender) in zip of (names, ages, genders)
 		set p to new person
-		set name of p to the name
-		set age of p to the age
-		set gender of p to the gender
+		set field name of p to the name
+		set field age of p to the age
+		set field gender of p to the gender
 		add p to people
 	end
 end
@@ -32,7 +30,7 @@ phrase main
 	initialize people
 	print sum of (
 		for all p in people
-		where age of p is not less than 11
-		select age of p
+		where field age of p is not less than 11
+		select field age of p
 		)
 end
