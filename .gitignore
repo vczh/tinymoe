@@ -1,4 +1,3 @@
 *.sdf
-*.suo
 /Debug/
 /Release/
