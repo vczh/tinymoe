@@ -30,12 +30,21 @@
     <ClCompile Include="..\Source\Tinymoe.cpp">
       <Filter>Tinymoe</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp">
+      <Filter>Tinymoe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Tinymoe.h">
+      <Filter>Tinymoe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TinymoeLexicalAnalyzer.h">
+      <Filter>Tinymoe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TinymoeSTL.h">
       <Filter>Tinymoe</Filter>
     </ClInclude>
   </ItemGroup>
