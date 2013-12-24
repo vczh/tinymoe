@@ -17,28 +17,28 @@ sentence reset continuation state (state) to (flag)
 	set field continuation of state to null
 end
 
-continuation (state) (continuation)
+cps (state) (continuation)
 sentence break
 	reset continuation state state to breaking repeating
 end
 
-continuation (state) (continuation)
+cps (state) (continuation)
 sentence continue
 	reset continuation state state to continuing repeating
 end
 
-continuation (state) (continuation)
+cps (state) (continuation)
 sentence raise (exception)
 	reset continuation state state to raising exception
 	set field exception of state to exception
 end
 
-continuation (state) (continuation)
+cps (state) (continuation)
 sentence exit
 	reset continuation state state to exiting repeating
 end
 
-continuation (state) (continuation)
+cps (state) (continuation)
 sentence exit
 	set field flag of state to exiting function
 	set field continuation of state to null
@@ -46,7 +46,7 @@ end
 
 ======================================================
 
-continuation (state)
+cps (state)
 block (body) repeat alias repeat statement
 	invoke body with state
 	select flag field of state
@@ -87,7 +87,7 @@ end
 
 ======================================================
 
-continuation (state)
+cps (state)
 category
 	start IFELSE if
 	closable
@@ -99,7 +99,7 @@ block (body) if (condition)
 	end
 end
 
-continuation (state)
+cps (state)
 category (signal)
 	follow IFELSE if
 	start IFELSE else if
@@ -112,7 +112,7 @@ block (body) if (condition)
 	end
 end
 
-continuation (state)
+cps (state)
 category (signal)
 	follow IFELSE if
 	closable
@@ -126,7 +126,7 @@ end
 
 ======================================================
 
-continuation (state)
+cps (state)
 category
 	start SEH try
 block (statement body) try
@@ -137,7 +137,7 @@ block (statement body) try
 	end
 end
 
-continuation (state)
+cps (state)
 category (signal)
 	follow SEH try
 	start SEH catch
@@ -148,7 +148,7 @@ block (body) catch (argument exception)
 	end	
 end
 
-continuation (state)
+cps (state)
 category (signal)
 	follow SEH try
 	follow SEH catch

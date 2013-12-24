@@ -19,15 +19,23 @@ namespace tinymoe
 		String,
 		Identifier,
 
-		Pharse,
-		Sentence,
-		Argument,
-		Expression,
-		Block,
-		End,
+		Module,				// module declaration
+		Phrase,				// phrase declaration
+		Sentence,			// sentence declaration
+		Block,				// block declaration
+		Symbol,				// symbol declaration
+		Type,				// type declaration
+
+		CPS,				// continuation decoration
+		Category,			// block category definition
+		Expression,			// expression argument
+		Argument,			// argument argument
+
+		End,				// end of an entity
 
 		OpenBracket,
 		CloseBracket,
+		Colon,
 		Concat,
 		Add,
 		Sub,
