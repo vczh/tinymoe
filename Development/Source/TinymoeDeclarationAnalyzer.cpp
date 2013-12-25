@@ -4,14 +4,22 @@ namespace tinymoe
 {
 
 	/*************************************************************
+	CodeFragment
+	*************************************************************/
+
+	CodeFragment::CodeFragment()
+	{
+	}
+
+	CodeFragment::~CodeFragment()
+	{
+	}
+
+	/*************************************************************
 	SymbolName
 	*************************************************************/
 
 	SymbolName::SymbolName()
-	{
-	}
-
-	SymbolName::~SymbolName()
 	{
 	}
 
@@ -20,10 +28,6 @@ namespace tinymoe
 	*************************************************************/
 
 	Declaration::Declaration()
-	{
-	}
-
-	Declaration::~Declaration()
 	{
 	}
 
@@ -51,19 +55,11 @@ namespace tinymoe
 	{
 	}
 
-	FunctionCategory::~FunctionCategory()
-	{
-	}
-
 	/*************************************************************
 	FunctionDeclaration::Fragment
 	*************************************************************/
 
 	FunctionDeclaration::Fragment::Fragment()
-	{
-	}
-
-	FunctionDeclaration::Fragment::~Fragment()
 	{
 	}
 
@@ -105,5 +101,19 @@ namespace tinymoe
 
 	FunctionDeclaration::FunctionDeclaration()
 	{
+	}
+
+	/*************************************************************
+	Module
+	*************************************************************/
+
+	Module::Module()
+	{
+	}
+
+	Module::Ptr Module::Parse(CodeFile::Ptr codeFile, CodeError::List& errors)
+	{
+		auto module = make_shared<Module>();
+		return module;
 	}
 }
