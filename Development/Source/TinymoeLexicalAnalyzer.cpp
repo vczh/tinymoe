@@ -44,6 +44,7 @@ namespace tinymoe
 					value == "category" ? CodeTokenType::Category :
 					value == "expression" ? CodeTokenType::Expression :
 					value == "argument" ? CodeTokenType::Argument :
+					value == "end" ? CodeTokenType::End :
 					value == "and" ? CodeTokenType::And :
 					value == "or" ? CodeTokenType::Or :
 					value == "not" ? CodeTokenType::Not :
@@ -85,7 +86,7 @@ namespace tinymoe
 							}
 						}
 					}
-					ss >> value;
+					value = ss.str();
 				}
 				break;
 			}
@@ -94,7 +95,7 @@ namespace tinymoe
 			{
 				type,
 				rowNumber,
-				reading - rowBegin,
+				tokenBegin - rowBegin + 1,
 				value,
 			};
 
@@ -111,12 +112,14 @@ namespace tinymoe
 
 		auto AddError = [&](int length, const string& message)
 		{
+			auto tokenBegin = begin ? begin : reading;
+			string value(tokenBegin, tokenBegin + length);
 			CodeToken token =
 			{
 				CodeTokenType::Unknown,
 				rowNumber,
-				reading - rowBegin,
-				string(reading, reading + length),
+				tokenBegin - rowBegin + 1,
+				value,
 			};
 			CodeError error =
 			{
@@ -252,7 +255,7 @@ namespace tinymoe
 				{
 				case '\"':
 					begin++;
-					AddToken(reading - begin - 1, CodeTokenType::String);
+					AddToken(reading - begin, CodeTokenType::String);
 					state = State::Begin;
 					begin = nullptr;
 					break;
