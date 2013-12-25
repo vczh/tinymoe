@@ -35,13 +35,7 @@ end
 
 cps (state) (continuation)
 sentence exit
-	reset continuation state state to exiting repeating
-end
-
-cps (state) (continuation)
-sentence exit
-	set field flag of state to exiting function
-	set field continuation of state to null
+	reset continuation state state to exiting function
 end
 
 ======================================================
