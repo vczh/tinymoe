@@ -33,6 +33,9 @@
     <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp">
       <Filter>Tinymoe</Filter>
     </ClCompile>
+    <ClCompile Include="TestLexicalAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
