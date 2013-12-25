@@ -1,7 +1,8 @@
 tinymoe
 =======
 
-###English-like dynamic typing programming language
+###English-like programming language
+######with dynamic typing and build-in continuation
 
 	module hello world
 	using standard library
