@@ -172,7 +172,7 @@ namespace tinymoe
 						reading++;
 						break;
 					case '>':
-						AddToken(1, CodeTokenType::NE);
+						AddToken(2, CodeTokenType::NE);
 						reading++;
 						break;
 					default:
@@ -216,7 +216,7 @@ namespace tinymoe
 					}
 					else
 					{
-						AddError(1, "Unknown character: " + string(*reading, *reading + 1) + ".");
+						AddError(1, "Unknown character: \"" + string(reading, reading + 1) + "\".");
 					}
 				}
 				break;

@@ -44,3 +44,123 @@ end
 		LAST_TOKEN;
 	LAST_LINE;
 }
+
+TEST_CASE(TestLexerNumber)
+{
+	string code = R"tinymoe(
+11 22. 33.44
+)tinymoe";
+
+	CodeError::List errors;
+	auto codeFile = CodeFile::Parse(code, errors);
+
+	FIRST_LINE(1);
+		FIRST_TOKEN(3);
+		TOKEN(2, 1, "11", CodeTokenType::Integer);
+		TOKEN(2, 4, "22", CodeTokenType::Integer);
+		TOKEN(2, 8, "33.44", CodeTokenType::Float);
+		LAST_TOKEN;
+	LAST_LINE;
+
+	TEST_ASSERT(errors.size() == 1);
+	TEST_ASSERT(errors[0].begin.value == ".");
+}
+
+TEST_CASE(TestLexerOperators)
+{
+	string code = R"tinymoe(
+(),:&+-*/<<=>>==<>
+)tinymoe";
+
+	CodeError::List errors;
+	auto codeFile = CodeFile::Parse(code, errors);
+
+	FIRST_LINE(1);
+		FIRST_TOKEN(15);
+		TOKEN(2, 1, "(", CodeTokenType::OpenBracket);
+		TOKEN(2, 2, ")", CodeTokenType::CloseBracket);
+		TOKEN(2, 3, ",", CodeTokenType::Comma);
+		TOKEN(2, 4, ":", CodeTokenType::Colon);
+		TOKEN(2, 5, "&", CodeTokenType::Concat);
+		TOKEN(2, 6, "+", CodeTokenType::Add);
+		TOKEN(2, 7, "-", CodeTokenType::Sub);
+		TOKEN(2, 8, "*", CodeTokenType::Mul);
+		TOKEN(2, 9, "/", CodeTokenType::Div);
+		TOKEN(2, 10, "<", CodeTokenType::LT);
+		TOKEN(2, 11, "<=", CodeTokenType::LE);
+		TOKEN(2, 13, ">", CodeTokenType::GT);
+		TOKEN(2, 14, ">=", CodeTokenType::GE);
+		TOKEN(2, 16, "=", CodeTokenType::EQ);
+		TOKEN(2, 17, "<>", CodeTokenType::NE);
+		LAST_TOKEN;
+	LAST_LINE;
+}
+
+TEST_CASE(TestLexerKeywords)
+{
+	string code = R"tinymoe(
+module using
+phrase sentence block symbol type
+cps category expression argument
+end and or not
+)tinymoe";
+
+	CodeError::List errors;
+	auto codeFile = CodeFile::Parse(code, errors);
+
+	FIRST_LINE(4);
+		FIRST_TOKEN(2);
+		TOKEN(2, 1, "module", CodeTokenType::Module);
+		TOKEN(2, 8, "using", CodeTokenType::Using);
+		LAST_TOKEN;
+	NEXT_LINE;
+		FIRST_TOKEN(5);
+		TOKEN(3, 1, "phrase", CodeTokenType::Phrase);
+		TOKEN(3, 8, "sentence", CodeTokenType::Sentence);
+		TOKEN(3, 17, "block", CodeTokenType::Block);
+		TOKEN(3, 23, "symbol", CodeTokenType::Symbol);
+		TOKEN(3, 30, "type", CodeTokenType::Type);
+		LAST_TOKEN;
+	NEXT_LINE;
+		FIRST_TOKEN(4);
+		TOKEN(4, 1, "cps", CodeTokenType::CPS);
+		TOKEN(4, 5, "category", CodeTokenType::Category);
+		TOKEN(4, 14, "expression", CodeTokenType::Expression);
+		TOKEN(4, 25, "argument", CodeTokenType::Argument);
+		LAST_TOKEN;
+	NEXT_LINE;
+		FIRST_TOKEN(4);
+		TOKEN(5, 1, "end", CodeTokenType::End);
+		TOKEN(5, 5, "and", CodeTokenType::And);
+		TOKEN(5, 9, "or", CodeTokenType::Or);
+		TOKEN(5, 12, "not", CodeTokenType::Not);
+		LAST_TOKEN;
+	LAST_LINE;
+}
+
+TEST_CASE(TestLexerString)
+{
+	string code = R"tinymoe(
+"First line\r\nSecond line"
+"Unfinished line
+"Unfinished escaping\
+"Third line\r\nFourth line"
+)tinymoe";
+
+	CodeError::List errors;
+	auto codeFile = CodeFile::Parse(code, errors);
+
+	FIRST_LINE(2);
+		FIRST_TOKEN(1);
+		TOKEN(2, 2, "First line\r\nSecond line", CodeTokenType::String);
+		LAST_TOKEN;
+	NEXT_LINE;
+		FIRST_TOKEN(1);
+		TOKEN(5, 2, "Third line\r\nFourth line", CodeTokenType::String);
+		LAST_TOKEN;
+	LAST_LINE;
+
+	TEST_ASSERT(errors.size() == 2);
+	TEST_ASSERT(errors[0].begin.value == "\"Unfinished line");
+	TEST_ASSERT(errors[1].begin.value == "\"Unfinished escaping\\");
+}
