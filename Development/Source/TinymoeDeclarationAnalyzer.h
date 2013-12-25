@@ -5,6 +5,10 @@
 
 namespace tinymoe
 {
+	/*************************************************************
+	Common
+	*************************************************************/
+
 	class CodeFragment
 	{
 	public:
@@ -22,39 +26,11 @@ namespace tinymoe
 		typedef vector<Ptr>							List;
 
 		vector<CodeToken>					identifiers;
-
-		SymbolName();
-	};
-
-	class Declaration abstract : public CodeFragment
-	{
-	public:
-		typedef shared_ptr<Declaration>				Ptr;
-		typedef vector<Ptr>							List;
-
-		Declaration();
 	};
 
 	/*************************************************************
-	Declarations
+	Function Components
 	*************************************************************/
-
-	class SymbolDeclaration : public Declaration
-	{
-	public:
-		SymbolName::Ptr						name;
-
-		SymbolDeclaration();
-	};
-
-	class TypeDeclaration : public Declaration
-	{
-	public:
-		SymbolName::Ptr						name;
-		SymbolName::List					fields;
-
-		TypeDeclaration();
-	};
 
 	enum class FunctionDeclarationType
 	{
@@ -79,8 +55,6 @@ namespace tinymoe
 		SymbolName::Ptr						categoryName;
 		SymbolName::List					followCategories;
 		bool								closable = false;
-
-		FunctionCategory();
 	};
 
 	class FunctionCps : public CodeFragment
@@ -90,69 +64,80 @@ namespace tinymoe
 
 		SymbolName::Ptr						stateName;
 		SymbolName::Ptr						continuationName;
+	};
 
-		FunctionCps();
+	class FunctionFragment abstract : public CodeFragment
+	{
+	public:
+		typedef shared_ptr<FunctionFragment>	Ptr;
+		typedef vector<Ptr>						List;
+	};
+
+	/*************************************************************
+	Declarations
+	*************************************************************/
+
+	class Declaration abstract : public CodeFragment
+	{
+	public:
+		typedef shared_ptr<Declaration>				Ptr;
+		typedef vector<Ptr>							List;
+	};
+
+	class SymbolDeclaration : public Declaration
+	{
+	public:
+		SymbolName::Ptr						name;
+	};
+
+	class TypeDeclaration : public Declaration
+	{
+	public:
+		SymbolName::Ptr						name;
+		SymbolName::List					fields;
 	};
 
 	class FunctionDeclaration : public Declaration
 	{
 	public:
 		typedef shared_ptr<FunctionDeclaration>		Ptr;
-
-		//-----------------------------------------------------
-
-		class Fragment abstract : public CodeFragment
-		{
-		public:
-			typedef shared_ptr<Fragment>			Ptr;
-			typedef vector<Ptr>						List;
-
-			Fragment();
-		};
-
-		class ArgumentFragment abstract : public Fragment
-		{
-		public:
-			FunctionArgumentType			type = FunctionArgumentType::Normal;
-
-			ArgumentFragment();
-		};
-
-		//-----------------------------------------------------
-
-		class NameFragment : public Fragment
-		{
-		public:
-			SymbolName::Ptr					name;
-
-			NameFragment();
-		};
-
-		class VariableArgumentFragment : public ArgumentFragment
-		{
-		public:
-			SymbolName::Ptr					name;
-
-			VariableArgumentFragment();
-		};
-
-		class FunctionArgumentFragment : public ArgumentFragment
-		{
-		public:
-			FunctionDeclaration::Ptr		declaration;
-
-			FunctionArgumentFragment();
-		};
-	public:
-		FunctionDeclarationType				type = FunctionDeclarationType::Phrase;
-		Fragment::List						name;
+		
 		FunctionCategory::Ptr				category;
 		FunctionCps::Ptr					cps;
+		FunctionDeclarationType				type = FunctionDeclarationType::Phrase;
+		FunctionFragment::List				name;
+		SymbolName::Ptr						alias;
 		int									beginLineIndex = -1;
 		int									codeLineIndex = -1;
 		int									endLineIndex = -1;
+	};
 
-		FunctionDeclaration();
+	/*************************************************************
+	Function Fragments
+	*************************************************************/
+
+	class ArgumentFragment abstract : public FunctionFragment
+	{
+	public:
+		FunctionArgumentType			type = FunctionArgumentType::Normal;
+	};
+
+	class NameFragment : public FunctionFragment
+	{
+	public:
+		SymbolName::Ptr					name;
+	};
+
+	class VariableArgumentFragment : public ArgumentFragment
+	{
+	public:
+		SymbolName::Ptr					name;
+	};
+
+	class FunctionArgumentFragment : public ArgumentFragment
+	{
+	public:
+		FunctionDeclaration::Ptr		declaration;
 	};
 
 	/*************************************************************
@@ -167,8 +152,6 @@ namespace tinymoe
 		SymbolName::Ptr						name;
 		SymbolName::List					usings;
 		Declaration::List					declarations;
-
-		Module();
 
 		static Module::Ptr					Parse(CodeFile::Ptr codeFile, CodeError::List& errors);
 	};
