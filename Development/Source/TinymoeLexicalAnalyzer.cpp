@@ -24,9 +24,10 @@ namespace tinymoe
 		int rowNumber = 1;
 		State state = State::Begin;
 
-		auto AddToken = [=, &begin](int length, CodeTokenType type)
+		auto AddToken = [&](int length, CodeTokenType type)
 		{
-			string value(reading, reading + length);
+			auto tokenBegin = begin ? begin : reading;
+			string value(tokenBegin, tokenBegin + length);
 
 			switch (type)
 			{
@@ -108,7 +109,7 @@ namespace tinymoe
 			lastLine->tokens.push_back(token);
 		};
 
-		auto AddError = [=, &errors](int length, const string& message)
+		auto AddError = [&](int length, const string& message)
 		{
 			CodeToken token =
 			{
@@ -198,6 +199,7 @@ namespace tinymoe
 				case '\"':
 					begin = reading;
 					state = State::InString;
+					break;
 				default:
 					if ('0' <= c && c <= '9')
 					{
@@ -227,6 +229,7 @@ namespace tinymoe
 				else
 				{
 					AddToken(reading - begin, CodeTokenType::Integer);
+					state = State::Begin;
 					reading--;
 					begin = nullptr;
 				}
@@ -239,6 +242,7 @@ namespace tinymoe
 				else
 				{
 					AddToken(reading - begin, CodeTokenType::Float);
+					state = State::Begin;
 					reading--;
 					begin = nullptr;
 				}
@@ -249,6 +253,7 @@ namespace tinymoe
 				case '\"':
 					begin++;
 					AddToken(reading - begin - 1, CodeTokenType::String);
+					state = State::Begin;
 					begin = nullptr;
 					break;
 				case '\\':
@@ -283,6 +288,7 @@ namespace tinymoe
 				else
 				{
 					AddToken(reading - begin, CodeTokenType::Identifier);
+					state = State::Begin;
 					reading--;
 					begin = nullptr;
 				}
