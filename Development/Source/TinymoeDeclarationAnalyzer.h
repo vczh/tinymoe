@@ -51,10 +51,10 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<FunctionCategory>		Ptr;
 		
-		SymbolName::Ptr						signalName;			// for non-first block (like else if, catch, etc) to access the result from the previous block
-		SymbolName::Ptr						categoryName;		// category for this block
-		SymbolName::List					followCategories;	// categories to follow
-		bool								closable = false;	// true means this block can be the end of a block series
+		SymbolName::Ptr						signalName;			// (optional) for non-first block (like else if, catch, etc) to access the result from the previous block
+		SymbolName::Ptr						categoryName;		// (optional) category for this block
+		SymbolName::List					followCategories;	// (optional) categories to follow
+		bool								closable = false;	// (optional) true means this block can be the end of a block series
 	};
 
 	class FunctionCps : public CodeFragment
@@ -63,7 +63,7 @@ namespace tinymoe
 		typedef shared_ptr<FunctionCps>				Ptr;
 
 		SymbolName::Ptr						stateName;			// for accessing the CPS state object
-		SymbolName::Ptr						continuationName;	// for accessing the CPS continuation function, statement only
+		SymbolName::Ptr						continuationName;	// (optional) for accessing the CPS continuation function, statement only
 	};
 
 	class FunctionFragment abstract : public CodeFragment
@@ -94,7 +94,7 @@ namespace tinymoe
 	{
 	public:
 		SymbolName::Ptr						name;
-		SymbolName::Ptr						parent;				// optional
+		SymbolName::Ptr						parent;				// (optional)
 		SymbolName::List					fields;
 	};
 
@@ -103,11 +103,11 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<FunctionDeclaration>		Ptr;
 		
-		FunctionCategory::Ptr				category;			// for block only
-		FunctionCps::Ptr					cps;				// for statement and block only
+		FunctionCategory::Ptr				category;			// (optional) for block only
+		FunctionCps::Ptr					cps;				// (optional) for statement and block only
 		FunctionDeclarationType				type = FunctionDeclarationType::Phrase;
-		FunctionFragment::List				name;
-		SymbolName::Ptr						alias;				// a name that referencing this function
+		FunctionFragment::List				name;				// function name and arguments
+		SymbolName::Ptr						alias;				// (optional) a name that referencing this function
 		int									beginLineIndex = -1;
 		int									codeLineIndex = -1;
 		int									endLineIndex = -1;
@@ -134,7 +134,7 @@ namespace tinymoe
 	public:
 		FunctionArgumentType				type;				// type of the form
 		SymbolName::Ptr						name;				// name of the argument
-		SymbolName::Ptr						receivingType;		// receiving type for Normal argument only to do multiple dispatching
+		SymbolName::Ptr						receivingType;		// (optional) receiving type for Normal argument only to do multiple dispatching
 	};
 
 	class FunctionArgumentFragment : public ArgumentFragment
