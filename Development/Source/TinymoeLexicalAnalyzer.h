@@ -57,6 +57,8 @@ namespace tinymoe
 		int								row;
 		int								column;
 		string							value;
+
+		bool							IsNameFragmentToken();
 	};
 
 	struct CodeError
@@ -70,16 +72,19 @@ namespace tinymoe
 
 	struct CodeLine
 	{
-		typedef vector<shared_ptr<CodeLine>>	List;
+		typedef shared_ptr<CodeLine>			Ptr;
+		typedef vector<Ptr>						List;
 
 		CodeToken::List					tokens;
 	};
 
 	struct CodeFile
 	{
+		typedef shared_ptr<CodeFile>			Ptr;
+
 		CodeLine::List					lines;
 
-		static shared_ptr<CodeFile>		Parse(const string& code, CodeError::List& errors);
+		static CodeFile::Ptr			Parse(const string& code, CodeError::List& errors);
 	};
 }
 

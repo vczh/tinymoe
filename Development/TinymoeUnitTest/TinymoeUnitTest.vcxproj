@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Tinymoe.cpp" />
+    <ClCompile Include="..\Source\TinymoeDeclarationAnalyzer.cpp" />
     <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TestLexicalAnalyzer.cpp" />
@@ -90,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Tinymoe.h" />
+    <ClInclude Include="..\Source\TinymoeDeclarationAnalyzer.h" />
     <ClInclude Include="..\Source\TinymoeLexicalAnalyzer.h" />
     <ClInclude Include="..\Source\TinymoeSTL.h" />
     <ClInclude Include="UnitTest.h" />

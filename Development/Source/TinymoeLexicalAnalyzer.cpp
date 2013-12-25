@@ -2,11 +2,42 @@
 
 namespace tinymoe
 {
+
+	/*************************************************************
+	CodeToken
+	*************************************************************/
+
+	bool CodeToken::IsNameFragmentToken()
+	{
+		switch (type)
+		{
+		case CodeTokenType::Identifier:
+		case CodeTokenType::Module:
+		case CodeTokenType::Using:
+		case CodeTokenType::Phrase:
+		case CodeTokenType::Sentence:
+		case CodeTokenType::Block:
+		case CodeTokenType::Symbol:
+		case CodeTokenType::Type:
+		case CodeTokenType::CPS:
+		case CodeTokenType::Category:
+		case CodeTokenType::Expression:
+		case CodeTokenType::Argument:
+		case CodeTokenType::End:
+		case CodeTokenType::And:
+		case CodeTokenType::Or:
+		case CodeTokenType::Not:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	/*************************************************************
 	CodeFile
 	*************************************************************/
 
-	shared_ptr<CodeFile> CodeFile::Parse(const string& code, CodeError::List& errors)
+	CodeFile::Ptr CodeFile::Parse(const string& code, CodeError::List& errors)
 	{
 		auto codeFile = make_shared<CodeFile>();
 		enum class State
