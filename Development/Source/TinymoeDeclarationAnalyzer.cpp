@@ -453,6 +453,7 @@ namespace tinymoe
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
 		auto functionToken = codeFile->lines[lineIndex]->tokens[0];
 		auto decl = make_shared<FunctionDeclaration>();
+		decl->beginLineIndex = lineIndex;
 		
 		if (codeFile->lines[lineIndex]->tokens[0].type == CodeTokenType::CPS)
 		{
@@ -556,6 +557,7 @@ namespace tinymoe
 			}
 		}
 
+		decl->endLineIndex = lineIndex - 1;
 		while ((size_t)lineIndex < codeFile->lines.size())
 		{
 			auto token = codeFile->lines[lineIndex]->tokens[0];
@@ -569,9 +571,17 @@ namespace tinymoe
 			case CodeTokenType::Sentence:
 			case CodeTokenType::Block:
 				goto END_OF_FUNCTION_BODY_SEARCHING;
+			default:
+				lineIndex++;
 			}
 		}
+
 	END_OF_FUNCTION_BODY_SEARCHING:
+		if (lineIndex > decl->endLineIndex + 1)
+		{
+			decl->codeLineIndex = decl->endLineIndex + 1;
+			decl->endLineIndex = lineIndex - 1;
+		}
 		return decl;
 	}
 

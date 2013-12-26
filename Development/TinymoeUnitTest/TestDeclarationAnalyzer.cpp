@@ -571,6 +571,46 @@ sentence abort
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 0);
 
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
+		TEST_ASSERT(!decl->cps);
+		TEST_ASSERT(!decl->category);
+		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(!decl->alias);
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+
+		TEST_ASSERT(decl->name.size() == 1);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+		}
+	}
+	{
+		string code = R"tinymoe(
+sentence abort
+	do something
+end
+
+sentence halt
+	do something
+end
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 0);
+		
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == 1);
+		TEST_ASSERT(decl->endLineIndex == 2);
 		TEST_ASSERT(!decl->cps);
 		TEST_ASSERT(!decl->category);
 		TEST_ASSERT(!decl->bodyName);
@@ -598,7 +638,10 @@ sentence abort : an alias
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 0);
-
+		
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
 		TEST_ASSERT(!decl->cps);
 		TEST_ASSERT(!decl->category);
 		TEST_ASSERT(!decl->bodyName);
@@ -629,7 +672,10 @@ sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an 
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 0);
-
+		
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
 		TEST_ASSERT(!decl->cps);
 		TEST_ASSERT(!decl->category);
 		TEST_ASSERT(!decl->bodyName);
@@ -720,6 +766,10 @@ cps (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
+
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
 		TEST_ASSERT(errors[1].begin.value == "cps");
@@ -740,6 +790,10 @@ category
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 1);
+
 		TEST_ASSERT(errors[0].begin.value == "category");
 		TEST_ASSERT(errors[0].end.value == "category");
 		TEST_ASSERT(errors[1].begin.value == "category");
@@ -761,6 +815,10 @@ category
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 3);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 2);
+
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
 		TEST_ASSERT(errors[1].begin.value == "cps");
@@ -784,6 +842,10 @@ cps (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 1);
+
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
 		TEST_ASSERT(errors[1].begin.value == "cps");
@@ -804,6 +866,10 @@ phrase whatever
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 1);
+
 		TEST_ASSERT(errors[0].begin.value == "phrase");
 		TEST_ASSERT(errors[0].end.value == "phrase");
 	}
@@ -823,6 +889,10 @@ phrase whatever
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 2);
+
 		TEST_ASSERT(errors[0].begin.value == "phrase");
 		TEST_ASSERT(errors[0].end.value == "phrase");
 	}
@@ -842,6 +912,10 @@ sentence whatever
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 2);
+
 		TEST_ASSERT(errors[0].begin.value == "sentence");
 		TEST_ASSERT(errors[0].end.value == "sentence");
 	}
@@ -859,6 +933,10 @@ block whatever
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
+
 		TEST_ASSERT(errors[0].begin.value == "block");
 		TEST_ASSERT(errors[0].end.value == "block");
 	}
