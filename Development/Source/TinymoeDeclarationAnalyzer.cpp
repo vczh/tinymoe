@@ -411,6 +411,7 @@ namespace tinymoe
 			if (it->type == CodeTokenType::Colon)
 			{
 				decl->alias = SymbolName::ParseToFarest(++it, end, "Function alias", ownerToken, errors);
+				break;
 			}
 			else if (it->type == CodeTokenType::OpenBracket)
 			{

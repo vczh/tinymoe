@@ -1130,4 +1130,25 @@ phrase (x) (y)
 		TEST_ASSERT(errors[1].begin.value == "phrase");
 		TEST_ASSERT(errors[1].end.value == "phrase");
 	}
+	{
+		string code = R"tinymoe(
+phrase a : b )
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
+
+		TEST_ASSERT(errors[0].begin.value == ")");
+		TEST_ASSERT(errors[0].end.value == ")");
+	}
 }
