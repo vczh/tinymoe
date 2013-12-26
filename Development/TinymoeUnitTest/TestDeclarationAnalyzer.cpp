@@ -556,6 +556,27 @@ category
 
 TEST_CASE(TestParseCorrectFunction)
 {
+	{
+		string code = R"tinymoe(
+sentence abort
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+
+		TEST_ASSERT(!decl->cps);
+		TEST_ASSERT(!decl->category);
+		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(!decl->alias);
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+	}
 }
 
 TEST_CASE(TestParseWrongFunction)
@@ -573,9 +594,11 @@ cps (state)
 		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
-		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors.size() == 2);
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[1].begin.value == "cps");
+		TEST_ASSERT(errors[1].end.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -591,9 +614,11 @@ category
 		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
-		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors.size() == 2);
 		TEST_ASSERT(errors[0].begin.value == "category");
 		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[1].begin.value == "category");
+		TEST_ASSERT(errors[1].end.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -610,9 +635,13 @@ category
 		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
-		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors.size() == 3);
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[1].begin.value == "cps");
+		TEST_ASSERT(errors[1].end.value == "cps");
+		TEST_ASSERT(errors[2].begin.value == "cps");
+		TEST_ASSERT(errors[2].end.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -629,8 +658,83 @@ cps (state)
 		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
-		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors.size() == 2);
 		TEST_ASSERT(errors[0].begin.value == "cps");
 		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[1].begin.value == "cps");
+		TEST_ASSERT(errors[1].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+cps (state)
+phrase whatever
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "phrase");
+		TEST_ASSERT(errors[0].end.value == "phrase");
+	}
+	{
+		string code = R"tinymoe(
+category
+	closable
+phrase whatever
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "phrase");
+		TEST_ASSERT(errors[0].end.value == "phrase");
+	}
+	{
+		string code = R"tinymoe(
+category
+	closable
+sentence whatever
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "sentence");
+		TEST_ASSERT(errors[0].end.value == "sentence");
+	}
+	{
+		string code = R"tinymoe(
+block whatever
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "block");
+		TEST_ASSERT(errors[0].end.value == "block");
 	}
 }

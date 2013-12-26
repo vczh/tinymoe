@@ -119,6 +119,7 @@ namespace tinymoe
 		FunctionCps::Ptr					cps;				// (optional) for statement and block only
 		FunctionCategory::Ptr				category;			// (optional) for block only
 		FunctionDeclarationType				type = FunctionDeclarationType::Phrase;
+		FunctionFragment::Ptr				bodyName;			// (optional) argument for block body, block only
 		FunctionFragment::List				name;				// function name and arguments
 		SymbolName::Ptr						alias;				// (optional) a name that referencing this function
 		int									beginLineIndex = -1;

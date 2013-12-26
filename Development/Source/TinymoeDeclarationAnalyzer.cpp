@@ -430,6 +430,42 @@ namespace tinymoe
 		}
 
 	END_OF_PARSING:
+		if (decl->cps)
+		{
+			if (decl->type == FunctionDeclarationType::Phrase)
+			{
+				CodeError error = {
+					functionToken,
+					functionToken,
+					"Phrase should not have a continuation definition.",
+				};
+				errors.push_back(error);
+			}
+		}
+		if (decl->category)
+		{
+			if (decl->type != FunctionDeclarationType::Block)
+			{
+				CodeError error = {
+					functionToken,
+					functionToken,
+					"Phrase and sentence should not have a category definition.",
+				};
+				errors.push_back(error);
+			}
+		}
+		if (decl->type == FunctionDeclarationType::Block)
+		{
+			if (!decl->bodyName)
+			{
+				CodeError error = {
+					functionToken,
+					functionToken,
+					"Block name should start with an argument for the block body.",
+				};
+				errors.push_back(error);
+			}
+		}
 		return decl;
 	}
 
