@@ -696,6 +696,7 @@ sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an 
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
 			TEST_ASSERT(name->name->identifiers[0].value == "x");
+			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[2]);
@@ -707,6 +708,7 @@ sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an 
 			TEST_ASSERT(name->type == FunctionArgumentType::Expression);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
 			TEST_ASSERT(name->name->identifiers[0].value == "y");
+			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[4]);
@@ -718,6 +720,7 @@ sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an 
 			TEST_ASSERT(name->type == FunctionArgumentType::Argument);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
 			TEST_ASSERT(name->name->identifiers[0].value == "z");
+			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[6]);
@@ -774,15 +777,68 @@ block (body) abort
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
 			TEST_ASSERT(name->name->identifiers[0].value == "body");
+			TEST_ASSERT(!name->receivingType);
 		}
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
-
+		
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
 			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+		}
+	}
+	{
+		string code = R"tinymoe(
+sentence remove (item) from (items : collection)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+		
+		TEST_ASSERT(decl->beginLineIndex == 0);
+		TEST_ASSERT(decl->codeLineIndex == -1);
+		TEST_ASSERT(decl->endLineIndex == 0);
+		TEST_ASSERT(!decl->cps);
+		TEST_ASSERT(!decl->category);
+		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(!decl->alias);
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+		
+		TEST_ASSERT(decl->name.size() == 4);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "remove");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "item");
+			TEST_ASSERT(!name->receivingType);
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[2]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "from");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[3]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "items");
+			TEST_ASSERT(name->receivingType);
+			TEST_ASSERT(name->receivingType->identifiers.size() == 1);
+			TEST_ASSERT(name->receivingType->identifiers[0].value == "collection");
 		}
 	}
 }

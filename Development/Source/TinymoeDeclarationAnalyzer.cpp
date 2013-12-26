@@ -661,31 +661,35 @@ namespace tinymoe
 			return nullptr;
 		}
 
-		if (it->value == "expression")
-		{
-			auto decl = make_shared<VariableArgumentFragment>();
-			decl->type = FunctionArgumentType::Expression;
-			decl->name = SymbolName::ParseToFarest(++it, end, "Function argument", ownerToken, errors);
-			return decl;
-		}
-		else if (it->value == "argument")
-		{
-			auto decl = make_shared<VariableArgumentFragment>();
-			decl->type = FunctionArgumentType::Argument;
-			decl->name = SymbolName::ParseToFarest(++it, end, "Function argument", ownerToken, errors);
-			return decl;
-		}
-		else if (it->value == "phrase" || it->value == "sentence")
+		if (it->type == CodeTokenType::Phrase || it->type == CodeTokenType::Sentence)
 		{
 			auto decl = make_shared<FunctionArgumentFragment>();
 			decl->declaration = FunctionDeclaration::Parse(it, end, nullptr, ownerToken, errors);
 			return decl;
 		}
-		else if (it->IsNameFragmentToken())
+		if (it->IsNameFragmentToken() && it->type != CodeTokenType::Block)
 		{
 			auto decl = make_shared<VariableArgumentFragment>();
-			decl->type = FunctionArgumentType::Normal;
+			if (it->type == CodeTokenType::Expression)
+			{
+				decl->type = FunctionArgumentType::Expression;
+				it++;
+			}
+			else if (it->type == CodeTokenType::Argument)
+			{
+				decl->type = FunctionArgumentType::Argument;
+				it++;
+			}
+			else
+			{
+				decl->type = FunctionArgumentType::Normal;
+			}
 			decl->name = SymbolName::ParseToFarest(it, end, "Function argument", ownerToken, errors);
+
+			if (it->type == CodeTokenType::Colon)
+			{
+				decl->receivingType = SymbolName::ParseToFarest(++it, end, "Function argument type", ownerToken, errors);
+			}
 			return decl;
 		}
 		else
