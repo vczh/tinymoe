@@ -517,46 +517,105 @@ namespace tinymoe
 					goto END_OF_PARSING;
 				}
 			}
+
+			if (decl->cps)
+			{
+				if (decl->type == FunctionDeclarationType::Phrase)
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Phrase should not have a continuation definition.",
+					};
+					errors.push_back(error);
+				}
+			}
+			if (decl->category)
+			{
+				if (decl->type != FunctionDeclarationType::Block)
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Phrase and sentence should not have a category definition.",
+					};
+					errors.push_back(error);
+				}
+			}
+			if (decl->type == FunctionDeclarationType::Block)
+			{
+				if (!decl->bodyName)
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Block name should start with an argument for the block body.",
+					};
+					errors.push_back(error);
+				}
+			}
+
+			if (decl->name.size() == 0)
+			{
+				CodeError error = {
+					functionToken,
+					functionToken,
+					"Function name should not be empty.",
+				};
+				errors.push_back(error);
+			}
+			else 
+			{
+				if (decl->type != FunctionDeclarationType::Phrase)
+				{
+					if (!dynamic_pointer_cast<NameFragment>(decl->name[0]))
+					{
+						CodeError error = {
+							functionToken,
+							functionToken,
+							"Sentence and block's name should not begin with an argument.",
+						};
+						errors.push_back(error);
+					}
+				}
+
+				int nameCount = 0;
+				bool lastNameIsArgument = false;
+				for (auto name : decl->name)
+				{
+					if (dynamic_pointer_cast<NameFragment>(name))
+					{
+						nameCount++;
+						lastNameIsArgument = false;
+					}
+					else
+					{
+						if (lastNameIsArgument)
+						{
+							CodeError error = {
+								functionToken,
+								functionToken,
+								"Function argument cannot appear just after another function argument.",
+							};
+							errors.push_back(error);
+						}
+						lastNameIsArgument = true;
+					}
+				}
+
+				if (nameCount == 0)
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Function name should not be form just by function arguments.",
+					};
+					errors.push_back(error);
+				}
+			}
 		}
 
 	END_OF_PARSING:
-		if (decl->cps)
-		{
-			if (decl->type == FunctionDeclarationType::Phrase)
-			{
-				CodeError error = {
-					functionToken,
-					functionToken,
-					"Phrase should not have a continuation definition.",
-				};
-				errors.push_back(error);
-			}
-		}
-		if (decl->category)
-		{
-			if (decl->type != FunctionDeclarationType::Block)
-			{
-				CodeError error = {
-					functionToken,
-					functionToken,
-					"Phrase and sentence should not have a category definition.",
-				};
-				errors.push_back(error);
-			}
-		}
-		if (decl->type == FunctionDeclarationType::Block)
-		{
-			if (!decl->bodyName)
-			{
-				CodeError error = {
-					functionToken,
-					functionToken,
-					"Block name should start with an argument for the block body.",
-				};
-				errors.push_back(error);
-			}
-		}
-
 		decl->endLineIndex = lineIndex - 1;
 		while ((size_t)lineIndex < codeFile->lines.size())
 		{
