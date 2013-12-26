@@ -41,7 +41,7 @@ end
 ======================================================
 
 cps (state)
-block (body) repeat alias repeat statement
+block (body) repeat : repeat statement
 	invoke body with state
 	select flag field of state
 		case breaking repeating

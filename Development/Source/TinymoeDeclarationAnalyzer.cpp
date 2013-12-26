@@ -367,7 +367,69 @@ namespace tinymoe
 	FunctionDeclaration::Ptr FunctionDeclaration::Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex)
 	{
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
+		auto functionToken = codeFile->lines[lineIndex]->tokens[0];
 		auto decl = make_shared<FunctionDeclaration>();
+		
+		if (codeFile->lines[lineIndex]->tokens[0].type == CodeTokenType::CPS)
+		{
+			decl->cps = FunctionCps::Parse(codeFile, errors, lineIndex);
+		}
+		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size())
+		{
+			CodeError error = {
+				functionToken,
+				functionToken,
+				"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+			};
+			errors.push_back(error);
+			goto END_OF_PARSING;
+		}
+		if (codeFile->lines[lineIndex]->tokens[0].type == CodeTokenType::Category)
+		{
+			decl->category = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		}
+		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size())
+		{
+			CodeError error = {
+				functionToken,
+				functionToken,
+				"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+			};
+			errors.push_back(error);
+			goto END_OF_PARSING;
+		}
+		
+		{
+			auto line = codeFile->lines[lineIndex++];
+			auto it = line->tokens.begin();
+			functionToken = *it;
+
+			switch (it->type)
+			{
+			case CodeTokenType::Phrase:
+				decl->type = FunctionDeclarationType::Phrase;
+				break;
+			case CodeTokenType::Sentence:
+				decl->type = FunctionDeclarationType::Sentence;
+				break;
+			case CodeTokenType::Block:
+				decl->type = FunctionDeclarationType::Block;
+				break;
+			default:
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+					};
+					errors.push_back(error);
+					lineIndex--;
+					goto END_OF_PARSING;
+				}
+			}
+		}
+
+	END_OF_PARSING:
 		return decl;
 	}
 

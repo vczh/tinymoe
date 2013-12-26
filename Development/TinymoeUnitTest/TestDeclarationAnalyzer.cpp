@@ -553,3 +553,84 @@ category
 		TEST_ASSERT(errors[0].end.value == "category");
 	}
 }
+
+TEST_CASE(TestParseCorrectFunction)
+{
+}
+
+TEST_CASE(TestParseWrongFunction)
+{
+	{
+		string code = R"tinymoe(
+cps (state)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+category
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "category");
+		TEST_ASSERT(errors[0].end.value == "category");
+	}
+	{
+		string code = R"tinymoe(
+cps (state)
+category
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+category
+	closable
+cps (state)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+}
