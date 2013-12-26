@@ -203,3 +203,229 @@ end
 		TEST_ASSERT(errors[0].end.value == "+");
 	}
 }
+
+TEST_CASE(TestParseCorrectCps)
+{
+	{
+		string code = R"tinymoe(
+cps (state)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+
+		TEST_ASSERT(decl->stateName);
+		TEST_ASSERT(decl->stateName->identifiers.size() == 1);
+		TEST_ASSERT(decl->stateName->identifiers[0].value == "state");
+		TEST_ASSERT(!decl->continuationName);
+	}
+	{
+		string code = R"tinymoe(
+cps (state) (continuation)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+
+		TEST_ASSERT(decl->stateName);
+		TEST_ASSERT(decl->stateName->identifiers.size() == 1);
+		TEST_ASSERT(decl->stateName->identifiers[0].value == "state");
+		TEST_ASSERT(decl->continuationName);
+		TEST_ASSERT(decl->continuationName->identifiers.size() == 1);
+		TEST_ASSERT(decl->continuationName->identifiers[0].value == "continuation");
+	}
+}
+
+TEST_CASE(TestParseWrongCps)
+{
+	{
+		string code = R"tinymoe(
+cps
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+cps +
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "+");
+		TEST_ASSERT(errors[0].end.value == "+");
+	}
+	{
+		string code = R"tinymoe(
+cps ()
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+cps (state
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+cps (state) (
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(errors[0].begin.value == "cps");
+		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[1].begin.value == "cps");
+		TEST_ASSERT(errors[1].end.value == "cps");
+	}
+	{
+		string code = R"tinymoe(
+cps (state) )
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == ")");
+		TEST_ASSERT(errors[0].end.value == ")");
+	}
+	{
+		string code = R"tinymoe(
+cps (state) (continuation) (too many parameters)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCps::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "(");
+		TEST_ASSERT(errors[0].end.value == "(");
+	}
+}
+
+TEST_CASE(TestParseCorrectCategory)
+{
+	{
+		string code = R"tinymoe(
+category
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 0);
+		
+		TEST_ASSERT(!decl->signalName);
+		TEST_ASSERT(!decl->categoryName);
+		TEST_ASSERT(decl->followCategories.size() == 0);
+		TEST_ASSERT(decl->closable);
+	}
+	{
+		string code = R"tinymoe(
+category (signal)
+	follow SEH try
+	start SEH catch
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 0);
+		
+		TEST_ASSERT(decl->signalName);
+		TEST_ASSERT(decl->signalName->identifiers.size() == 1);
+		TEST_ASSERT(decl->signalName->identifiers[0].value == "signal");
+		TEST_ASSERT(decl->categoryName);
+		TEST_ASSERT(decl->categoryName->identifiers.size() == 2);
+		TEST_ASSERT(decl->categoryName->identifiers[0].value == "SEH");
+		TEST_ASSERT(decl->categoryName->identifiers[1].value == "catch");
+		TEST_ASSERT(decl->followCategories.size() == 1);
+		TEST_ASSERT(decl->followCategories[0]->identifiers.size() == 2);
+		TEST_ASSERT(decl->followCategories[0]->identifiers[0].value == "SEH");
+		TEST_ASSERT(decl->followCategories[0]->identifiers[1].value == "try");
+		TEST_ASSERT(!decl->closable);
+	}
+}

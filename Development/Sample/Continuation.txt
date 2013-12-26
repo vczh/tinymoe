@@ -96,7 +96,7 @@ end
 cps (state)
 category (signal)
 	follow IFELSE if
-	start IFELSE else if
+	start IFELSE if
 	closable
 block (body) if (condition)
 	set the result to not signal and condition

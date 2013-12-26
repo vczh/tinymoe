@@ -19,6 +19,34 @@ namespace tinymoe
 	SymbolName
 	*************************************************************/
 
+	bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors)
+	{
+		if (it == end)
+		{
+			CodeError error = {
+				ownerToken,
+				ownerToken,
+				"Incomplete code, \"" + content + "\" expected.",
+			};
+			errors.push_back(error);
+			return false;
+		}
+
+		if (it->type != tokenType)
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"\"" + content + "\" expected but \"" + it->value + "\" found.",
+			};
+			errors.push_back(error);
+			return false;
+		}
+
+		it++;
+		return true;
+	}
+
 	SymbolName::Ptr SymbolName::ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
 	{
 		auto symbolName = make_shared<SymbolName>();
@@ -77,6 +105,164 @@ namespace tinymoe
 			errors.push_back(error);
 		}
 		return symbolName;
+	}
+
+	/*************************************************************
+	FunctionCps
+	*************************************************************/
+
+	FunctionCps::Ptr FunctionCps::Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex)
+	{
+		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
+		auto line = codeFile->lines[lineIndex++];
+		auto it = line->tokens.begin();
+		auto cpsToken = *it;
+		if (it->type != CodeTokenType::CPS)
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"CPS definition should start with \"cps\".",
+			};
+			errors.push_back(error);
+			return nullptr;
+		}
+		it++;
+
+		auto decl = make_shared<FunctionCps>();
+		if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", cpsToken, errors)) goto END_OF_PARSING;
+		decl->stateName = SymbolName::ParseToFarest(it, line->tokens.end(), "CPS state", cpsToken, errors);
+		if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", cpsToken, errors)) goto END_OF_PARSING;
+		if (it == line->tokens.end()) goto END_OF_PARSING;
+		
+		if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", cpsToken, errors)) goto END_OF_PARSING;
+		decl->continuationName = SymbolName::ParseToFarest(it, line->tokens.end(), "CPS continuation", cpsToken, errors);
+		if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", cpsToken, errors)) goto END_OF_PARSING;
+		if (it != line->tokens.end())
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"Too many tokens.",
+			};
+			errors.push_back(error);
+		}
+	END_OF_PARSING:
+		return decl;
+	}
+
+	/*************************************************************
+	FunctionCategory
+	*************************************************************/
+
+	FunctionCategory::Ptr FunctionCategory::Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex)
+	{
+		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
+		auto line = codeFile->lines[lineIndex++];
+		auto it = line->tokens.begin();
+		auto categoryToken = *it;
+		if (it->type != CodeTokenType::Category)
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"Category definition should start with \"category\".",
+			};
+			errors.push_back(error);
+			return nullptr;
+		}
+		it++;
+
+		auto decl = make_shared<FunctionCategory>();
+		if (it != line->tokens.end())
+		{
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
+			decl->signalName = SymbolName::ParseToFarest(it, line->tokens.end(), "Category signal", categoryToken, errors);
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
+
+			if (it != line->tokens.end())
+			{
+				CodeError error = {
+					*it,
+					*it,
+					"Too many tokens.",
+				};
+				errors.push_back(error);
+			}
+		}
+	END_OF_SIGNAL_PARSING:
+
+		while ((size_t)lineIndex < codeFile->lines.size())
+		{
+			line = codeFile->lines[lineIndex++];
+			it = line->tokens.begin();
+
+			if (it->value == "start")
+			{
+				if (decl->categoryName)
+				{
+					CodeError error = {
+						*it,
+						*it,
+						"Too many start category name.",
+					};
+					errors.push_back(error);
+				}
+				else
+				{
+					decl->categoryName = SymbolName::ParseToEnd(++it, line->tokens.end(), "Start category", categoryToken, errors);
+				}
+			}
+			else if (it->value == "follow")
+			{
+				decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Follow category", categoryToken, errors));
+			}
+			else if (it->value == "closable")
+			{
+				decl->closable = true;
+				if (++it != line->tokens.end())
+				{
+					CodeError error = {
+						*it,
+						*it,
+						"Too many tokens.",
+					};
+					errors.push_back(error);
+				}
+			}
+			else
+			{
+				lineIndex--;
+				break;
+			}
+		}
+
+		if (decl->signalName)
+		{
+			if (decl->followCategories.size() == 0)
+			{
+				CodeError error = {
+					categoryToken,
+					categoryToken,
+					"A category with signal parameter should have follow categories.",
+				};
+				errors.push_back(error);
+			}
+		}
+
+		if (!decl->categoryName)
+		{
+			if (!decl->closable)
+			{
+				CodeError error = {
+					categoryToken,
+					categoryToken,
+					"A category without start category name should be closable.",
+				};
+				errors.push_back(error);
+			}
+		}
+		return decl;
 	}
 
 	/*************************************************************

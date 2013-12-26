@@ -24,6 +24,7 @@ namespace tinymoe
 
 		vector<CodeToken>					identifiers;
 
+		static bool							ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors);
 		static SymbolName::Ptr				ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
 		static SymbolName::Ptr				ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
 	};
@@ -46,6 +47,17 @@ namespace tinymoe
 		Expression,			// for block only, represnets a re-evaluable expression
 	};
 
+	class FunctionCps : public CodeFragment
+	{
+	public:
+		typedef shared_ptr<FunctionCps>				Ptr;
+
+		SymbolName::Ptr						stateName;			// for accessing the CPS state object
+		SymbolName::Ptr						continuationName;	// (optional) for accessing the CPS continuation function, statement only
+		
+		static FunctionCps::Ptr				Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
+	};
+
 	class FunctionCategory : public CodeFragment
 	{
 	public:
@@ -55,15 +67,8 @@ namespace tinymoe
 		SymbolName::Ptr						categoryName;		// (optional) category for this block
 		SymbolName::List					followCategories;	// (optional) categories to follow
 		bool								closable = false;	// (optional) true means this block can be the end of a block series
-	};
-
-	class FunctionCps : public CodeFragment
-	{
-	public:
-		typedef shared_ptr<FunctionCps>				Ptr;
-
-		SymbolName::Ptr						stateName;			// for accessing the CPS state object
-		SymbolName::Ptr						continuationName;	// (optional) for accessing the CPS continuation function, statement only
+		
+		static FunctionCategory::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 	};
 
 	class FunctionFragment abstract : public CodeFragment
@@ -111,8 +116,8 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<FunctionDeclaration>		Ptr;
 		
-		FunctionCategory::Ptr				category;			// (optional) for block only
 		FunctionCps::Ptr					cps;				// (optional) for statement and block only
+		FunctionCategory::Ptr				category;			// (optional) for block only
 		FunctionDeclarationType				type = FunctionDeclarationType::Phrase;
 		FunctionFragment::List				name;				// function name and arguments
 		SymbolName::Ptr						alias;				// (optional) a name that referencing this function
