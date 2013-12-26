@@ -402,6 +402,7 @@ category
 		string code = R"tinymoe(
 category (signal)
 	follow SEH try
+	follow SEH catch
 	start SEH catch
 )tinymoe";
 		CodeError::List errors;
@@ -412,7 +413,7 @@ category (signal)
 		int lineIndex = 0;
 		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
-		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 0);
 		
 		TEST_ASSERT(decl->signalName);
@@ -422,10 +423,133 @@ category (signal)
 		TEST_ASSERT(decl->categoryName->identifiers.size() == 2);
 		TEST_ASSERT(decl->categoryName->identifiers[0].value == "SEH");
 		TEST_ASSERT(decl->categoryName->identifiers[1].value == "catch");
-		TEST_ASSERT(decl->followCategories.size() == 1);
+		TEST_ASSERT(decl->followCategories.size() == 2);
 		TEST_ASSERT(decl->followCategories[0]->identifiers.size() == 2);
 		TEST_ASSERT(decl->followCategories[0]->identifiers[0].value == "SEH");
 		TEST_ASSERT(decl->followCategories[0]->identifiers[1].value == "try");
+		TEST_ASSERT(decl->followCategories[1]->identifiers.size() == 2);
+		TEST_ASSERT(decl->followCategories[1]->identifiers[0].value == "SEH");
+		TEST_ASSERT(decl->followCategories[1]->identifiers[1].value == "catch");
 		TEST_ASSERT(!decl->closable);
+	}
+}
+
+TEST_CASE(TestParseWrongCategory)
+{
+	{
+		string code = R"tinymoe(
+category (state
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(errors[0].begin.value == "category");
+		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[1].begin.value == "category");
+		TEST_ASSERT(errors[1].end.value == "category");
+	}
+	{
+		string code = R"tinymoe(
+category (state)
+	start illegal + name
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 3);
+		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(errors[0].begin.value == "+");
+		TEST_ASSERT(errors[0].end.value == "+");
+		TEST_ASSERT(errors[1].begin.value == "category");
+		TEST_ASSERT(errors[1].end.value == "category");
+	}
+	{
+		string code = R"tinymoe(
+category (state)
+	start SEH try
+	follow
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 4);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "follow");
+		TEST_ASSERT(errors[0].end.value == "follow");
+	}
+	{
+		string code = R"tinymoe(
+category (signal)
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(errors[0].begin.value == "category");
+		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[1].begin.value == "category");
+		TEST_ASSERT(errors[1].end.value == "category");
+	}
+	{
+		string code = R"tinymoe(
+category (signal)
+	closable
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "category");
+		TEST_ASSERT(errors[0].end.value == "category");
+	}
+	{
+		string code = R"tinymoe(
+category
+	follow a category
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionCategory::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 2);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors[0].begin.value == "category");
+		TEST_ASSERT(errors[0].end.value == "category");
 	}
 }

@@ -210,12 +210,14 @@ namespace tinymoe
 				}
 				else
 				{
-					decl->categoryName = SymbolName::ParseToEnd(++it, line->tokens.end(), "Start category", categoryToken, errors);
+					auto startToken = *it;
+					decl->categoryName = SymbolName::ParseToEnd(++it, line->tokens.end(), "Start category", startToken, errors);
 				}
 			}
 			else if (it->value == "follow")
 			{
-				decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Follow category", categoryToken, errors));
+				auto followToken = *it;
+				decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Follow category", followToken, errors));
 			}
 			else if (it->value == "closable")
 			{
