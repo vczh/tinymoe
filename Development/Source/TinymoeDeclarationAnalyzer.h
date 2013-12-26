@@ -23,6 +23,8 @@ namespace tinymoe
 		typedef vector<Ptr>							List;
 
 		vector<CodeToken>					identifiers;
+
+		static SymbolName::Ptr				ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
 	};
 
 	/*************************************************************

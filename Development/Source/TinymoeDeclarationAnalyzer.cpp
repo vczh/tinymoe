@@ -16,6 +16,43 @@ namespace tinymoe
 	}
 
 	/*************************************************************
+	CodeFragment
+	*************************************************************/
+
+	SymbolName::Ptr SymbolName::ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
+	{
+		auto symbolName = make_shared<SymbolName>();
+		while (it != end)
+		{
+			if (it->IsNameFragmentToken())
+			{
+				symbolName->identifiers.push_back(*it);
+			}
+			else
+			{
+				CodeError error = {
+					*it,
+					*it,
+					"Token is not a legal name: \"" + it->value + "\".",
+				};
+				errors.push_back(error);
+			}
+			it++;
+		}
+
+		if (symbolName->identifiers.size() == 0)
+		{
+			CodeError error = {
+				ownerToken,
+				ownerToken,
+				ownerName + " name should be empty.",
+			};
+			errors.push_back(error);
+		}
+		return symbolName;
+	}
+
+	/*************************************************************
 	SymbolDeclaration
 	*************************************************************/
 
@@ -36,37 +73,7 @@ namespace tinymoe
 		}
 
 		auto decl = make_shared<SymbolDeclaration>();
-		decl->name = make_shared<SymbolName>();
-
-		while (++it != line->tokens.end())
-		{
-			if (it->IsNameFragmentToken())
-			{
-				decl->name->identifiers.push_back(*it);
-			}
-			else
-			{
-				CodeError error = {
-					*it,
-					*it,
-					"Token is not a legal name: \"" + it->value + "\".",
-				};
-				errors.push_back(error);
-			}
-		}
-
-		if (decl->name->identifiers.size() == 0)
-		{
-			CodeError error = {
-				line->tokens[0],
-				line->tokens[0],
-				"Symbol name should be empty.",
-			};
-			errors.push_back(error);
-		}
-		else
-		{
-		}
+		decl->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Symbol", line->tokens[0], errors);
 		return decl;
 	}
 
@@ -77,7 +84,47 @@ namespace tinymoe
 	TypeDeclaration::Ptr TypeDeclaration::Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex)
 	{
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
+		auto line = codeFile->lines[lineIndex++];
+		auto it = line->tokens.begin();
+		auto typeToken = *it;
+		if (it->type != CodeTokenType::Type)
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"Type definition should start with \"type\".",
+			};
+			errors.push_back(error);
+			return nullptr;
+		}
+
 		auto decl = make_shared<TypeDeclaration>();
+		decl->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Type", line->tokens[0], errors);
+
+		bool reachTheEnd = false;
+		while ((size_t)lineIndex < codeFile->lines.size())
+		{
+			line = codeFile->lines[lineIndex++];
+			if (line->tokens.size() == 1 && line->tokens[0].type == CodeTokenType::End)
+			{
+				reachTheEnd = true;
+				break;
+			}
+			else
+			{
+				decl->fields.push_back(SymbolName::ParseToEnd(line->tokens.begin(), line->tokens.end(), "Field", line->tokens[0], errors));
+			}
+		}
+
+		if (!reachTheEnd)
+		{
+			CodeError error = {
+				typeToken,
+				typeToken,
+				"Ending of the type is not found.",
+			};
+			errors.push_back(error);
+		}
 		return decl;
 	}
 

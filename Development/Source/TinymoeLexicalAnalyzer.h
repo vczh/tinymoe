@@ -53,9 +53,9 @@ namespace tinymoe
 	{
 		typedef vector<CodeToken>				List;
 
-		CodeTokenType					type;
-		int								row;
-		int								column;
+		CodeTokenType					type = CodeTokenType::Unknown;
+		int								row = -1;
+		int								column = -1;
 		string							value;
 
 		bool							IsNameFragmentToken();
