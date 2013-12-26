@@ -576,6 +576,44 @@ sentence abort
 		TEST_ASSERT(!decl->bodyName);
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+
+		TEST_ASSERT(decl->name.size() == 1);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+		}
+	}
+	{
+		string code = R"tinymoe(
+sentence abort : an alias
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+
+		TEST_ASSERT(!decl->cps);
+		TEST_ASSERT(!decl->category);
+		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(decl->alias);
+		TEST_ASSERT(decl->alias->identifiers.size() == 2);
+		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
+		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+
+		TEST_ASSERT(decl->name.size() == 1);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+		}
 	}
 }
 

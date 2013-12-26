@@ -427,6 +427,43 @@ namespace tinymoe
 					goto END_OF_PARSING;
 				}
 			}
+			it++;
+
+			while (it != line->tokens.end())
+			{
+				if (it->type == CodeTokenType::Colon)
+				{
+					decl->alias = SymbolName::ParseToEnd(++it, line->tokens.end(), "Function alias", functionToken, errors);
+					break;
+				}
+				else if (it->type == CodeTokenType::OpenBracket)
+				{
+				}
+				else if (it->IsNameFragmentToken())
+				{
+					auto nameFragment = make_shared<NameFragment>();
+					nameFragment->name = SymbolName::ParseToFarest(it, line->tokens.end(), "Function", functionToken, errors);
+					decl->name.push_back(nameFragment);
+				}
+				else
+				{
+					CodeError error = {
+						functionToken,
+						functionToken,
+						"Token is not a legal name: \"" + it->value + "\".",
+					};
+					errors.push_back(error);
+				}
+			}
+
+			if (decl->type == FunctionDeclarationType::Block && decl->name.size() > 0)
+			{
+				if (auto argument = dynamic_pointer_cast<ArgumentFragment>(decl->name[0]))
+				{
+					decl->name.erase(decl->name.begin());
+					decl->bodyName = argument;
+				}
+			}
 		}
 
 	END_OF_PARSING:
@@ -466,6 +503,23 @@ namespace tinymoe
 				errors.push_back(error);
 			}
 		}
+
+		while ((size_t)lineIndex < codeFile->lines.size())
+		{
+			auto token = codeFile->lines[lineIndex]->tokens[0];
+			switch (token.type)
+			{
+			case CodeTokenType::Symbol:
+			case CodeTokenType::Type:
+			case CodeTokenType::CPS:
+			case CodeTokenType::Category:
+			case CodeTokenType::Phrase:
+			case CodeTokenType::Sentence:
+			case CodeTokenType::Block:
+				goto END_OF_FUNCTION_BODY_SEARCHING;
+			}
+		}
+	END_OF_FUNCTION_BODY_SEARCHING:
 		return decl;
 	}
 
