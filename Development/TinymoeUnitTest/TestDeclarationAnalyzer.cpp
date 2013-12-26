@@ -615,6 +615,93 @@ sentence abort : an alias
 			TEST_ASSERT(name->name->identifiers[0].value == "abort");
 		}
 	}
+	{
+		string code = R"tinymoe(
+sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an alias
+)tinymoe";
+		CodeError::List errors;
+
+		auto codeFile = CodeFile::Parse(code, errors);
+		TEST_ASSERT(errors.size() == 0);
+
+		int lineIndex = 0;
+		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
+		TEST_ASSERT(decl);
+		TEST_ASSERT(lineIndex == 1);
+		TEST_ASSERT(errors.size() == 0);
+
+		TEST_ASSERT(!decl->cps);
+		TEST_ASSERT(!decl->category);
+		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(decl->alias);
+		TEST_ASSERT(decl->alias->identifiers.size() == 2);
+		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
+		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+
+		TEST_ASSERT(decl->name.size() == 10);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "a");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "x");
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[2]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "b");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[3]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Expression);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "y");
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[4]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "c");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[5]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Argument);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "z");
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[6]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "d");
+		}
+		{
+			auto name = dynamic_pointer_cast<FunctionArgumentFragment>(decl->name[7]);
+			TEST_ASSERT(name->declaration->type == FunctionDeclarationType::Phrase);
+			TEST_ASSERT(name->declaration->name.size() == 1);
+			
+			auto argument = dynamic_pointer_cast<NameFragment>(name->declaration->name[0]);
+			TEST_ASSERT(argument->name->identifiers.size() == 1);
+			TEST_ASSERT(argument->name->identifiers[0].value == "o");
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[8]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "e");
+		}
+		{
+			auto name = dynamic_pointer_cast<FunctionArgumentFragment>(decl->name[9]);
+			TEST_ASSERT(name->declaration->type == FunctionDeclarationType::Sentence);
+			TEST_ASSERT(name->declaration->name.size() == 1);
+			
+			auto argument = dynamic_pointer_cast<NameFragment>(name->declaration->name[0]);
+			TEST_ASSERT(argument->name->identifiers.size() == 1);
+			TEST_ASSERT(argument->name->identifiers[0].value == "p");
+		}
+	}
 }
 
 TEST_CASE(TestParseWrongFunction)

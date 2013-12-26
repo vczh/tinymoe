@@ -126,6 +126,7 @@ namespace tinymoe
 		int									codeLineIndex = -1;
 		int									endLineIndex = -1;
 		
+		static FunctionDeclaration::Ptr		Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, FunctionDeclaration::Ptr decl, CodeToken ownerToken, CodeError::List& errors);
 		static FunctionDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 	};
 
@@ -137,6 +138,8 @@ namespace tinymoe
 	{
 	public:
 		FunctionArgumentType				type = FunctionArgumentType::Normal;
+
+		static ArgumentFragment::Ptr		Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeToken ownerToken, CodeError::List& errors);
 	};
 
 	class NameFragment : public FunctionFragment

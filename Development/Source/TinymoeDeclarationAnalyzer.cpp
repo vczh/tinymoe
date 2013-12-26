@@ -73,7 +73,7 @@ namespace tinymoe
 			CodeError error = {
 				ownerToken,
 				ownerToken,
-				ownerName + " name should be empty.",
+				ownerName + " name should not be empty.",
 			};
 			errors.push_back(error);
 		}
@@ -100,7 +100,7 @@ namespace tinymoe
 			CodeError error = {
 				ownerToken,
 				ownerToken,
-				ownerName + " name should be empty.",
+				ownerName + " name should not be empty.",
 			};
 			errors.push_back(error);
 		}
@@ -122,7 +122,7 @@ namespace tinymoe
 			CodeError error = {
 				*it,
 				*it,
-				"CPS definition should start with \"cps\".",
+				"CPS definition should begin with \"cps\".",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -166,7 +166,7 @@ namespace tinymoe
 			CodeError error = {
 				*it,
 				*it,
-				"Category definition should start with \"category\".",
+				"Category definition should begin with \"category\".",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -281,7 +281,7 @@ namespace tinymoe
 			CodeError error = {
 				*it,
 				*it,
-				"Symbol definition should start with \"symbol\".",
+				"Symbol definition should begin with \"symbol\".",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -307,7 +307,7 @@ namespace tinymoe
 			CodeError error = {
 				*it,
 				*it,
-				"Type definition should start with \"type\".",
+				"Type definition should begin with \"type\".",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -327,7 +327,7 @@ namespace tinymoe
 				CodeError error = {
 					*it,
 					*it,
-					"Inheriting from a type should begins with a \":\".",
+					"Inheriting from a type should begin with a \":\".",
 				};
 				errors.push_back(error);
 			}
@@ -364,6 +364,90 @@ namespace tinymoe
 	FunctionDeclaration
 	*************************************************************/
 
+	FunctionDeclaration::Ptr FunctionDeclaration::Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, FunctionDeclaration::Ptr decl, CodeToken ownerToken, CodeError::List& errors)
+	{
+		if (!decl)
+		{
+			decl = make_shared<FunctionDeclaration>();
+		}
+		if (it == end)
+		{
+			CodeError error = {
+				ownerToken,
+				ownerToken,
+				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+			};
+			errors.push_back(error);
+			goto END_OF_PARSING;
+		}
+		ownerToken = *it;
+
+		switch (it->type)
+		{
+		case CodeTokenType::Phrase:
+			decl->type = FunctionDeclarationType::Phrase;
+			break;
+		case CodeTokenType::Sentence:
+			decl->type = FunctionDeclarationType::Sentence;
+			break;
+		case CodeTokenType::Block:
+			decl->type = FunctionDeclarationType::Block;
+			break;
+		default:
+			{
+				CodeError error = {
+					ownerToken,
+					ownerToken,
+					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+				};
+				errors.push_back(error);
+				goto END_OF_PARSING;
+			}
+		}
+		it++;
+
+		while (it != end)
+		{
+			if (it->type == CodeTokenType::Colon)
+			{
+				decl->alias = SymbolName::ParseToFarest(++it, end, "Function alias", ownerToken, errors);
+			}
+			else if (it->type == CodeTokenType::OpenBracket)
+			{
+				if (auto argument = ArgumentFragment::Parse(++it, end, ownerToken, errors))
+				{
+					decl->name.push_back(argument);
+					if (!SymbolName::ConsumeToken(it, end, CodeTokenType::CloseBracket, ")", ownerToken, errors)) goto END_OF_PARSING;
+				}
+				else
+				{
+					goto END_OF_PARSING;
+				}
+			}
+			else if (it->IsNameFragmentToken())
+			{
+				auto nameFragment = make_shared<NameFragment>();
+				nameFragment->name = SymbolName::ParseToFarest(it, end, "Function", ownerToken, errors);
+				decl->name.push_back(nameFragment);
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (decl->type == FunctionDeclarationType::Block && decl->name.size() > 0)
+		{
+			if (auto argument = dynamic_pointer_cast<ArgumentFragment>(decl->name[0]))
+			{
+				decl->name.erase(decl->name.begin());
+				decl->bodyName = argument;
+			}
+		}
+	END_OF_PARSING:
+		return decl;
+	}
+
 	FunctionDeclaration::Ptr FunctionDeclaration::Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex)
 	{
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size()) return nullptr;
@@ -379,7 +463,7 @@ namespace tinymoe
 			CodeError error = {
 				functionToken,
 				functionToken,
-				"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 			};
 			errors.push_back(error);
 			goto END_OF_PARSING;
@@ -393,7 +477,7 @@ namespace tinymoe
 			CodeError error = {
 				functionToken,
 				functionToken,
-				"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 			};
 			errors.push_back(error);
 			goto END_OF_PARSING;
@@ -403,65 +487,33 @@ namespace tinymoe
 			auto line = codeFile->lines[lineIndex++];
 			auto it = line->tokens.begin();
 			functionToken = *it;
-
+			
 			switch (it->type)
 			{
 			case CodeTokenType::Phrase:
-				decl->type = FunctionDeclarationType::Phrase;
-				break;
 			case CodeTokenType::Sentence:
-				decl->type = FunctionDeclarationType::Sentence;
-				break;
 			case CodeTokenType::Block:
-				decl->type = FunctionDeclarationType::Block;
+				Parse(it, line->tokens.end(), decl, functionToken, errors);
+				if (it != line->tokens.end())
+				{
+					CodeError error = {
+						*it,
+						*it,
+						"Too many tokens.",
+					};
+					errors.push_back(error);
+				}
 				break;
 			default:
 				{
 					CodeError error = {
 						functionToken,
 						functionToken,
-						"Missing function declaration which starts from \"phrase\", \"sentence\" or \"block\".",
+						"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 					};
 					errors.push_back(error);
 					lineIndex--;
 					goto END_OF_PARSING;
-				}
-			}
-			it++;
-
-			while (it != line->tokens.end())
-			{
-				if (it->type == CodeTokenType::Colon)
-				{
-					decl->alias = SymbolName::ParseToEnd(++it, line->tokens.end(), "Function alias", functionToken, errors);
-					break;
-				}
-				else if (it->type == CodeTokenType::OpenBracket)
-				{
-				}
-				else if (it->IsNameFragmentToken())
-				{
-					auto nameFragment = make_shared<NameFragment>();
-					nameFragment->name = SymbolName::ParseToFarest(it, line->tokens.end(), "Function", functionToken, errors);
-					decl->name.push_back(nameFragment);
-				}
-				else
-				{
-					CodeError error = {
-						functionToken,
-						functionToken,
-						"Token is not a legal name: \"" + it->value + "\".",
-					};
-					errors.push_back(error);
-				}
-			}
-
-			if (decl->type == FunctionDeclarationType::Block && decl->name.size() > 0)
-			{
-				if (auto argument = dynamic_pointer_cast<ArgumentFragment>(decl->name[0]))
-				{
-					decl->name.erase(decl->name.begin());
-					decl->bodyName = argument;
 				}
 			}
 		}
@@ -521,6 +573,62 @@ namespace tinymoe
 		}
 	END_OF_FUNCTION_BODY_SEARCHING:
 		return decl;
+	}
+
+	/*************************************************************
+	ArgumentFragment
+	*************************************************************/
+
+	ArgumentFragment::Ptr ArgumentFragment::Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeToken ownerToken, CodeError::List& errors)
+	{
+		if (it == end)
+		{
+			CodeError error = {
+				ownerToken,
+				ownerToken,
+				"Function argument should begin with \"expression\", \"argument\", \"phrase\", \"sentence\" or a name.",
+			};
+			errors.push_back(error);
+			return nullptr;
+		}
+
+		if (it->value == "expression")
+		{
+			auto decl = make_shared<VariableArgumentFragment>();
+			decl->type = FunctionArgumentType::Expression;
+			decl->name = SymbolName::ParseToFarest(++it, end, "Function argument", ownerToken, errors);
+			return decl;
+		}
+		else if (it->value == "argument")
+		{
+			auto decl = make_shared<VariableArgumentFragment>();
+			decl->type = FunctionArgumentType::Argument;
+			decl->name = SymbolName::ParseToFarest(++it, end, "Function argument", ownerToken, errors);
+			return decl;
+		}
+		else if (it->value == "phrase" || it->value == "sentence")
+		{
+			auto decl = make_shared<FunctionArgumentFragment>();
+			decl->declaration = FunctionDeclaration::Parse(it, end, nullptr, ownerToken, errors);
+			return decl;
+		}
+		else if (it->IsNameFragmentToken())
+		{
+			auto decl = make_shared<VariableArgumentFragment>();
+			decl->type = FunctionArgumentType::Normal;
+			decl->name = SymbolName::ParseToFarest(it, end, "Function argument", ownerToken, errors);
+			return decl;
+		}
+		else
+		{
+			CodeError error = {
+				*it,
+				*it,
+				"Function argument should begin with \"expression\", \"argument\", \"phrase\", \"sentence\" or a name.",
+			};
+			errors.push_back(error);
+			return nullptr;
+		}
 	}
 
 	/*************************************************************
