@@ -25,6 +25,7 @@ namespace tinymoe
 		vector<CodeToken>					identifiers;
 
 		static SymbolName::Ptr				ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
+		static SymbolName::Ptr				ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
 	};
 
 	/*************************************************************
