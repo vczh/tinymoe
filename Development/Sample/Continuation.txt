@@ -52,7 +52,7 @@ block (body) repeat : repeat statement
 	end
 end
 
-block repeat while (expression condition) (block phrase body)
+block (body) repeat while (expression condition)
 	repeat
 		if not condition
 			break
@@ -61,14 +61,14 @@ block repeat while (expression condition) (block phrase body)
 	end
 end
 
-block repeat with (argument item) from (start) to (end) (block phrase deal with (item))
+block (phrase deal with (item)) repeat with (argument item) from (start) to (end)
 	set the current number to start
 	repeat while the current number is not greater than end
 		yield deal with the current number
 	end
 end
 
-block repeat with (argument item) in (items : enumerable) (block phrase deal with (item))
+block (phrase deal with (item)) repeat with (argument item) in (items : enumerable)
 	set cursor to new enumerator from items
 	repeat
 		consume item from cursor
