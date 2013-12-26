@@ -86,6 +86,7 @@
     <ClCompile Include="..\Source\TinymoeDeclarationAnalyzer.cpp" />
     <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TestDeclarationAnalyzer.cpp" />
     <ClCompile Include="TestLexicalAnalyzer.cpp" />
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>

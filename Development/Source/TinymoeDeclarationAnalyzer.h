@@ -12,9 +12,6 @@ namespace tinymoe
 	class CodeFragment
 	{
 	public:
-		CodeToken							begin;
-		CodeToken							end;
-
 		CodeFragment();
 		virtual ~CodeFragment();
 	};
@@ -87,15 +84,23 @@ namespace tinymoe
 	class SymbolDeclaration : public Declaration
 	{
 	public:
+		typedef shared_ptr<SymbolDeclaration>		Ptr;
+
 		SymbolName::Ptr						name;
+
+		static SymbolDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 	};
 
 	class TypeDeclaration : public Declaration
 	{
 	public:
+		typedef shared_ptr<TypeDeclaration>			Ptr;
+
 		SymbolName::Ptr						name;
 		SymbolName::Ptr						parent;				// (optional)
 		SymbolName::List					fields;
+		
+		static TypeDeclaration::Ptr			Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 	};
 
 	class FunctionDeclaration : public Declaration
@@ -111,6 +116,8 @@ namespace tinymoe
 		int									beginLineIndex = -1;
 		int									codeLineIndex = -1;
 		int									endLineIndex = -1;
+		
+		static FunctionDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 	};
 
 	/*************************************************************
