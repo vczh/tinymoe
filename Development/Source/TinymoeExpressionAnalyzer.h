@@ -39,16 +39,22 @@ namespace tinymoe
 		Case,					// (statement)	case <expression>
 		TailCall,				// (statement)	tail call <expression>
 		Assign,					// (statement)	set <assignable> to <expression>
-		Increase,				// (statement)	increase <assignable>
-		AddTo,					// (statement)	add <assignable> to <expression>
-		Decrease,				// (statement)	decrease <assignable>
-		SubtractFrom,			// (statement)	subtract <assignable> from <expression>
+		SetArrayItem,			// (statement)	set item <expression> of array <expression> to <expression>
+		
+		NewType,				// (expression) new <type>
+		NewArray,				// (expression)	new array of <expression> items
+		GetArrayItem,			// (expression)	item <expression> of array <primitive>
 		Invoke,					// (expression)	invoke <primitive>
 		InvokeWith,				// (expression)	invoke <expression> with (<expression>, ..)
 		Field,					// (assignable) field <argument> of <primitive>
-		NewType,				// (expression) new <type>
 		IsType,					// (expression) <primitive> is <type>
 		IsNotType,				// (expression) <primitive> is not <type>
+
+		Array,					// (type)		array
+		String,					// (type)		string
+		Integer,				// (type)		integer
+		Float,					// (type)		float
+		Symbol,					// (type)		symbol
 	};
 
 	class GrammarSymbol
