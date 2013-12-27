@@ -38,6 +38,7 @@ namespace tinymoe
 		Select,					// (statement)	select <expression>
 		Case,					// (statement)	case <expression>
 		TailCall,				// (statement)	tail call <expression>
+		RedirectTo,				// (statement)	redirect to <expression>
 		Assign,					// (statement)	set <assignable> to <expression>
 		SetArrayItem,			// (statement)	set item <expression> of array <expression> to <expression>
 		

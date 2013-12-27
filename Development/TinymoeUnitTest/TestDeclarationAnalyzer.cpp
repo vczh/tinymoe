@@ -1193,7 +1193,6 @@ using another module
 
 phrase print (message)
 	redirect to "TheNameOfAnExternalPrintFunction"
-end
 
 phrase main
 	print "Hello, world!"
