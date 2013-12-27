@@ -44,7 +44,8 @@ namespace tinymoe
 	{
 		Normal,				// a normal function argument
 		Argument,			// for block only, represents an argument to the block body
-		Expression,			// for block only, represnets a re-evaluable expression
+		Expression,			// for sentence and block only, represnets a re-evaluable expression
+		Assignable,			// for sentence and block only, represnets a assignable expression
 	};
 
 	class FunctionCps : public CodeFragment

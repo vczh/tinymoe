@@ -3,6 +3,7 @@
 
 #include "TinymoeLexicalAnalyzer.h"
 #include "TinymoeDeclarationAnalyzer.h"
+#include "TinymoeExpressionAnalyzer.h"
 
 namespace tinymoe
 {

@@ -24,6 +24,7 @@ namespace tinymoe
 		Category,			// block category definition
 		Expression,			// expression argument
 		Argument,			// argument argument
+		Assignable,			// assignable argument
 
 		End,				// end of an entity
 

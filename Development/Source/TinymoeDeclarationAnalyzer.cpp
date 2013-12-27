@@ -23,7 +23,8 @@ namespace tinymoe
 	{
 		if (it == end)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				ownerToken,
 				ownerToken,
 				"Incomplete code, \"" + content + "\" expected.",
@@ -34,7 +35,8 @@ namespace tinymoe
 
 		if (it->type != tokenType)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"\"" + content + "\" expected but \"" + it->value + "\" found.",
@@ -58,7 +60,8 @@ namespace tinymoe
 			}
 			else
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					*it,
 					*it,
 					"Token is not a legal name: \"" + it->value + "\".",
@@ -70,7 +73,8 @@ namespace tinymoe
 
 		if (symbolName->identifiers.size() == 0)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				ownerToken,
 				ownerToken,
 				ownerName + " name should not be empty.",
@@ -97,7 +101,8 @@ namespace tinymoe
 
 		if (symbolName->identifiers.size() == 0)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				ownerToken,
 				ownerToken,
 				ownerName + " name should not be empty.",
@@ -119,7 +124,8 @@ namespace tinymoe
 		auto cpsToken = *it;
 		if (it->type != CodeTokenType::CPS)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"CPS definition should begin with \"cps\".",
@@ -140,7 +146,8 @@ namespace tinymoe
 		if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", cpsToken, errors)) goto END_OF_PARSING;
 		if (it != line->tokens.end())
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"Too many tokens.",
@@ -163,7 +170,8 @@ namespace tinymoe
 		auto categoryToken = *it;
 		if (it->type != CodeTokenType::Category)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"Category definition should begin with \"category\".",
@@ -182,7 +190,8 @@ namespace tinymoe
 
 			if (it != line->tokens.end())
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					*it,
 					*it,
 					"Too many tokens.",
@@ -201,7 +210,8 @@ namespace tinymoe
 			{
 				if (decl->categoryName)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						*it,
 						*it,
 						"Too many start category name.",
@@ -224,7 +234,8 @@ namespace tinymoe
 				decl->closable = true;
 				if (++it != line->tokens.end())
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						*it,
 						*it,
 						"Too many tokens.",
@@ -243,7 +254,8 @@ namespace tinymoe
 		{
 			if (decl->followCategories.size() == 0)
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					categoryToken,
 					categoryToken,
 					"A category with signal parameter should have follow categories.",
@@ -256,7 +268,8 @@ namespace tinymoe
 		{
 			if (!decl->closable)
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					categoryToken,
 					categoryToken,
 					"A category without start category name should be closable.",
@@ -278,7 +291,8 @@ namespace tinymoe
 		auto it = line->tokens.begin();
 		if (it->type != CodeTokenType::Symbol)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"Symbol definition should begin with \"symbol\".",
@@ -304,7 +318,8 @@ namespace tinymoe
 		auto typeToken = *it;
 		if (it->type != CodeTokenType::Type)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
 				"Type definition should begin with \"type\".",
@@ -324,7 +339,8 @@ namespace tinymoe
 			}
 			else
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					*it,
 					*it,
 					"Inheriting from a type should begin with a \":\".",
@@ -350,7 +366,8 @@ namespace tinymoe
 
 		if (!reachTheEnd)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				typeToken,
 				typeToken,
 				"Ending of the type is not found.",
@@ -372,7 +389,8 @@ namespace tinymoe
 		}
 		if (it == end)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				ownerToken,
 				ownerToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
@@ -395,7 +413,8 @@ namespace tinymoe
 			break;
 		default:
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					ownerToken,
 					ownerToken,
 					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
@@ -462,7 +481,8 @@ namespace tinymoe
 		}
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size())
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				functionToken,
 				functionToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
@@ -476,7 +496,8 @@ namespace tinymoe
 		}
 		if (0 > (size_t)lineIndex || (size_t)lineIndex >= codeFile->lines.size())
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				functionToken,
 				functionToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
@@ -498,7 +519,8 @@ namespace tinymoe
 				Parse(it, line->tokens.end(), decl, functionToken, errors);
 				if (it != line->tokens.end())
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						*it,
 						*it,
 						"Too many tokens.",
@@ -508,7 +530,8 @@ namespace tinymoe
 				break;
 			default:
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						functionToken,
 						functionToken,
 						"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
@@ -523,7 +546,8 @@ namespace tinymoe
 			{
 				if (decl->type == FunctionDeclarationType::Phrase)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						functionToken,
 						functionToken,
 						"Phrase should not have a continuation definition.",
@@ -535,7 +559,8 @@ namespace tinymoe
 			{
 				if (decl->type != FunctionDeclarationType::Block)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						functionToken,
 						functionToken,
 						"Phrase and sentence should not have a category definition.",
@@ -547,7 +572,8 @@ namespace tinymoe
 			{
 				if (!decl->bodyName)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						functionToken,
 						functionToken,
 						"Block name should start with an argument for the block body.",
@@ -558,7 +584,8 @@ namespace tinymoe
 
 			if (decl->name.size() == 0)
 			{
-				CodeError error = {
+				CodeError error =
+				{
 					functionToken,
 					functionToken,
 					"Function name should not be empty.",
@@ -571,7 +598,8 @@ namespace tinymoe
 				{
 					if (!dynamic_pointer_cast<NameFragment>(decl->name[0]))
 					{
-						CodeError error = {
+						CodeError error =
+						{
 							functionToken,
 							functionToken,
 							"Sentence and block's name should not begin with an argument.",
@@ -593,7 +621,8 @@ namespace tinymoe
 					{
 						if (lastNameIsArgument)
 						{
-							CodeError error = {
+							CodeError error =
+							{
 								functionToken,
 								functionToken,
 								"Function argument cannot appear just after another function argument.",
@@ -606,7 +635,8 @@ namespace tinymoe
 
 				if (nameCount == 0)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						functionToken,
 						functionToken,
 						"Function name should not be form just by function arguments.",
@@ -653,10 +683,11 @@ namespace tinymoe
 	{
 		if (it == end)
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				ownerToken,
 				ownerToken,
-				"Function argument should begin with \"expression\", \"argument\", \"phrase\", \"sentence\" or a name.",
+				"Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name.",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -674,6 +705,11 @@ namespace tinymoe
 			if (it->type == CodeTokenType::Expression)
 			{
 				decl->type = FunctionArgumentType::Expression;
+				it++;
+			}
+			else if (it->type == CodeTokenType::Assignable)
+			{
+				decl->type = FunctionArgumentType::Assignable;
 				it++;
 			}
 			else if (it->type == CodeTokenType::Argument)
@@ -695,10 +731,11 @@ namespace tinymoe
 		}
 		else
 		{
-			CodeError error = {
+			CodeError error =
+			{
 				*it,
 				*it,
-				"Function argument should begin with \"expression\", \"argument\", \"phrase\", \"sentence\" or a name.",
+				"Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name.",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -723,7 +760,8 @@ namespace tinymoe
 			case CodeTokenType::Module:
 				if (module->name)
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						*it,
 						*it,
 						"A module can only have one name.",
@@ -759,7 +797,8 @@ namespace tinymoe
 				break;
 			default:
 				{
-					CodeError error = {
+					CodeError error =
+					{
 						*it,
 						*it,
 						"Cannot process a declaration that begins with \"" + it->value + "\".",

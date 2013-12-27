@@ -23,6 +23,7 @@ namespace tinymoe
 		case CodeTokenType::Category:
 		case CodeTokenType::Expression:
 		case CodeTokenType::Argument:
+		case CodeTokenType::Assignable:
 		case CodeTokenType::End:
 		case CodeTokenType::And:
 		case CodeTokenType::Or:
@@ -75,6 +76,7 @@ namespace tinymoe
 					value == "category" ? CodeTokenType::Category :
 					value == "expression" ? CodeTokenType::Expression :
 					value == "argument" ? CodeTokenType::Argument :
+					value == "assignable" ? CodeTokenType::Assignable :
 					value == "end" ? CodeTokenType::End :
 					value == "and" ? CodeTokenType::And :
 					value == "or" ? CodeTokenType::Or :
@@ -122,13 +124,11 @@ namespace tinymoe
 				break;
 			}
 
-			CodeToken token =
-			{
-				type,
-				rowNumber,
-				tokenBegin - rowBegin + 1,
-				value,
-			};
+			CodeToken token;
+			token.type = type;
+			token.row = rowNumber;
+			token.column = tokenBegin - rowBegin + 1;
+			token.value = value;
 
 			int lineCount = codeFile->lines.size();
 			auto lastLine = lineCount ? codeFile->lines[lineCount - 1] : nullptr;
@@ -145,13 +145,12 @@ namespace tinymoe
 		{
 			auto tokenBegin = begin ? begin : reading;
 			string value(tokenBegin, tokenBegin + length);
-			CodeToken token =
-			{
-				CodeTokenType::Unknown,
-				rowNumber,
-				tokenBegin - rowBegin + 1,
-				value,
-			};
+			CodeToken token;
+			token.type = CodeTokenType::Unknown;
+			token.row = rowNumber;
+			token.column = tokenBegin - rowBegin + 1;
+			token.value = value;
+
 			CodeError error =
 			{
 				token,

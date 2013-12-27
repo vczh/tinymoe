@@ -39,6 +39,15 @@
     <ClCompile Include="..\Source\TinymoeDeclarationAnalyzer.cpp">
       <Filter>Tinymoe</Filter>
     </ClCompile>
+    <ClCompile Include="TestDeclarationAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TinymoeExpressionAnalyzer.cpp">
+      <Filter>Tinymoe</Filter>
+    </ClCompile>
+    <ClCompile Include="TestExpressionAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
@@ -54,6 +63,9 @@
       <Filter>Tinymoe</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\TinymoeDeclarationAnalyzer.h">
+      <Filter>Tinymoe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TinymoeExpressionAnalyzer.h">
       <Filter>Tinymoe</Filter>
     </ClInclude>
   </ItemGroup>
