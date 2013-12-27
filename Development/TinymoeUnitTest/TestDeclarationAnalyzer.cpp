@@ -1152,3 +1152,65 @@ phrase a : b )
 		TEST_ASSERT(errors[0].end.value == ")");
 	}
 }
+
+TEST_CASE(TestParseCorrectModule)
+{
+	string code = R"tinymoe(
+module hello world
+using standard library
+using another module
+
+phrase print (message)
+	redirect to "TheNameOfAnExternalPrintFunction"
+end
+
+phrase main
+	print "Hello, world!"
+end
+)tinymoe";
+	CodeError::List errors;
+
+	auto codeFile = CodeFile::Parse(code, errors);
+	TEST_ASSERT(errors.size() == 0);
+
+	auto module = Module::Parse(codeFile, errors);
+	TEST_ASSERT(module);
+	TEST_ASSERT(errors.size() == 0);
+
+	TEST_ASSERT(module->name->identifiers.size() == 2);
+	TEST_ASSERT(module->name->identifiers[0].value == "hello");
+	TEST_ASSERT(module->name->identifiers[1].value == "world");
+
+	TEST_ASSERT(module->usings.size() == 2);
+	TEST_ASSERT(module->usings[0]->identifiers.size() == 2);
+	TEST_ASSERT(module->usings[0]->identifiers[0].value == "standard");
+	TEST_ASSERT(module->usings[0]->identifiers[1].value == "library");
+	TEST_ASSERT(module->usings[1]->identifiers.size() == 2);
+	TEST_ASSERT(module->usings[1]->identifiers[0].value == "another");
+	TEST_ASSERT(module->usings[1]->identifiers[1].value == "module");
+
+	TEST_ASSERT(module->declarations.size() == 2);
+	{
+		auto decl = dynamic_pointer_cast<FunctionDeclaration>(module->declarations[0]);
+		TEST_ASSERT(decl->name.size() == 2);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "print");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "message");
+		}
+	}
+	{
+		auto decl = dynamic_pointer_cast<FunctionDeclaration>(module->declarations[1]);
+		TEST_ASSERT(decl->name.size() == 1);
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "main");
+		}
+	}
+}

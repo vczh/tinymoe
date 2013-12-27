@@ -712,6 +712,64 @@ namespace tinymoe
 	Module::Ptr Module::Parse(CodeFile::Ptr codeFile, CodeError::List& errors)
 	{
 		auto module = make_shared<Module>();
+
+		int lineIndex = 0;
+		while ((size_t)lineIndex < codeFile->lines.size())
+		{
+			auto line = codeFile->lines[lineIndex];
+			auto it = line->tokens.begin();
+			switch (it->type)
+			{
+			case CodeTokenType::Module:
+				if (module->name)
+				{
+					CodeError error = {
+						*it,
+						*it,
+						"A module can only have one name.",
+					};
+					errors.push_back(error);
+				}
+				else
+				{
+					auto token = *it;
+					module->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Module", token, errors);
+				}
+				lineIndex++;
+				break;
+			case CodeTokenType::Using:
+				{
+					auto token = *it;
+					module->usings.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Module using", token, errors));
+					lineIndex++;
+				}
+				break;
+			case CodeTokenType::Symbol:
+				module->declarations.push_back(SymbolDeclaration::Parse(codeFile, errors, lineIndex));
+				break;
+			case CodeTokenType::Type:
+				module->declarations.push_back(TypeDeclaration::Parse(codeFile, errors, lineIndex));
+				break;
+			case CodeTokenType::CPS:
+			case CodeTokenType::Category:
+			case CodeTokenType::Phrase:
+			case CodeTokenType::Sentence:
+			case CodeTokenType::Block:
+				module->declarations.push_back(FunctionDeclaration::Parse(codeFile, errors, lineIndex));
+				break;
+			default:
+				{
+					CodeError error = {
+						*it,
+						*it,
+						"Cannot process a declaration that begins with \"" + it->value + "\".",
+					};
+					errors.push_back(error);
+					lineIndex++;
+				}
+			}
+		}
+
 		return module;
 	}
 }
