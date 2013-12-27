@@ -349,4 +349,16 @@ namespace tinymoe
 
 		return codeFile;
 	}
+
+	/*************************************************************
+	CodeFragment
+	*************************************************************/
+
+	CodeFragment::CodeFragment()
+	{
+	}
+
+	CodeFragment::~CodeFragment()
+	{
+	}
 }

@@ -2,19 +2,6 @@
 
 namespace tinymoe
 {
-
-	/*************************************************************
-	CodeFragment
-	*************************************************************/
-
-	CodeFragment::CodeFragment()
-	{
-	}
-
-	CodeFragment::~CodeFragment()
-	{
-	}
-
 	/*************************************************************
 	SymbolName
 	*************************************************************/
@@ -464,6 +451,101 @@ namespace tinymoe
 				decl->bodyName = argument;
 			}
 		}
+
+		if (decl->name.size() == 0)
+		{
+			CodeError error =
+			{
+				ownerToken,
+				ownerToken,
+				"Function name should not be empty.",
+			};
+			errors.push_back(error);
+		}
+		else 
+		{
+			if (decl->type != FunctionDeclarationType::Phrase)
+			{
+				if (!dynamic_pointer_cast<NameFragment>(decl->name[0]))
+				{
+					CodeError error =
+					{
+						ownerToken,
+						ownerToken,
+						"Sentence and block's name should not begin with an argument.",
+					};
+					errors.push_back(error);
+				}
+			}
+
+			int nameCount = 0;
+			bool lastNameIsArgument = false;
+			for (auto name : decl->name)
+			{
+				if (dynamic_pointer_cast<NameFragment>(name))
+				{
+					nameCount++;
+					lastNameIsArgument = false;
+				}
+				else
+				{
+					if (lastNameIsArgument)
+					{
+						CodeError error =
+						{
+							ownerToken,
+							ownerToken,
+							"Function argument cannot appear just after another function argument.",
+						};
+						errors.push_back(error);
+					}
+					lastNameIsArgument = true;
+
+					if (auto argument = dynamic_pointer_cast<VariableArgumentFragment>(name))
+					{
+						switch (argument->type)
+						{
+						case FunctionArgumentType::Argument:
+							if (decl->type != FunctionDeclarationType::Block)
+							{
+								CodeError error =
+								{
+									ownerToken,
+									ownerToken,
+									"Argument of type \"argument\" is only allowed in block declaration.",
+								};
+								errors.push_back(error);
+							}
+							break;
+						case FunctionArgumentType::Expression:
+						case FunctionArgumentType::Assignable:
+							if (decl->type == FunctionDeclarationType::Phrase)
+							{
+								CodeError error =
+								{
+									ownerToken,
+									ownerToken,
+									"Argument of type \"argument\" or \"expression\" is only allowed in sentence or block declaration.",
+								};
+								errors.push_back(error);
+							}
+							break;
+						}
+					}
+				}
+			}
+
+			if (nameCount == 0)
+			{
+				CodeError error =
+				{
+					ownerToken,
+					ownerToken,
+					"Function name should not be form just by function arguments.",
+				};
+				errors.push_back(error);
+			}
+		}
 	END_OF_PARSING:
 		return decl;
 	}
@@ -581,69 +663,6 @@ namespace tinymoe
 					errors.push_back(error);
 				}
 			}
-
-			if (decl->name.size() == 0)
-			{
-				CodeError error =
-				{
-					functionToken,
-					functionToken,
-					"Function name should not be empty.",
-				};
-				errors.push_back(error);
-			}
-			else 
-			{
-				if (decl->type != FunctionDeclarationType::Phrase)
-				{
-					if (!dynamic_pointer_cast<NameFragment>(decl->name[0]))
-					{
-						CodeError error =
-						{
-							functionToken,
-							functionToken,
-							"Sentence and block's name should not begin with an argument.",
-						};
-						errors.push_back(error);
-					}
-				}
-
-				int nameCount = 0;
-				bool lastNameIsArgument = false;
-				for (auto name : decl->name)
-				{
-					if (dynamic_pointer_cast<NameFragment>(name))
-					{
-						nameCount++;
-						lastNameIsArgument = false;
-					}
-					else
-					{
-						if (lastNameIsArgument)
-						{
-							CodeError error =
-							{
-								functionToken,
-								functionToken,
-								"Function argument cannot appear just after another function argument.",
-							};
-							errors.push_back(error);
-						}
-						lastNameIsArgument = true;
-					}
-				}
-
-				if (nameCount == 0)
-				{
-					CodeError error =
-					{
-						functionToken,
-						functionToken,
-						"Function name should not be form just by function arguments.",
-					};
-					errors.push_back(error);
-				}
-			}
 		}
 
 	END_OF_PARSING:
@@ -725,6 +744,15 @@ namespace tinymoe
 
 			if (it->type == CodeTokenType::Colon)
 			{
+				if (decl->type != FunctionArgumentType::Normal)
+				{
+					CodeError error =
+					{
+						*it,
+						*it,
+						"Argument type for multiple dispatch is only allowed for value argument (that is, not \"expression\", \"assignable\" and \"argument\").",
+					};
+				}
 				decl->receivingType = SymbolName::ParseToFarest(++it, end, "Function argument type", ownerToken, errors);
 			}
 			return decl;

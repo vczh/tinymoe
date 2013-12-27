@@ -9,13 +9,6 @@ namespace tinymoe
 	Common
 	*************************************************************/
 
-	class CodeFragment
-	{
-	public:
-		CodeFragment();
-		virtual ~CodeFragment();
-	};
-
 	class SymbolName : public CodeFragment
 	{
 	public:

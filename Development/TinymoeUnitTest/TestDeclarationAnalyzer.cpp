@@ -660,7 +660,7 @@ sentence abort : an alias
 	}
 	{
 		string code = R"tinymoe(
-sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an alias
+block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an alias
 )tinymoe";
 		CodeError::List errors;
 
@@ -678,12 +678,19 @@ sentence a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an 
 		TEST_ASSERT(decl->endLineIndex == 0);
 		TEST_ASSERT(!decl->cps);
 		TEST_ASSERT(!decl->category);
-		TEST_ASSERT(!decl->bodyName);
+		TEST_ASSERT(decl->bodyName);
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->bodyName);
+			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "body");
+			TEST_ASSERT(!name->receivingType);
+		}
 		TEST_ASSERT(decl->alias);
 		TEST_ASSERT(decl->alias->identifiers.size() == 2);
 		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
 		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
-		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
+		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
 
 		TEST_ASSERT(decl->name.size() == 10);
 		{

@@ -87,6 +87,13 @@ namespace tinymoe
 
 		static CodeFile::Ptr			Parse(const string& code, CodeError::List& errors);
 	};
+
+	class CodeFragment
+	{
+	public:
+		CodeFragment();
+		virtual ~CodeFragment();
+	};
 }
 
 #endif
