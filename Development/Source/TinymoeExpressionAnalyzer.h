@@ -13,10 +13,12 @@ namespace tinymoe
 	{
 		Name,					// for identifier list,				e.g. [repeat with] the current number [from] 1 [to] 100
 		PrimitiveExpression,	// for primitive expression,		e.g. sum from 1 to [10]
-		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
 		List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
-		Type,					// for type name,					e.g. set names to new [hash set]
+		Assignable,				// for left value expression,		e.g. [field unique identifier of person]
+								//									e.g. [a variable]
 		Argument,				// for creating a new symbol,		e.g. repeat with [the current number] from 1 to sum from 1 to 10
+		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
+		Type,					// for type name,					e.g. set names to new [hash set]
 	};
 
 	class GrammarFragment
@@ -43,7 +45,7 @@ namespace tinymoe
 		SubtractFrom,			// (statement)	subtract <assignable> from <expression>
 		Invoke,					// (expression)	invoke <primitive>
 		InvokeWith,				// (expression)	invoke <expression> with (<expression>, ..)
-		Field,					// (expression) field <argument> of <primitive>
+		Field,					// (assignable) field <argument> of <primitive>
 		NewType,				// (expression) new <type>
 		IsType,					// (expression) <primitive> is <type>
 		IsNotType,				// (expression) <primitive> is not <type>
