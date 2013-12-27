@@ -41,14 +41,14 @@ namespace tinymoe
 		Assign,					// (statement)	set <assignable> to <expression>
 		SetArrayItem,			// (statement)	set item <expression> of array <expression> to <expression>
 		
-		NewType,				// (expression) new <type>
-		NewArray,				// (expression)	new array of <expression> items
-		GetArrayItem,			// (expression)	item <expression> of array <primitive>
-		Invoke,					// (expression)	invoke <primitive>
-		InvokeWith,				// (expression)	invoke <expression> with (<expression>, ..)
+		NewType,				// (primitive)	new <type>
+		NewArray,				// (primitive)	new array of <expression> items
+		GetArrayItem,			// (primitive)	item <expression> of array <primitive>
+		Invoke,					// (primitive)	invoke <primitive>
+		InvokeWith,				// (primitive)	invoke <expression> with (<expression>, ..)
+		IsType,					// (primitive)	<primitive> is <type>
+		IsNotType,				// (primitive)	<primitive> is not <type>
 		Field,					// (assignable) field <argument> of <primitive>
-		IsType,					// (expression) <primitive> is <type>
-		IsNotType,				// (expression) <primitive> is not <type>
 
 		Array,					// (type)		array
 		String,					// (type)		string
