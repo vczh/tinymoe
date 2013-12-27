@@ -660,7 +660,7 @@ sentence abort : an alias
 	}
 	{
 		string code = R"tinymoe(
-block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) : an alias
+block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f (assignable q) g (list r) : an alias
 )tinymoe";
 		CodeError::List errors;
 
@@ -692,7 +692,7 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) :
 		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
 
-		TEST_ASSERT(decl->name.size() == 10);
+		TEST_ASSERT(decl->name.size() == 14);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
@@ -756,6 +756,30 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) :
 			auto argument = dynamic_pointer_cast<NameFragment>(name->declaration->name[0]);
 			TEST_ASSERT(argument->name->identifiers.size() == 1);
 			TEST_ASSERT(argument->name->identifiers[0].value == "p");
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[10]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "f");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[11]);
+			TEST_ASSERT(name->type == FunctionArgumentType::Assignable);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "q");
+			TEST_ASSERT(!name->receivingType);
+		}
+		{
+			auto name = dynamic_pointer_cast<NameFragment>(decl->name[12]);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "g");
+		}
+		{
+			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[13]);
+			TEST_ASSERT(name->type == FunctionArgumentType::List);
+			TEST_ASSERT(name->name->identifiers.size() == 1);
+			TEST_ASSERT(name->name->identifiers[0].value == "r");
+			TEST_ASSERT(!name->receivingType);
 		}
 	}
 	{

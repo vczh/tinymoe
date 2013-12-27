@@ -25,6 +25,7 @@ namespace tinymoe
 		Expression,			// expression argument
 		Argument,			// argument argument
 		Assignable,			// assignable argument
+		List,				// list
 
 		End,				// end of an entity
 

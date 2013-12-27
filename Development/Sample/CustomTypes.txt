@@ -7,7 +7,7 @@ type person
 	gender
 end
 
-phrase collection of (parameters items)
+phrase collection of (list items)
 	set the result to items
 end
 

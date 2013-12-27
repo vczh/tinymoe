@@ -24,6 +24,7 @@ namespace tinymoe
 		case CodeTokenType::Expression:
 		case CodeTokenType::Argument:
 		case CodeTokenType::Assignable:
+		case CodeTokenType::List:
 		case CodeTokenType::End:
 		case CodeTokenType::And:
 		case CodeTokenType::Or:
@@ -77,6 +78,7 @@ namespace tinymoe
 					value == "expression" ? CodeTokenType::Expression :
 					value == "argument" ? CodeTokenType::Argument :
 					value == "assignable" ? CodeTokenType::Assignable :
+					value == "list" ? CodeTokenType::List :
 					value == "end" ? CodeTokenType::End :
 					value == "and" ? CodeTokenType::And :
 					value == "or" ? CodeTokenType::Or :

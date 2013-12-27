@@ -36,6 +36,7 @@ namespace tinymoe
 	enum class FunctionArgumentType
 	{
 		Normal,				// a normal function argument
+		List,				// a tuple marshalled as array
 		Argument,			// for block only, represents an argument to the block body
 		Expression,			// for sentence and block only, represnets a re-evaluable expression
 		Assignable,			// for sentence and block only, represnets a assignable expression

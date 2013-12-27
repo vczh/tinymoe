@@ -11,9 +11,11 @@ namespace tinymoe
 
 	enum class GrammarType
 	{
-		Name,					// for identifier list,				e.g. [repeat with] the current number [from] 1 [to] [sum from] 1 [to] 10
-		PrimitiveExpression,	// for primitive expression,		e.g. repeat with the current number from 1 to sum from 1 to [10]
-		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [sum from [1] to 10]
+		Name,					// for identifier list,				e.g. [repeat with] the current number [from] 1 [to] 100
+		PrimitiveExpression,	// for primitive expression,		e.g. sum from 1 to [10]
+		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
+		List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
+		Type,					// for type name,					e.g. set names to new [hash set]
 		Argument,				// for creating a new symbol,		e.g. repeat with [the current number] from 1 to sum from 1 to 10
 	};
 
@@ -23,8 +25,28 @@ namespace tinymoe
 		typedef shared_ptr<GrammarFragment>			Ptr;
 		typedef vector<Ptr>							List;
 
-		GrammarType					type;
-		CodeToken::List				identifiers;
+		GrammarType					type = GrammarType::Name;
+		vector<string>				identifiers;
+	};
+
+	enum class PredefinedSymbolType
+	{
+		Custom,					// user defined symbol
+		End,					// (statement)	end
+		Select,					// (statement)	select <expression>
+		Case,					// (statement)	case <expression>
+		TailCall,				// (statement)	tail call <expression>
+		Assign,					// (statement)	set <assignable> to <expression>
+		Increase,				// (statement)	increase <assignable>
+		AddTo,					// (statement)	add <assignable> to <expression>
+		Decrease,				// (statement)	decrease <assignable>
+		SubtractFrom,			// (statement)	subtract <assignable> from <expression>
+		Invoke,					// (expression)	invoke <primitive>
+		InvokeWith,				// (expression)	invoke <expression> with (<expression>, ..)
+		Field,					// (expression) field <argument> of <primitive>
+		NewType,				// (expression) new <type>
+		IsType,					// (expression) <primitive> is <type>
+		IsNotType,				// (expression) <primitive> is not <type>
 	};
 
 	class GrammarSymbol
@@ -39,6 +61,7 @@ namespace tinymoe
 													// a statement cannot be an expression
 													// the top invoke expression's function of a statement should reference to a statement symbol
 		string						uniqueId;		// a string that identifies the grammar structure
+		PredefinedSymbolType		type = PredefinedSymbolType::Custom;
 	};
 
 	/*************************************************************
@@ -50,9 +73,10 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<GrammarFragment>			Ptr;
 		typedef vector<Ptr>							List;
-
-		GrammarSymbol::List			expressionSymbols;		// all symbols for a legal expression
-		GrammarSymbol::List			statementSymbols;		// all symbols for a legal statement
+		
+		GrammarSymbol::List			typeSymbols;			// all symbols for a legal <type>
+		GrammarSymbol::List			expressionSymbols;		// all symbols for a legal <primitive>
+		GrammarSymbol::List			statementSymbols;		// all symbols for a legal <statement>
 	};
 
 	class GrammarStack
@@ -80,6 +104,12 @@ namespace tinymoe
 	{
 	public:
 		CodeToken					token;
+	};
+
+	class ArgumentExpression : public Expression
+	{
+	public:
+		CodeToken::List				token;
 	};
 
 	class ReferenceExpression : public Expression

@@ -706,7 +706,7 @@ namespace tinymoe
 			{
 				ownerToken,
 				ownerToken,
-				"Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name.",
+				"Function argument needed.",
 			};
 			errors.push_back(error);
 			return nullptr;
@@ -736,6 +736,11 @@ namespace tinymoe
 				decl->type = FunctionArgumentType::Argument;
 				it++;
 			}
+			else if (it->type == CodeTokenType::List)
+			{
+				decl->type = FunctionArgumentType::List;
+				it++;
+			}
 			else
 			{
 				decl->type = FunctionArgumentType::Normal;
@@ -750,7 +755,7 @@ namespace tinymoe
 					{
 						*it,
 						*it,
-						"Argument type for multiple dispatch is only allowed for value argument (that is, not \"expression\", \"assignable\" and \"argument\").",
+						"Argument type for multiple dispatch is only allowed for value argument (that is, not \"list\", \"expression\", \"assignable\" and \"argument\").",
 					};
 				}
 				decl->receivingType = SymbolName::ParseToFarest(++it, end, "Function argument type", ownerToken, errors);
