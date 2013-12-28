@@ -525,7 +525,7 @@ namespace tinymoe
 								{
 									ownerToken,
 									ownerToken,
-									"Argument of type \"argument\" or \"expression\" is only allowed in sentence or block declaration.",
+									"Argument of type \"assignable\" or \"expression\" is only allowed in sentence or block declaration.",
 								};
 								errors.push_back(error);
 							}

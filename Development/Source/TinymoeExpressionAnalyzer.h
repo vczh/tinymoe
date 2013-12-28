@@ -9,16 +9,18 @@ namespace tinymoe
 	Symbol
 	*************************************************************/
 
-	enum class GrammarType
+	enum class GrammarFragmentType
 	{
 		Name,					// for identifier list,				e.g. [repeat with] the current number [from] 1 [to] 100
-		PrimitiveExpression,	// for primitive expression,		e.g. sum from 1 to [10]
-		List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
-		Assignable,				// for left value expression,		e.g. [field unique identifier of person]
-								//									e.g. [a variable]
-		Argument,				// for creating a new symbol,		e.g. repeat with [the current number] from 1 to sum from 1 to 10
-		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
 		Type,					// for type name,					e.g. set names to new [hash set]
+		Primitive,				// for primitive expression,		e.g. sum from 1 to [10]
+		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
+		List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
+		Assignable,				// for left value expression, create a new symbol in the containing block if the <assignable> does not exist
+								//									e.g. [field unique identifier of person]
+								//									e.g. [a variable]
+		Argument,				// always create a new symbol in the block body
+								//									e.g. repeat with [the current number] from 1 to sum from 1 to 10
 	};
 
 	class GrammarFragment
@@ -27,50 +29,67 @@ namespace tinymoe
 		typedef shared_ptr<GrammarFragment>			Ptr;
 		typedef vector<Ptr>							List;
 
-		GrammarType					type = GrammarType::Name;
+		GrammarFragmentType			type;
 		vector<string>				identifiers;
+
+		GrammarFragment(GrammarFragmentType _type);
 	};
 
-	enum class PredefinedSymbolType
+	enum class GrammarSymbolTarget
 	{
 		Custom,					// user defined symbol
-		End,					// (statement)	end
-		Select,					// (statement)	select <expression>
-		Case,					// (statement)	case <expression>
-		TailCall,				// (statement)	tail call <expression>
-		RedirectTo,				// (statement)	redirect to <expression>
-		Assign,					// (statement)	set <assignable> to <expression>
-		SetArrayItem,			// (statement)	set item <expression> of array <expression> to <expression>
-		
-		NewType,				// (primitive)	new <type>
-		NewArray,				// (primitive)	new array of <expression> items
-		GetArrayItem,			// (primitive)	item <expression> of array <primitive>
-		Invoke,					// (primitive)	invoke <primitive>
-		InvokeWith,				// (primitive)	invoke <expression> with (<expression>, ..)
-		IsType,					// (primitive)	<primitive> is <type>
-		IsNotType,				// (primitive)	<primitive> is not <type>
-		Field,					// (assignable) field <argument> of <primitive>
 
 		Array,					// (type)		array
 		String,					// (type)		string
 		Integer,				// (type)		integer
 		Float,					// (type)		float
 		Symbol,					// (type)		symbol
+		
+		NewType,				// (primitive)	new <type>
+		NewArray,				// (primitive)	new array of <expression> items
+		GetArrayItem,			// (primitive)	item <expression> of array <primitive>
+		Invoke,					// (primitive)	invoke <primitive>
+		InvokeWith,				// (primitive)	invoke <expression> with (<list>)
+		IsType,					// (primitive)	<primitive> is <type>
+		IsNotType,				// (primitive)	<primitive> is not <type>
+		GetField,				// (primitive)	field <argument> of <primitive>
+
+		End,					// (sentence)	end
+		Select,					// (sentence)	select <expression>
+		Case,					// (sentence)	case <expression>
+		TailCall,				// (sentence)	tail call <expression>
+		RedirectTo,				// (sentence)	redirect to <expression>
+		Assign,					// (sentence)	set <assignable> to <expression>
+		SetArrayItem,			// (sentence)	set item <expression> of array <expression> to <expression>
+		SetField,				// (sentence)	set field <argument> of <expression> to <expression>
+	};
+
+	enum class GrammarSymbolType
+	{
+		Type,
+		Primitive,
+		Sentence,
+		Block,
 	};
 
 	class GrammarSymbol
 	{
 	public:
-		typedef shared_ptr<GrammarFragment>			Ptr;
+		typedef shared_ptr<GrammarSymbol>			Ptr;
 		typedef vector<Ptr>							List;
 		typedef multimap<string, Ptr>				MultiMap;
 
-		GrammarFragment::List		grammar;		// grammar for this symbol
+		GrammarFragment::List		fragments;		// grammar fragments for this symbol
 		bool						statement;		// true means this symbol is a statement
 													// a statement cannot be an expression
 													// the top invoke expression's function of a statement should reference to a statement symbol
 		string						uniqueId;		// a string that identifies the grammar structure
-		PredefinedSymbolType		type = PredefinedSymbolType::Custom;
+		GrammarSymbolTarget			target;
+		GrammarSymbolType			type;
+
+		GrammarSymbol(GrammarSymbolType _type, GrammarSymbolTarget _target = GrammarSymbolTarget::Custom);
+
+		void						CalculateUniqueId();
 	};
 
 	/*************************************************************
@@ -80,22 +99,25 @@ namespace tinymoe
 	class GrammarStackItem
 	{
 	public:
-		typedef shared_ptr<GrammarFragment>			Ptr;
+		typedef shared_ptr<GrammarStackItem>		Ptr;
 		typedef vector<Ptr>							List;
 		
-		GrammarSymbol::List			typeSymbols;			// all symbols for a legal <type>
-		GrammarSymbol::List			expressionSymbols;		// all symbols for a legal <primitive>
-		GrammarSymbol::List			statementSymbols;		// all symbols for a legal <statement>
+		GrammarSymbol::List			symbols;
+
+		void						FillPredefinedSymbols();
 	};
 
 	class GrammarStack
 	{
 	public:
-		typedef shared_ptr<GrammarFragment>			Ptr;
+		typedef shared_ptr<GrammarStack>			Ptr;
 
-		GrammarStackItem::List		stackItems;				// available symbols organized like a scope based structure
+		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
 		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
 															// the last symbol overrides all other symbols in the same group
+
+		void						Push(GrammarStackItem::Ptr stackItem);
+		GrammarStackItem::Ptr		Pop();
 	};
 
 	/*************************************************************
@@ -132,6 +154,46 @@ namespace tinymoe
 	public:
 		Expression::Ptr				function;
 		Expression::List			arguments;
+	};
+
+	enum class UnaryOperator
+	{
+		Positive,
+		Negative,
+		Not,
+	};
+
+	class UnaryExpression : public Expression
+	{
+	public:
+		Expression::Ptr				first;
+		Expression::Ptr				second;
+		UnaryOperator				op;
+	};
+
+	enum class BinaryOperator
+	{
+		Concat,
+		Add,
+		Sub,
+		Mul,
+		Div,
+		LT,
+		GT,
+		LE,
+		GE,
+		EQ,
+		NE,
+		And,
+		Or,
+	};
+
+	class BinaryExpression : public Expression
+	{
+	public:
+		Expression::Ptr				first;
+		Expression::Ptr				second;
+		BinaryOperator				op;
 	};
 }
 
