@@ -50,7 +50,7 @@ TEST_CASE(TestParseNameExpression)
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "true ");
@@ -60,7 +60,7 @@ TEST_CASE(TestParseNameExpression)
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "false ");
@@ -70,7 +70,7 @@ TEST_CASE(TestParseNameExpression)
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "null ");
@@ -92,7 +92,7 @@ TEST_CASE(TestParseTypeExpression)
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "array ");
@@ -102,7 +102,7 @@ TEST_CASE(TestParseTypeExpression)
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "integer ");
@@ -112,7 +112,7 @@ TEST_CASE(TestParseTypeExpression)
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "float ");
@@ -122,7 +122,7 @@ TEST_CASE(TestParseTypeExpression)
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "string ");
@@ -132,7 +132,7 @@ TEST_CASE(TestParseTypeExpression)
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
-		
+
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->symbol->uniqueId == "symbol ");
@@ -141,10 +141,59 @@ TEST_CASE(TestParseTypeExpression)
 
 TEST_CASE(TestParseArgumentExpression)
 {
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	Tokenize("true end", tokens);
+	result.clear();
+	stack->ParseArgument(tokens.begin(), tokens.end(), result);
+	TEST_ASSERT(result.size() == 2);
+	{
+		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->tokens.size() == 1);
+		TEST_ASSERT(expr->tokens[0].value == "true");
+	}
+	{
+		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->tokens.size() == 2);
+		TEST_ASSERT(expr->tokens[0].value == "true");
+		TEST_ASSERT(expr->tokens[1].value == "end");
+	}
 }
 
 TEST_CASE(TestParseAssignableExpression)
 {
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	Tokenize("true end", tokens);
+	result.clear();
+	stack->ParseAssignable(tokens.begin(), tokens.end(), result);
+	TEST_ASSERT(result.size() == 2);
+	{
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "true ");
+	}
+	{
+		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->tokens.size() == 2);
+		TEST_ASSERT(expr->tokens[0].value == "true");
+		TEST_ASSERT(expr->tokens[1].value == "end");
+	}
 }
 
 TEST_CASE(TestParsePrimitiveExpression)

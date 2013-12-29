@@ -727,11 +727,71 @@ namespace tinymoe
 
 	CodeError GrammarStack::ParseAssignable(Iterator input, Iterator end, ResultList& result)
 	{
-		throw 0;
+		int resultBegin = result.size();
+
+		CodeError resultError;
+		auto it = availableSymbols.begin();
+		while (it != availableSymbols.end())
+		{
+			it = availableSymbols.upper_bound(it->first);
+			it--;
+			if (it->second->type == GrammarSymbolType::Symbol)
+			{
+				auto error = ParseGrammarSymbol(it->second, input, end, result);
+				resultError = FoldError(resultError, error);
+			}
+			it++;
+		}
+
+		int resultEnd = result.size();
+		vector<int> symbolSizes;
+		for (int i = resultBegin; i < resultEnd; i++)
+		{
+			if (auto reference = dynamic_pointer_cast<ReferenceExpression>(result[i].second))
+			{
+				symbolSizes.push_back(reference->symbol->fragments[0]->identifiers.size());
+			}
+		}
+
+		auto error = ParseArgument(input, end, result);
+		for (int i = result.size() - 1; i >= resultEnd; i--)
+		{
+			if (auto argument = dynamic_pointer_cast<ArgumentExpression>(result[i].second))
+			{
+				if (find(symbolSizes.begin(), symbolSizes.end(), argument->tokens.size()) != symbolSizes.end())
+				{
+					result.erase(result.begin() + i);
+				}
+			}
+		}
+
+		resultError = FoldError(resultError, error);
+		return resultError;
 	}
 
 	CodeError GrammarStack::ParseArgument(Iterator input, Iterator end, ResultList& result)
 	{
-		throw 0;
+		if (input == end)
+		{
+			auto token = *(input - 1);
+			CodeError error = {
+				token,
+				token,
+				"Unexpected end of line.",
+			};
+			return error;
+		}
+
+		CodeToken::List tokens;
+		while (input != end)
+		{
+			tokens.push_back(*input++);
+
+			auto argument = make_shared<ArgumentExpression>();
+			argument->tokens = tokens;
+			result.push_back(make_pair(input, static_pointer_cast<Expression>(argument)));
+		}
+
+		return CodeError();
 	}
 }
