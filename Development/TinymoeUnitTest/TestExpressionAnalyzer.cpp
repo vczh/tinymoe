@@ -37,6 +37,44 @@ TEST_CASE(TestGrammarStack)
 
 TEST_CASE(TestParseNameExpression)
 {
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	{
+		Tokenize("true", tokens);
+		result.clear();
+		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "true ");
+	}
+	{
+		Tokenize("false", tokens);
+		result.clear();
+		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "false ");
+	}
+	{
+		Tokenize("null", tokens);
+		result.clear();
+		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "null ");
+	}
 }
 
 TEST_CASE(TestParseTypeExpression)
