@@ -208,4 +208,125 @@ namespace tinymoe
 
 		return stackItem;
 	}
+
+	CodeError GrammarStack::SuccessError()
+	{
+		return CodeError();
+	}
+
+	CodeError GrammarStack::ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result)
+	{
+		if (input == end)
+		{
+			auto token = *(input - 1);
+			CodeError error = {
+				token,
+				token,
+				"Unexpected end of line.",
+			};
+			return error;
+		}
+		else if (input->value != token)
+		{
+			auto token = *input;
+			CodeError error = {
+				token,
+				token,
+				"\"" + token.value + "\" expected but \"" + input->value + "\" found.",
+			};
+			return error;
+		}
+		else
+		{
+			result.push_back(++input);
+			return CodeError();
+		}
+	}
+
+	CodeError GrammarStack::PickError(CodeError::List& errors)
+	{
+		auto it = errors.begin();
+		auto token = *it++;
+		while (it != errors.end())
+		{
+			if (it->begin.column > token.begin.column)
+			{
+				token = *it;
+			}
+			it++;
+		}
+		return token;
+	}
+
+	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		switch (fragment->type)
+		{
+		case GrammarFragmentType::Type:
+			return ParseType(input, end, result);
+		case GrammarFragmentType::Primitive:
+			return ParsePrimitive(input, end, result);
+		case GrammarFragmentType::Expression:
+			return ParseExpression(input, end, result);
+		case GrammarFragmentType::List:
+			return ParseList(input, end, result);
+		case GrammarFragmentType::Assignable:
+			return ParseAssignable(input, end, result);
+		case GrammarFragmentType::Argument:
+			return ParseArgument(input, end, result);
+		}
+
+		vector<Iterator> nameResult;
+		for (auto id : fragment->identifiers)
+		{
+			auto error = ParseToken(id, input, end, nameResult);
+			if (nameResult.size() == 0)
+			{
+				return error;
+			}
+			else
+			{
+				input = nameResult[0];
+				nameResult.clear();
+			}
+		}
+
+		result.push_back(make_pair(input, Expression::Ptr(nullptr)));
+		return SuccessError();
+	}
+
+	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseList(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseAssignable(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseArgument(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	{
+		throw 0;
+	}
 }

@@ -93,34 +93,6 @@ namespace tinymoe
 	};
 
 	/*************************************************************
-	Symbol Stack
-	*************************************************************/
-
-	class GrammarStackItem
-	{
-	public:
-		typedef shared_ptr<GrammarStackItem>		Ptr;
-		typedef vector<Ptr>							List;
-		
-		GrammarSymbol::List			symbols;
-
-		void						FillPredefinedSymbols();
-	};
-
-	class GrammarStack
-	{
-	public:
-		typedef shared_ptr<GrammarStack>			Ptr;
-
-		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
-		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
-															// the last symbol overrides all other symbols in the same group
-
-		void						Push(GrammarStackItem::Ptr stackItem);
-		GrammarStackItem::Ptr		Pop();
-	};
-
-	/*************************************************************
 	Expression
 	*************************************************************/
 
@@ -131,29 +103,40 @@ namespace tinymoe
 		typedef vector<Ptr>							List;
 	};
 
+	// for numbers and strings
 	class LiteralExpression : public Expression
 	{
 	public:
 		CodeToken					token;
 	};
 
+	// for new created symbols in <assignable> and <argument>
 	class ArgumentExpression : public Expression
 	{
 	public:
 		CodeToken::List				token;
 	};
 
+	// for symbol referencing
 	class ReferenceExpression : public Expression
 	{
 	public:
 		GrammarSymbol::Ptr			symbol;
 	};
 
+	// for function invoking
 	class InvokeExpression : public Expression
 	{
 	public:
 		Expression::Ptr				function;
 		Expression::List			arguments;
+	};
+
+	// for <list>
+	class ListExpression : public Expression
+	{
+	public:
+		Expression::List			elements;
 	};
 
 	enum class UnaryOperator
@@ -163,6 +146,7 @@ namespace tinymoe
 		Not,
 	};
 
+	// for unary operator invoking
 	class UnaryExpression : public Expression
 	{
 	public:
@@ -188,12 +172,55 @@ namespace tinymoe
 		Or,
 	};
 
+	// for binary operator invoking
 	class BinaryExpression : public Expression
 	{
 	public:
 		Expression::Ptr				first;
 		Expression::Ptr				second;
 		BinaryOperator				op;
+	};
+
+	/*************************************************************
+	Symbol Stack
+	*************************************************************/
+
+	class GrammarStackItem
+	{
+	public:
+		typedef shared_ptr<GrammarStackItem>		Ptr;
+		typedef vector<Ptr>							List;
+		
+		GrammarSymbol::List			symbols;
+
+		void						FillPredefinedSymbols();
+	};
+
+	class GrammarStack
+	{
+	public:
+		typedef shared_ptr<GrammarStack>			Ptr;
+		typedef CodeToken::List::iterator			Iterator;
+
+		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
+		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
+															// the last symbol overrides all other symbols in the same group
+
+		void						Push(GrammarStackItem::Ptr stackItem);
+		GrammarStackItem::Ptr		Pop();
+
+		CodeError					SuccessError();
+		CodeError					ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
+		CodeError					PickError(CodeError::List& errors);
+
+		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseExpression(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseList(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseAssignable(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseArgument(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
 	};
 }
 
