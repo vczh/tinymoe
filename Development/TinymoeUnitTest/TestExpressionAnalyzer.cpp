@@ -3,8 +3,13 @@
 
 using namespace tinymoe;
 
-TEST_CASE(TestGrammarUniqueId)
+void Tokenize(const string& code, CodeToken::List& tokens)
 {
+	CodeError::List errors;
+	auto codeFile = CodeFile::Parse(code, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(codeFile->lines.size() == 1);
+	tokens = codeFile->lines[0]->tokens;
 }
 
 TEST_CASE(TestGrammarStack)
@@ -36,6 +41,64 @@ TEST_CASE(TestParseNameExpression)
 
 TEST_CASE(TestParseTypeExpression)
 {
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	{
+		Tokenize("array", tokens);
+		result.clear();
+		stack->ParseType(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "array ");
+	}
+	{
+		Tokenize("integer", tokens);
+		result.clear();
+		stack->ParseType(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "integer ");
+	}
+	{
+		Tokenize("float", tokens);
+		result.clear();
+		stack->ParseType(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "float ");
+	}
+	{
+		Tokenize("string", tokens);
+		result.clear();
+		stack->ParseType(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "string ");
+	}
+	{
+		Tokenize("symbol", tokens);
+		result.clear();
+		stack->ParseType(tokens.begin(), tokens.end(), result);
+		TEST_ASSERT(result.size() == 1);
+		
+		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
+		TEST_ASSERT(expr);
+		TEST_ASSERT(expr->symbol->uniqueId == "symbol ");
+	}
 }
 
 TEST_CASE(TestParseArgumentExpression)

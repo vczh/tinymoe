@@ -548,7 +548,7 @@ namespace tinymoe
 		return error1.begin.column > error2.begin.column ? error1 : error2;
 	}
 
-	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result)
 	{
 		switch (fragment->type)
 		{
@@ -608,7 +608,7 @@ namespace tinymoe
 		return error;
 	}
 
-	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result)
 	{
 		vector<pair<Iterator, ExpressionLink::Ptr>> stepResult;
 		stepResult.push_back(make_pair(input, ExpressionLink::Ptr(nullptr)));
@@ -671,43 +671,45 @@ namespace tinymoe
 		return resultError;
 	}
 
-	CodeError GrammarStack::ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseType(Iterator input, Iterator end, ResultList& result)
 	{
 		CodeError resultError;
 		auto it = availableSymbols.begin();
 		while (it != availableSymbols.end())
 		{
 			it = availableSymbols.upper_bound(it->first);
+			it--;
 			if (it->second->type == GrammarSymbolType::Type)
 			{
 				auto error = ParseGrammarSymbol(it->second, input, end, result);
 				resultError = FoldError(resultError, error);
 			}
+			it++;
 		}
 		return resultError;
 	}
 
-	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, ResultList& result)
 	{
 		throw 0;
 	}
 
-	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, ResultList& result)
 	{
 		throw 0;
 	}
 
-	CodeError GrammarStack::ParseList(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseList(Iterator input, Iterator end, ResultList& result)
 	{
 		throw 0;
 	}
 
-	CodeError GrammarStack::ParseAssignable(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseAssignable(Iterator input, Iterator end, ResultList& result)
 	{
 		throw 0;
 	}
 
-	CodeError GrammarStack::ParseArgument(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
+	CodeError GrammarStack::ParseArgument(Iterator input, Iterator end, ResultList& result)
 	{
 		throw 0;
 	}

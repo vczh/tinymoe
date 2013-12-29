@@ -227,8 +227,9 @@ namespace tinymoe
 	class GrammarStack
 	{
 	public:
-		typedef shared_ptr<GrammarStack>			Ptr;
-		typedef CodeToken::List::iterator			Iterator;
+		typedef shared_ptr<GrammarStack>					Ptr;
+		typedef CodeToken::List::iterator					Iterator;
+		typedef vector<pair<Iterator, Expression::Ptr>>		ResultList;
 
 		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
 		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
@@ -249,15 +250,15 @@ namespace tinymoe
 		CodeError					ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
 		CodeError					FoldError(CodeError error1, CodeError error2);
 
-		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result);
 		CodeError					ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
-		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParseExpression(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParseList(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParseAssignable(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
-		CodeError					ParseArgument(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result);
+		CodeError					ParseType(Iterator input, Iterator end, ResultList& result);
+		CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);
+		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);
+		CodeError					ParseList(Iterator input, Iterator end, ResultList& result);
+		CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);
+		CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);
 	};
 }
 
