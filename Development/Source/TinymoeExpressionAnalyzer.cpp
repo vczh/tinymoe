@@ -543,16 +543,9 @@ namespace tinymoe
 		}
 	}
 
-	CodeError GrammarStack::PickError(CodeError error, CodeError::List& errors)
+	CodeError GrammarStack::FoldError(CodeError error1, CodeError error2)
 	{
-		for (auto candidate : errors)
-		{
-			if (candidate.begin.column > error.begin.column)
-			{
-				error = candidate;
-			}
-		}
-		return error;
+		return error1.begin.column > error2.begin.column ? error1 : error2;
 	}
 
 	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
@@ -600,10 +593,17 @@ namespace tinymoe
 
 		for (auto fr : fragmentResult)
 		{
-			auto link = make_shared<ExpressionLink>();
-			link->expression = fr.second;
-			link->previous = previousExpression;
-			result.push_back(make_pair(fr.first, link));
+			if (fr.second)
+				{
+				auto link = make_shared<ExpressionLink>();
+				link->expression = fr.second;
+				link->previous = previousExpression;
+				result.push_back(make_pair(fr.first, link));
+			}
+			else
+			{
+				result.push_back(make_pair(fr.first, previousExpression));
+			}
 		}
 		return error;
 	}
@@ -615,14 +615,76 @@ namespace tinymoe
 
 		int stepResultBegin = 0;
 		int stepResultEnd = stepResult.size();
+		CodeError resultError;
 		for (int i = 0; (size_t)i < symbol->fragments.size(); i++)
 		{
+			for (int j = stepResultBegin; j < stepResultEnd; j++)
+			{
+				auto it = stepResult[j].first;
+				auto expr = stepResult[j].second;
+				auto error = ParseGrammarSymbolStep(symbol, i, expr, it, end, stepResult);
+				resultError = FoldError(resultError, error);
+			}
+
+			stepResultBegin = stepResultEnd;
+			stepResultEnd = stepResult.size();
 		}
+
+		for (int j = stepResultBegin; j < stepResultEnd; j++)
+		{
+			auto it = stepResult[j].first;
+			auto expr = stepResult[j].second;
+			Expression::List arguments;
+			while (expr)
+			{
+				arguments.insert(arguments.begin(), expr->expression);
+				expr = expr->previous;
+			}
+
+			bool invoke = arguments.size() > 0
+				|| symbol->type == GrammarSymbolType::Phrase
+				|| symbol->type == GrammarSymbolType::Sentence
+				|| symbol->type == GrammarSymbolType::Block
+				;
+
+			Expression::Ptr resultExpr;
+			if (invoke)
+			{
+				auto reference = make_shared<ReferenceExpression>();
+				reference->symbol = symbol;
+
+				auto invoke = make_shared<InvokeExpression>();
+				invoke->function = reference;
+				invoke->arguments = arguments;
+
+				resultExpr = invoke;
+			}
+			else
+			{
+				auto reference = make_shared<ReferenceExpression>();
+				reference->symbol = symbol;
+
+				resultExpr = reference;
+			}
+			result.push_back(make_pair(it, resultExpr));
+		}
+		return resultError;
 	}
 
 	CodeError GrammarStack::ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
 	{
-		throw 0;
+		CodeError resultError;
+		auto it = availableSymbols.begin();
+		while (it != availableSymbols.end())
+		{
+			it = availableSymbols.upper_bound(it->first);
+			if (it->second->type == GrammarSymbolType::Type)
+			{
+				auto error = ParseGrammarSymbol(it->second, input, end, result);
+				resultError = FoldError(resultError, error);
+			}
+		}
+		return resultError;
 	}
 
 	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)

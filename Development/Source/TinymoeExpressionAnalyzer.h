@@ -247,7 +247,7 @@ namespace tinymoe
 
 		CodeError					SuccessError();
 		CodeError					ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
-		CodeError					PickError(CodeError error, CodeError::List& errors);
+		CodeError					FoldError(CodeError error1, CodeError error2);
 
 		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
 		CodeError					ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
