@@ -543,19 +543,16 @@ namespace tinymoe
 		}
 	}
 
-	CodeError GrammarStack::PickError(CodeError::List& errors)
+	CodeError GrammarStack::PickError(CodeError error, CodeError::List& errors)
 	{
-		auto it = errors.begin();
-		auto token = *it++;
-		while (it != errors.end())
+		for (auto candidate : errors)
 		{
-			if (it->begin.column > token.begin.column)
+			if (candidate.begin.column > error.begin.column)
 			{
-				token = *it;
+				error = candidate;
 			}
-			it++;
 		}
-		return token;
+		return error;
 	}
 
 	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
@@ -595,9 +592,32 @@ namespace tinymoe
 		return SuccessError();
 	}
 
+	CodeError GrammarStack::ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result)
+	{
+		auto fragment = symbol->fragments[fragmentIndex];
+		vector<pair<Iterator, Expression::Ptr>> fragmentResult;
+		auto error = ParseGrammarFragment(fragment, input, end, fragmentResult);
+
+		for (auto fr : fragmentResult)
+		{
+			auto link = make_shared<ExpressionLink>();
+			link->expression = fr.second;
+			link->previous = previousExpression;
+			result.push_back(make_pair(fr.first, link));
+		}
+		return error;
+	}
+
 	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)
 	{
-		throw 0;
+		vector<pair<Iterator, ExpressionLink::Ptr>> stepResult;
+		stepResult.push_back(make_pair(input, ExpressionLink::Ptr(nullptr)));
+
+		int stepResultBegin = 0;
+		int stepResultEnd = stepResult.size();
+		for (int i = 0; (size_t)i < symbol->fragments.size(); i++)
+		{
+		}
 	}
 
 	CodeError GrammarStack::ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result)

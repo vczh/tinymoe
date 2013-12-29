@@ -17,10 +17,10 @@ namespace tinymoe
 		Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
 		List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
 		Assignable,				// for left value expression, create a new symbol in the containing block if the <assignable> does not exist
-								//									e.g. [field unique identifier of person]
-								//									e.g. [a variable]
+		//									e.g. [field unique identifier of person]
+		//									e.g. [a variable]
 		Argument,				// always create a new symbol in the block body
-								//									e.g. repeat with [the current number] from 1 to sum from 1 to 10
+		//									e.g. repeat with [the current number] from 1 to sum from 1 to 10
 	};
 
 	class GrammarFragment
@@ -48,7 +48,7 @@ namespace tinymoe
 		True,					// (primitive)	true
 		False,					// (primitive)	false
 		Null,					// (primitive)	null
-		
+
 		NewType,				// (primitive)	new <type>
 		NewArray,				// (primitive)	new array of <expression> items
 		GetArrayItem,			// (primitive)	item <expression> of array <primitive>
@@ -86,8 +86,8 @@ namespace tinymoe
 
 		GrammarFragment::List		fragments;		// grammar fragments for this symbol
 		bool						statement;		// true means this symbol is a statement
-													// a statement cannot be an expression
-													// the top invoke expression's function of a statement should reference to a statement symbol
+		// a statement cannot be an expression
+		// the top invoke expression's function of a statement should reference to a statement symbol
 		string						uniqueId;		// a string that identifies the grammar structure
 		GrammarSymbolTarget			target;
 		GrammarSymbolType			type;
@@ -218,7 +218,7 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<GrammarStackItem>		Ptr;
 		typedef vector<Ptr>							List;
-		
+
 		GrammarSymbol::List			symbols;
 
 		void						FillPredefinedSymbols();
@@ -232,16 +232,25 @@ namespace tinymoe
 
 		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
 		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
-															// the last symbol overrides all other symbols in the same group
+		// the last symbol overrides all other symbols in the same group
+
+		struct ExpressionLink
+		{
+			typedef shared_ptr<ExpressionLink>		Ptr;
+
+			Expression::Ptr			expression;
+			Ptr						previous;
+		};
 
 		void						Push(GrammarStackItem::Ptr stackItem);
 		GrammarStackItem::Ptr		Pop();
 
 		CodeError					SuccessError();
 		CodeError					ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
-		CodeError					PickError(CodeError::List& errors);
+		CodeError					PickError(CodeError error, CodeError::List& errors);
 
 		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
+		CodeError					ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
 		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
 		CodeError					ParseType(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
 		CodeError					ParsePrimitive(Iterator input, Iterator end, vector<pair<Iterator, Expression::Ptr>>& result);
