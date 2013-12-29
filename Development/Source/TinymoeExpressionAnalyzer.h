@@ -53,7 +53,7 @@ namespace tinymoe
 		NewArray,				// (primitive)	new array of <expression> items
 		GetArrayItem,			// (primitive)	item <expression> of array <primitive>
 		Invoke,					// (primitive)	invoke <primitive>
-		InvokeWith,				// (primitive)	invoke <expression> with (<list>)
+		InvokeWith,				// (primitive)	invoke <expression> with <list>
 		IsType,					// (primitive)	<primitive> is <type>
 		IsNotType,				// (primitive)	<primitive> is not <type>
 		GetField,				// (primitive)	field <argument> of <primitive>

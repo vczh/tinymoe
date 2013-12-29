@@ -692,9 +692,7 @@ namespace tinymoe
 	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, ResultList& result)
 	{
 		CodeError resultError;
-		GrammarSymbol::List leftRecursiveSymbols;
 		auto it = availableSymbols.begin();
-
 		while (it != availableSymbols.end())
 		{
 			it = availableSymbols.upper_bound(it->first);
@@ -706,7 +704,6 @@ namespace tinymoe
 				{
 				case GrammarFragmentType::Primitive:
 				case GrammarFragmentType::Expression:
-					leftRecursiveSymbols.push_back(symbol);
 					break;
 				default:
 					auto error = ParseGrammarSymbol(symbol, input, end, result);
@@ -715,7 +712,6 @@ namespace tinymoe
 			}
 			it++;
 		}
-
 		return resultError;
 	}
 
