@@ -44,6 +44,10 @@ namespace tinymoe
 		Integer,				// (type)		integer
 		Float,					// (type)		float
 		Symbol,					// (type)		symbol
+
+		True,					// (primitive)	true
+		False,					// (primitive)	false
+		Null,					// (primitive)	null
 		
 		NewType,				// (primitive)	new <type>
 		NewArray,				// (primitive)	new array of <expression> items
@@ -66,10 +70,11 @@ namespace tinymoe
 
 	enum class GrammarSymbolType
 	{
-		Type,
-		Primitive,
-		Sentence,
-		Block,
+		Type,					// <type>
+		Symbol,					// <primitive>
+		Phrase,					// <primitive>
+		Sentence,				// <sentence>
+		Block,					// <block>
 	};
 
 	class GrammarSymbol
@@ -101,6 +106,9 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<Expression>				Ptr;
 		typedef vector<Ptr>							List;
+
+		virtual string				ToLog() = 0;
+		virtual string				ToCode() = 0;
 	};
 
 	// for numbers and strings
@@ -108,13 +116,19 @@ namespace tinymoe
 	{
 	public:
 		CodeToken					token;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	// for new created symbols in <assignable> and <argument>
 	class ArgumentExpression : public Expression
 	{
 	public:
-		CodeToken::List				token;
+		CodeToken::List				tokens;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	// for symbol referencing
@@ -122,6 +136,9 @@ namespace tinymoe
 	{
 	public:
 		GrammarSymbol::Ptr			symbol;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	// for function invoking
@@ -130,6 +147,9 @@ namespace tinymoe
 	public:
 		Expression::Ptr				function;
 		Expression::List			arguments;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	// for <list>
@@ -137,6 +157,9 @@ namespace tinymoe
 	{
 	public:
 		Expression::List			elements;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	enum class UnaryOperator
@@ -150,9 +173,11 @@ namespace tinymoe
 	class UnaryExpression : public Expression
 	{
 	public:
-		Expression::Ptr				first;
-		Expression::Ptr				second;
+		Expression::Ptr				operand;
 		UnaryOperator				op;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	enum class BinaryOperator
@@ -179,6 +204,9 @@ namespace tinymoe
 		Expression::Ptr				first;
 		Expression::Ptr				second;
 		BinaryOperator				op;
+
+		string						ToLog()override;
+		string						ToCode()override;
 	};
 
 	/*************************************************************

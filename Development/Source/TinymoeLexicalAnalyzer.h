@@ -61,6 +61,9 @@ namespace tinymoe
 		string							value;
 
 		bool							IsNameFragmentToken();
+
+		static string					EscapeString(string value);
+		static string					UnescapeString(string str);
 	};
 
 	struct CodeError

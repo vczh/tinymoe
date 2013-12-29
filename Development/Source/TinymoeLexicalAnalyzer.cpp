@@ -35,6 +35,74 @@ namespace tinymoe
 		}
 	}
 
+	string CodeToken::EscapeString(string value)
+	{
+		stringstream ss;
+		for (auto c : value)
+		{
+			switch (c)
+			{
+			case '\n':
+				ss << "\\n";
+				break;
+			case '\r':
+				ss << "\\r";
+				break;
+			case '\t':
+				ss << "\\t";
+				break;
+			case '\\':
+				ss << "\\\\";
+				break;
+			case '\"':
+				ss << "\\\"";
+				break;
+			default:
+				ss << c;
+			}
+		}
+		return ss.str();
+	}
+
+	string CodeToken::UnescapeString(string str)
+	{
+		stringstream ss;
+		bool escaping = false;
+		for (auto c : str)
+		{
+			if (escaping)
+			{
+				escaping = false;
+				switch (c)
+				{
+				case 'n':
+					ss << '\n';
+					break;
+				case 'r':
+					ss << '\r';
+					break;
+				case 't':
+					ss << '\t';
+					break;
+				default:
+					ss << c;
+				}
+			}
+			else
+			{
+				if (c == '\\')
+				{
+					escaping = true;
+				}
+				else
+				{
+					ss << c;
+				}
+			}
+		}
+		return ss.str();
+	}
+
 	/*************************************************************
 	CodeFile
 	*************************************************************/
@@ -86,43 +154,7 @@ namespace tinymoe
 					CodeTokenType::Identifier;
 				break;
 			case CodeTokenType::String:
-				{
-					stringstream ss;
-					bool escaping = false;
-					for (auto c : value)
-					{
-						if (escaping)
-						{
-							escaping = false;
-							switch (c)
-							{
-							case 'n':
-								ss << '\n';
-								break;
-							case 'r':
-								ss << '\r';
-								break;
-							case 't':
-								ss << '\t';
-								break;
-							default:
-								ss << c;
-							}
-						}
-						else
-						{
-							if (c == '\\')
-							{
-								escaping = true;
-							}
-							else
-							{
-								ss << c;
-							}
-						}
-					}
-					value = ss.str();
-				}
+				value = CodeToken::UnescapeString(value);
 				break;
 			}
 
