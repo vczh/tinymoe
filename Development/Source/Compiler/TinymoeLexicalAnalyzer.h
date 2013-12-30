@@ -86,6 +86,7 @@ namespace tinymoe
 	struct CodeFile
 	{
 		typedef shared_ptr<CodeFile>			Ptr;
+		typedef vector<Ptr>						List;
 
 		CodeLine::List					lines;
 

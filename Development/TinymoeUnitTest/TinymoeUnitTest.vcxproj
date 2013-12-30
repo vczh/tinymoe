@@ -91,6 +91,7 @@
     <ClCompile Include="TestDeclarationAnalyzer.cpp" />
     <ClCompile Include="TestExpressionAnalyzer.cpp" />
     <ClCompile Include="TestLexicalAnalyzer.cpp" />
+    <ClCompile Include="TestStatementAnalyzer.cpp" />
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>

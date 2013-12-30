@@ -54,6 +54,9 @@
     <ClCompile Include="..\Source\Compiler\TinymoeStatementAnalyzer.cpp">
       <Filter>Tinymoe\Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="TestStatementAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">

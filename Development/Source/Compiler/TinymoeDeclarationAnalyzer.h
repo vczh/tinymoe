@@ -165,6 +165,7 @@ namespace tinymoe
 	{
 	public:
 		typedef shared_ptr<Module>			Ptr;
+		typedef vector<Ptr>					List;
 
 		SymbolName::Ptr						name;				// name of the module
 		SymbolName::List					usings;				// other modules whose declarations can be referred in this module
