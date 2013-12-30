@@ -1,5 +1,5 @@
 #include "UnitTest.h"
-#include "..\Source\Tinymoe.h"
+#include "../Source/Tinymoe.h"
 
 using namespace tinymoe;
 

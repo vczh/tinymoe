@@ -1,5 +1,5 @@
 #include "UnitTest.h"
-#include "..\Source\TinymoeExpressionAnalyzer.h"
+#include "../Source/Tinymoe.h"
 
 using namespace tinymoe;
 

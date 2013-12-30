@@ -82,10 +82,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Compiler\TinymoeDeclarationAnalyzer.cpp" />
+    <ClCompile Include="..\Source\Compiler\TinymoeExpressionAnalyzer.cpp" />
+    <ClCompile Include="..\Source\Compiler\TinymoeLexicalAnalyzer.cpp" />
+    <ClCompile Include="..\Source\Compiler\TinymoeStatementAnalyzer.cpp" />
     <ClCompile Include="..\Source\Tinymoe.cpp" />
-    <ClCompile Include="..\Source\TinymoeDeclarationAnalyzer.cpp" />
-    <ClCompile Include="..\Source\TinymoeExpressionAnalyzer.cpp" />
-    <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TestDeclarationAnalyzer.cpp" />
     <ClCompile Include="TestExpressionAnalyzer.cpp" />
@@ -93,10 +94,11 @@
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Compiler\TinymoeDeclarationAnalyzer.h" />
+    <ClInclude Include="..\Source\Compiler\TinymoeExpressionAnalyzer.h" />
+    <ClInclude Include="..\Source\Compiler\TinymoeLexicalAnalyzer.h" />
+    <ClInclude Include="..\Source\Compiler\TinymoeStatementAnalyzer.h" />
     <ClInclude Include="..\Source\Tinymoe.h" />
-    <ClInclude Include="..\Source\TinymoeDeclarationAnalyzer.h" />
-    <ClInclude Include="..\Source\TinymoeExpressionAnalyzer.h" />
-    <ClInclude Include="..\Source\TinymoeLexicalAnalyzer.h" />
     <ClInclude Include="..\Source\TinymoeSTL.h" />
     <ClInclude Include="UnitTest.h" />
   </ItemGroup>

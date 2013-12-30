@@ -1,9 +1,10 @@
 #ifndef VCZH_TINYMOE
 #define VCZH_TINYMOE
 
-#include "TinymoeLexicalAnalyzer.h"
-#include "TinymoeDeclarationAnalyzer.h"
-#include "TinymoeExpressionAnalyzer.h"
+#include "Compiler/TinymoeLexicalAnalyzer.h"
+#include "Compiler/TinymoeDeclarationAnalyzer.h"
+#include "Compiler/TinymoeExpressionAnalyzer.h"
+#include "Compiler/TinymoeStatementAnalyzer.h"
 
 namespace tinymoe
 {

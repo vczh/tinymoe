@@ -19,6 +19,9 @@
     <Filter Include="Sample">
       <UniqueIdentifier>{3de6a6a2-4689-435d-b6bd-1d65c974390c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tinymoe\Compiler">
+      <UniqueIdentifier>{9685582c-5f07-44f2-aefd-c88422be8af6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -30,23 +33,26 @@
     <ClCompile Include="..\Source\Tinymoe.cpp">
       <Filter>Tinymoe</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\TinymoeLexicalAnalyzer.cpp">
-      <Filter>Tinymoe</Filter>
-    </ClCompile>
     <ClCompile Include="TestLexicalAnalyzer.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\TinymoeDeclarationAnalyzer.cpp">
-      <Filter>Tinymoe</Filter>
     </ClCompile>
     <ClCompile Include="TestDeclarationAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\TinymoeExpressionAnalyzer.cpp">
-      <Filter>Tinymoe</Filter>
-    </ClCompile>
     <ClCompile Include="TestExpressionAnalyzer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeDeclarationAnalyzer.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeExpressionAnalyzer.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeLexicalAnalyzer.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeStatementAnalyzer.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,17 +62,20 @@
     <ClInclude Include="..\Source\Tinymoe.h">
       <Filter>Tinymoe</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TinymoeLexicalAnalyzer.h">
-      <Filter>Tinymoe</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\TinymoeSTL.h">
       <Filter>Tinymoe</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TinymoeDeclarationAnalyzer.h">
-      <Filter>Tinymoe</Filter>
+    <ClInclude Include="..\Source\Compiler\TinymoeDeclarationAnalyzer.h">
+      <Filter>Tinymoe\Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TinymoeExpressionAnalyzer.h">
-      <Filter>Tinymoe</Filter>
+    <ClInclude Include="..\Source\Compiler\TinymoeExpressionAnalyzer.h">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Compiler\TinymoeLexicalAnalyzer.h">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Compiler\TinymoeStatementAnalyzer.h">
+      <Filter>Tinymoe\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
