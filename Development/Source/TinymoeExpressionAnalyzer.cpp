@@ -264,13 +264,13 @@ namespace tinymoe
 		switch (op)
 		{
 		case UnaryOperator::Positive:
-			result = "+ (";
+			result = "+(";
 			break;
 		case UnaryOperator::Negative:
-			result = "- (";
+			result = "-(";
 			break;
 		case UnaryOperator::Not:
-			result = "not (";
+			result = "not(";
 			break;
 		}
 		result += operand->ToLog() + ")";
@@ -279,50 +279,50 @@ namespace tinymoe
 
 	string BinaryExpression::ToLog()
 	{
-		string result = "(" + first->ToLog() + " ";
+		string result;
 		switch (op)
 		{
 		case BinaryOperator::Concat:
-			result += "&";
+			result += "&(";
 			break;
 		case BinaryOperator::Add:
-			result += "+";
+			result += "+(";
 			break;
 		case BinaryOperator::Sub:
-			result += "-";
+			result += "-(";
 			break;
 		case BinaryOperator::Mul:
-			result += "*";
+			result += "*(";
 			break;
 		case BinaryOperator::Div:
-			result += "/";
+			result += "/(";
 			break;
 		case BinaryOperator::LT:
-			result += "<";
+			result += "<(";
 			break;
 		case BinaryOperator::GT:
-			result += ">";
+			result += ">(";
 			break;
 		case BinaryOperator::LE:
-			result += "<=";
+			result += "<=(";
 			break;
 		case BinaryOperator::GE:
-			result += ">=";
+			result += ">=(";
 			break;
 		case BinaryOperator::EQ:
-			result += "=";
+			result += "=(";
 			break;
 		case BinaryOperator::NE:
-			result += "<>";
+			result += "<>(";
 			break;
 		case BinaryOperator::And:
-			result += "and";
+			result += "and(";
 			break;
 		case BinaryOperator::Or:
-			result += "or";
+			result += "or(";
 			break;
 		}
-		result += " " + second->ToLog() + ")";
+		result += first->ToLog() + ", " + second->ToLog() + ")";
 		return result;
 	}
 
@@ -393,7 +393,7 @@ namespace tinymoe
 			}
 		}
 
-		string result = "invoke " + function->ToCode() + " with (";
+		string result = "(invoke " + function->ToCode() + " with (";
 		for (auto i = arguments.begin(); i != arguments.end(); i++)
 		{
 			result += (*i)->ToCode();
@@ -402,7 +402,7 @@ namespace tinymoe
 				result += ", ";
 			}
 		}
-		result += ")";
+		result += "))";
 		return result;
 	}
 
@@ -427,13 +427,13 @@ namespace tinymoe
 		switch (op)
 		{
 		case UnaryOperator::Positive:
-			result = "+ (";
+			result = "(+";
 			break;
 		case UnaryOperator::Negative:
-			result = "- (";
+			result = "(-";
 			break;
 		case UnaryOperator::Not:
-			result = "not (";
+			result = "(not";
 			break;
 		}
 		result += operand->ToCode() + ")";
@@ -744,7 +744,7 @@ namespace tinymoe
 			{
 				auto unaryType = input->type;
 				ResultList primitiveResult;
-				auto resultError = ParsePrimitive(++input, end, primitiveResult);
+				auto resultError = ParseShortPrimitive(++input, end, primitiveResult);
 				for (auto pr : primitiveResult)
 				{
 					auto unary = make_shared<UnaryExpression>();
@@ -826,27 +826,30 @@ namespace tinymoe
 		{
 			for (int i = resultBegin; i < resultEnd; i++)
 			{
-				auto it = availableSymbols.begin();
-				while (it != availableSymbols.end())
+				if (result[i].first != end)
 				{
-					it = availableSymbols.upper_bound(it->first);
-					it--;
-					if (it->second->type == GrammarSymbolType::Phrase)
+					auto it = availableSymbols.begin();
+					while (it != availableSymbols.end())
 					{
-						auto symbol = it->second;
-						switch (symbol->fragments[0]->type)
+						it = availableSymbols.upper_bound(it->first);
+						it--;
+						if (it->second->type == GrammarSymbolType::Phrase)
 						{
-						case GrammarFragmentType::Primitive:
+							auto symbol = it->second;
+							switch (symbol->fragments[0]->type)
 							{
-								auto link = make_shared<ExpressionLink>();
-								link->expression = result[i].second;
-								auto error = ParseGrammarSymbol(symbol, 1, link, result[i].first, end, result);
-								resultError = FoldError(resultError, error);
+							case GrammarFragmentType::Primitive:
+								{
+									auto link = make_shared<ExpressionLink>();
+									link->expression = result[i].second;
+									auto error = ParseGrammarSymbol(symbol, 1, link, result[i].first, end, result);
+									resultError = FoldError(resultError, error);
+								}
+								break;
 							}
-							break;
 						}
+						it++;
 					}
-					it++;
 				}
 			}
 
@@ -1004,22 +1007,25 @@ namespace tinymoe
 			for (int i = resultBegin; i < resultEnd; i++)
 			{
 				auto it = result[i].first;
-				for (int j = 0; j < count; j++)
+				if (it != end)
 				{
-					if (it->type == tokenTypes[j])
+					for (int j = 0; j < count; j++)
 					{
-						ResultList expressionResult;
-						auto error = (this->*parser)(++it, end, expressionResult);
-						resultError = FoldError(resultError, error);
-						for (auto er : expressionResult)
+						if (it->type == tokenTypes[j])
 						{
-							auto binary = make_shared<BinaryExpression>();
-							binary->first = result[i].second;
-							binary->second = er.second;
-							binary->op = binaryOperators[j];
-							result.push_back(make_pair(er.first, static_pointer_cast<Expression>(binary)));
+							ResultList expressionResult;
+							auto error = (this->*parser)(++it, end, expressionResult);
+							resultError = FoldError(resultError, error);
+							for (auto er : expressionResult)
+							{
+								auto binary = make_shared<BinaryExpression>();
+								binary->first = result[i].second;
+								binary->second = er.second;
+								binary->op = binaryOperators[j];
+								result.push_back(make_pair(er.first, static_pointer_cast<Expression>(binary)));
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}

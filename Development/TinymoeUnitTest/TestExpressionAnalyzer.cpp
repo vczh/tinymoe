@@ -195,7 +195,7 @@ TEST_CASE(TestParseAssignableExpression)
 	}
 }
 
-TEST_CASE(TestParsePrimitiveExpression)
+Expression::Ptr ParseNonAmbiguousExpression(const string& code)
 {
 	auto item = make_shared<GrammarStackItem>();
 	item->FillPredefinedSymbols();
@@ -205,8 +205,8 @@ TEST_CASE(TestParsePrimitiveExpression)
 	CodeToken::List tokens;
 	GrammarStack::ResultList result;
 
-	Tokenize("item 1 of array new array of 10 items is not integer", tokens);
-	stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
+	Tokenize(code, tokens);
+	stack->ParseExpression(tokens.begin(), tokens.end(), result);
 
 	Expression::List fullExpressions;
 	for (auto r : result)
@@ -218,14 +218,25 @@ TEST_CASE(TestParsePrimitiveExpression)
 	}
 
 	TEST_ASSERT(fullExpressions.size() == 1);
-	auto log = fullExpressions[0]->ToLog();
-	auto code = fullExpressions[0]->ToCode();
+	return fullExpressions[0];
+}
+
+TEST_CASE(TestParsePrimitiveExpression)
+{
+	auto expr = ParseNonAmbiguousExpression("item 1 of array new array of 10 items is not integer");
+	auto log = expr->ToLog();
+	auto code = expr->ToCode();
 	TEST_ASSERT(log == "<primitive> is not <type>(item <expression> of array <primitive>(1, new array of <expression> items(10)), integer)");
 	TEST_ASSERT(code == "((item 1 of array (new array of 10 items)) is not (integer))");
 }
 
 TEST_CASE(TestParseUnaryExpression)
 {
+	auto expr = ParseNonAmbiguousExpression("not (-1 is string)");
+	auto log = expr->ToLog();
+	auto code = expr->ToCode();
+	TEST_ASSERT(log == "not(<primitive> is <type>(-(1), string))");
+	TEST_ASSERT(code == "(not((-1) is (string)))");
 }
 
 TEST_CASE(TestParseBinaryExpression)
