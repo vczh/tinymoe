@@ -608,15 +608,15 @@ namespace tinymoe
 		return error;
 	}
 
-	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result)
+	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, int beginFragment, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, ResultList& result)
 	{
 		vector<pair<Iterator, ExpressionLink::Ptr>> stepResult;
-		stepResult.push_back(make_pair(input, ExpressionLink::Ptr(nullptr)));
+		stepResult.push_back(make_pair(input, previousExpression));
 
 		int stepResultBegin = 0;
 		int stepResultEnd = stepResult.size();
 		CodeError resultError;
-		for (int i = 0; (size_t)i < symbol->fragments.size(); i++)
+		for (int i = beginFragment; (size_t)i < symbol->fragments.size(); i++)
 		{
 			for (int j = stepResultBegin; j < stepResultEnd; j++)
 			{
@@ -671,6 +671,11 @@ namespace tinymoe
 		return resultError;
 	}
 
+	CodeError GrammarStack::ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result)
+	{
+		return ParseGrammarSymbol(symbol, 0, nullptr, input, end, result);
+	}
+
 	CodeError GrammarStack::ParseType(Iterator input, Iterator end, ResultList& result)
 	{
 		CodeError resultError;
@@ -702,6 +707,8 @@ namespace tinymoe
 			return error;
 		}
 
+		CodeError resultError;
+		int resultBegin = result.size();
 		switch (input->type)
 		{
 		case CodeTokenType::Integer:
@@ -711,15 +718,15 @@ namespace tinymoe
 				auto literal = make_shared<LiteralExpression>();
 				literal->token = *input++;
 				result.push_back(make_pair(input, static_pointer_cast<Expression>(literal)));
-				return CodeError();
 			}
+			goto END_OF_PRIMITIVE_FRAGMENT;
 		case CodeTokenType::Add:
 		case CodeTokenType::Sub:
 		case CodeTokenType::Not:
 			{
 				auto unaryType = input->type;
 				ResultList primitiveResult;
-				auto resultError = ParsePrimitive(++input, end, primitiveResult);
+				resultError = ParsePrimitive(++input, end, primitiveResult);
 				for (auto pr : primitiveResult)
 				{
 					auto unary = make_shared<UnaryExpression>();
@@ -740,51 +747,92 @@ namespace tinymoe
 					result.push_back(make_pair(pr.first, static_pointer_cast<Expression>(unary)));
 					return CodeError();
 				}
-				return resultError;
 			}
+			goto END_OF_PRIMITIVE_FRAGMENT;
 		}
 
-		vector<Iterator> tokenResult;
-		auto resultError = ParseToken("(", input, end, tokenResult);
-		if (tokenResult.size() > 0)
 		{
-			ResultList expressionResult;
-			auto error = ParseExpression(tokenResult[0], end, expressionResult);
-			resultError = FoldError(resultError, error);
-
-			for (auto er : expressionResult)
+			vector<Iterator> tokenResult;
+			resultError = ParseToken("(", input, end, tokenResult);
+			if (tokenResult.size() > 0)
 			{
-				tokenResult.clear();
-				error = ParseToken(")", er.first, end, tokenResult);
+				ResultList expressionResult;
+				auto error = ParseExpression(tokenResult[0], end, expressionResult);
 				resultError = FoldError(resultError, error);
-				if (tokenResult.size() > 0)
+
+				for (auto er : expressionResult)
 				{
-					result.push_back(make_pair(tokenResult[0], er.second));
-				}
-			}
-			return resultError;
-		}
-		
-		auto it = availableSymbols.begin();
-		while (it != availableSymbols.end())
-		{
-			it = availableSymbols.upper_bound(it->first);
-			it--;
-			if (it->second->type == GrammarSymbolType::Symbol || it->second->type == GrammarSymbolType::Phrase)
-			{
-				auto symbol = it->second;
-				switch (symbol->fragments[0]->type)
-				{
-				case GrammarFragmentType::Primitive:
-				case GrammarFragmentType::Expression:
-					break;
-				default:
-					auto error = ParseGrammarSymbol(symbol, input, end, result);
+					tokenResult.clear();
+					error = ParseToken(")", er.first, end, tokenResult);
 					resultError = FoldError(resultError, error);
+					if (tokenResult.size() > 0)
+					{
+						result.push_back(make_pair(tokenResult[0], er.second));
+					}
+				}
+
+				goto END_OF_PRIMITIVE_FRAGMENT;
+			}
+		}
+
+		{
+			auto it = availableSymbols.begin();
+			while (it != availableSymbols.end())
+			{
+				it = availableSymbols.upper_bound(it->first);
+				it--;
+				if (it->second->type == GrammarSymbolType::Symbol || it->second->type == GrammarSymbolType::Phrase)
+				{
+					auto symbol = it->second;
+					switch (symbol->fragments[0]->type)
+					{
+					case GrammarFragmentType::Primitive:
+					case GrammarFragmentType::Expression:
+						break;
+					default:
+						auto error = ParseGrammarSymbol(symbol, input, end, result);
+						resultError = FoldError(resultError, error);
+					}
+				}
+				it++;
+			}
+		}
+
+	END_OF_PRIMITIVE_FRAGMENT:
+		int resultEnd = result.size();
+
+		while (resultBegin < resultEnd)
+		{
+			for (int i = resultBegin; i < resultEnd; i++)
+			{
+				auto it = availableSymbols.begin();
+				while (it != availableSymbols.end())
+				{
+					it = availableSymbols.upper_bound(it->first);
+					it--;
+					if (it->second->type == GrammarSymbolType::Phrase)
+					{
+						auto symbol = it->second;
+						switch (symbol->fragments[0]->type)
+						{
+						case GrammarFragmentType::Primitive:
+							{
+								auto link = make_shared<ExpressionLink>();
+								link->expression = result[i].second;
+								auto error = ParseGrammarSymbol(symbol, 1, link, result[i].first, end, result);
+								resultError = FoldError(resultError, error);
+							}
+							break;
+						}
+					}
+					it++;
 				}
 			}
-			it++;
+
+			resultBegin = resultEnd;
+			resultEnd = result.size();
 		}
+
 		return resultError;
 	}
 
@@ -926,12 +974,44 @@ namespace tinymoe
 
 	CodeError GrammarStack::ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result)
 	{
-		throw 0;
+		int resultBegin = result.size();
+		auto resultError = (this->*parser)(input, end, result);
+		int resultEnd = result.size();
+
+		while (resultBegin < resultEnd)
+		{
+			for (int i = resultBegin; i < resultEnd; i++)
+			{
+				auto it = result[i].first;
+				for (int j = 0; j < count; j++)
+				{
+					if (it->type == tokenTypes[j])
+					{
+						ResultList expressionResult;
+						auto error = (this->*parser)(++it, end, expressionResult);
+						resultError = FoldError(resultError, error);
+						for (auto er : expressionResult)
+						{
+							auto binary = make_shared<BinaryExpression>();
+							binary->first = result[i].second;
+							binary->second = er.second;
+							binary->op = binaryOperators[j];
+							result.push_back(make_pair(er.first, static_pointer_cast<Expression>(binary)));
+						}
+						break;
+					}
+				}
+			}
+			resultBegin = resultEnd;
+			resultEnd = result.size();
+		}
+
+		return resultError;
 	}
 
 	CodeError GrammarStack::ParseExp0(Iterator input, Iterator end, ResultList& result)
 	{
-		throw 0;
+		return ParsePrimitive(input, end, result);
 	}
 
 	CodeError GrammarStack::ParseExp1(Iterator input, Iterator end, ResultList& result)
