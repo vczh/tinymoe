@@ -21,7 +21,7 @@ end
 )tinymoe";
 
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 
 	FIRST_LINE(4);
 		FIRST_TOKEN(2);
@@ -52,7 +52,7 @@ TEST_CASE(TestLexerNumber)
 )tinymoe";
 
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 
 	FIRST_LINE(1);
 		FIRST_TOKEN(3);
@@ -73,7 +73,7 @@ TEST_CASE(TestLexerOperators)
 )tinymoe";
 
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 
 	FIRST_LINE(1);
 		FIRST_TOKEN(15);
@@ -106,7 +106,7 @@ end and or not
 )tinymoe";
 
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 
 	FIRST_LINE(4);
 		FIRST_TOKEN(2);
@@ -148,7 +148,7 @@ TEST_CASE(TestLexerString)
 )tinymoe";
 
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 
 	FIRST_LINE(2);
 		FIRST_TOKEN(1);

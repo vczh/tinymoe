@@ -10,7 +10,7 @@ symbol symbol name
 )tinymoe";
 	CodeError::List errors;
 
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 	TEST_ASSERT(errors.size() == 0);
 
 	int lineIndex = 0;
@@ -32,7 +32,7 @@ symbol
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -49,7 +49,7 @@ symbol illegal + name
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -71,7 +71,7 @@ end
 	)tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -95,7 +95,7 @@ end
 	)tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -123,7 +123,7 @@ end
 	)tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -154,7 +154,7 @@ end
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -172,7 +172,7 @@ end
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -191,7 +191,7 @@ end
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -212,7 +212,7 @@ cps (state)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -232,7 +232,7 @@ cps (state) (continuation)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -258,7 +258,7 @@ cps
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -275,7 +275,7 @@ cps +
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -292,7 +292,7 @@ cps ()
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -309,7 +309,7 @@ cps (state
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -326,7 +326,7 @@ cps (state) (
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -345,7 +345,7 @@ cps (state) )
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -362,7 +362,7 @@ cps (state) (continuation) (too many parameters)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -384,7 +384,7 @@ category
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -407,7 +407,7 @@ category (signal)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -443,7 +443,7 @@ category (state
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -464,7 +464,7 @@ category (state)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -486,7 +486,7 @@ category (state)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -503,7 +503,7 @@ category (signal)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -523,7 +523,7 @@ category (signal)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -541,7 +541,7 @@ category
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -562,7 +562,7 @@ sentence abort
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -599,7 +599,7 @@ end
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -630,7 +630,7 @@ sentence abort : an alias
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -664,7 +664,7 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -788,7 +788,7 @@ block (body) abort
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -826,7 +826,7 @@ sentence remove (item) from (items : collection)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -882,7 +882,7 @@ cps (state)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -904,7 +904,7 @@ category
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -927,7 +927,7 @@ category
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -950,7 +950,7 @@ cps (state)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -972,7 +972,7 @@ phrase whatever
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -995,7 +995,7 @@ phrase whatever
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1018,7 +1018,7 @@ sentence whatever
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1039,7 +1039,7 @@ block whatever
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1060,7 +1060,7 @@ sentence (x) y
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1081,7 +1081,7 @@ block (body) (x) y
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1102,7 +1102,7 @@ phrase
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1123,7 +1123,7 @@ phrase (x)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1144,7 +1144,7 @@ phrase (x) (y)
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1167,7 +1167,7 @@ phrase a : b )
 )tinymoe";
 		CodeError::List errors;
 
-		auto codeFile = CodeFile::Parse(code, errors);
+		auto codeFile = CodeFile::Parse(code, 0, errors);
 		TEST_ASSERT(errors.size() == 0);
 
 		int lineIndex = 0;
@@ -1200,7 +1200,7 @@ end
 )tinymoe";
 	CodeError::List errors;
 
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 	TEST_ASSERT(errors.size() == 0);
 
 	auto module = Module::Parse(codeFile, errors);

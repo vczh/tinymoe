@@ -6,7 +6,7 @@ using namespace tinymoe;
 void Tokenize(const string& code, CodeToken::List& tokens)
 {
 	CodeError::List errors;
-	auto codeFile = CodeFile::Parse(code, errors);
+	auto codeFile = CodeFile::Parse(code, 0, errors);
 	TEST_ASSERT(errors.size() == 0);
 	TEST_ASSERT(codeFile->lines.size() == 1);
 	tokens = codeFile->lines[0]->tokens;

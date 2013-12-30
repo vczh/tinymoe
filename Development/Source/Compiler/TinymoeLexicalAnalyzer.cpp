@@ -107,7 +107,7 @@ namespace tinymoe
 	CodeFile
 	*************************************************************/
 
-	CodeFile::Ptr CodeFile::Parse(const string& code, CodeError::List& errors)
+	CodeFile::Ptr CodeFile::Parse(const string& code, int codeIndex, CodeError::List& errors)
 	{
 		auto codeFile = make_shared<CodeFile>();
 		enum class State
@@ -163,6 +163,7 @@ namespace tinymoe
 			token.row = rowNumber;
 			token.column = tokenBegin - rowBegin + 1;
 			token.value = value;
+			token.codeIndex = codeIndex;
 
 			int lineCount = codeFile->lines.size();
 			auto lastLine = lineCount ? codeFile->lines[lineCount - 1] : nullptr;
@@ -184,6 +185,7 @@ namespace tinymoe
 			token.row = rowNumber;
 			token.column = tokenBegin - rowBegin + 1;
 			token.value = value;
+			token.codeIndex = codeIndex;
 
 			CodeError error =
 			{

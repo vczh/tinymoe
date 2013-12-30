@@ -3,49 +3,14 @@
 
 using namespace tinymoe;
 
-SymbolAssembly::Ptr CreateAssemblyFromFiles(vector<string>& codes)
-{
-	Module::List modules;
-	CodeFile::List codeFiles;
-	CodeError::List errors;
-
-	for (auto code : codes)
-	{
-		auto codeFile = CodeFile::Parse(code, errors);
-		TEST_ASSERT(errors.size() == 0);
-
-		auto module = Module::Parse(codeFile, errors);
-		TEST_ASSERT(errors.size() == 0);
-
-		codeFiles.push_back(codeFile);
-		modules.push_back(module);
-	}
-
-	auto assembly = make_shared<SymbolAssembly>();
-	assembly->InstallModules(modules, codeFiles, errors);
-	TEST_ASSERT(errors.size() == 0);
-	TEST_ASSERT(assembly->symbolModules.size() == codes.size());
-
-	auto item = make_shared<GrammarStackItem>();
-	item->FillPredefinedSymbols();
-	auto stack = make_shared<GrammarStack>();
-	stack->Push(item);
-
-	for (auto module : assembly->symbolModules)
-	{
-		module->Build(stack, errors);
-		TEST_ASSERT(errors.size() == 0);
-		TEST_ASSERT(stack->stackItems.size() == 1);
-	}
-
-	return assembly;
-}
-
 TEST_CASE(TestParseStandardLibraryModule)
 {
 	vector<string> codes;
+	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
-	CreateAssemblyFromFiles(codes);
+	auto assembly = SymbolAssembly::Parse(codes, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(assembly->symbolModules.size() == 1);
 }
 
 TEST_CASE(TestParseHelloWorldModule)
@@ -67,7 +32,10 @@ end
 )tinymoe";
 	
 	vector<string> codes;
+	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
-	auto assembly = CreateAssemblyFromFiles(codes);
+	auto assembly = SymbolAssembly::Parse(codes, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(assembly->symbolModules.size() == 2);
 }

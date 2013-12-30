@@ -59,6 +59,7 @@ namespace tinymoe
 		int								row = -1;
 		int								column = -1;
 		string							value;
+		int								codeIndex = -1;
 
 		bool							IsNameFragmentToken();
 
@@ -90,7 +91,7 @@ namespace tinymoe
 
 		CodeLine::List					lines;
 
-		static CodeFile::Ptr			Parse(const string& code, CodeError::List& errors);
+		static CodeFile::Ptr			Parse(const string& code, int codeIndex, CodeError::List& errors);
 	};
 
 	class CodeFragment

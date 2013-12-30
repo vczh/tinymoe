@@ -14,14 +14,33 @@ namespace tinymoe
 	SymbolAssembly
 	*************************************************************/
 
-	void SymbolAssembly::InstallModules(Module::List& modules, CodeFile::List& codeFiles, CodeError::List& errors)
+	SymbolAssembly::Ptr SymbolAssembly::Parse(vector<string>& codes, CodeError::List& errors)
 	{
+		Module::List modules;
+		CodeFile::List codeFiles;
+
+		int codeIndex = 0;
+		for (auto code : codes)
+		{
+			auto codeFile = CodeFile::Parse(code, codeIndex++, errors);
+			auto module = Module::Parse(codeFile, errors);
+
+			codeFiles.push_back(codeFile);
+			modules.push_back(module);
+		}
+
+		auto assembly = make_shared<SymbolAssembly>();
 		for (int i = 0; (size_t)i < modules.size(); i++)
 		{
 			auto symbolModule = make_shared<SymbolModule>();
 			symbolModule->codeFile = codeFiles[i];
 			symbolModule->module = modules[i];
-			symbolModules.push_back(symbolModule);
+			assembly->symbolModules.push_back(symbolModule);
 		}
+
+		if (errors.size() == 0)
+		{
+		}
+		return assembly;
 	}
 }

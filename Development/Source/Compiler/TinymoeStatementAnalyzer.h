@@ -55,7 +55,7 @@ namespace tinymoe
 
 		SymbolModule::List				symbolModules;
 
-		void							InstallModules(Module::List& modules, CodeFile::List& codeFiles, CodeError::List& errors);
+		static SymbolAssembly::Ptr		Parse(vector<string>& codes, CodeError::List& errors);
 	};
 }
 
