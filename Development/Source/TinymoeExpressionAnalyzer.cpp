@@ -906,6 +906,8 @@ namespace tinymoe
 					}
 				}
 			}
+			linkResultBegin = linkResultEnd;
+			linkResultEnd = linkResult.size();
 		}
 
 		for (auto lfr : linkFinalResult)

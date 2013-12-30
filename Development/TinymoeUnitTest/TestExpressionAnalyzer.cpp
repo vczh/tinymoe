@@ -241,14 +241,20 @@ TEST_CASE(TestParseUnaryExpression)
 
 TEST_CASE(TestParseBinaryExpression)
 {
+	auto expr = ParseNonAmbiguousExpression("1+2*3+4");
+	auto log = expr->ToLog();
+	auto code = expr->ToCode();
+	TEST_ASSERT(log == "+(+(1, *(2, 3)), 4)");
+	TEST_ASSERT(code == "((1 + (2 * 3)) + 4)");
 }
 
 TEST_CASE(TestParseListExpression)
 {
-}
-
-TEST_CASE(TestParseInvokeExpression)
-{
+	auto expr = ParseNonAmbiguousExpression("invoke null with (1, 2, 3)");
+	auto log = expr->ToLog();
+	auto code = expr->ToCode();
+	TEST_ASSERT(log == "invoke <expression> with <list>(null, (1, 2, 3))");
+	TEST_ASSERT(code == "(invoke (null) with (1, 2, 3))");
 }
 
 TEST_CASE(TestParseStatement)
