@@ -272,6 +272,8 @@ namespace tinymoe
 		CodeError					ParseExp4(Iterator input, Iterator end, ResultList& result);			// < > <= >= = <>
 		CodeError					ParseExp5(Iterator input, Iterator end, ResultList& result);			// and
 		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);		// or, aka. <expression>
+
+		CodeError					ParseStatement(Iterator input, Iterator end, ResultList& result);
 	};
 }
 

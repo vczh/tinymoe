@@ -253,10 +253,93 @@ TEST_CASE(TestParseListExpression)
 	auto expr = ParseNonAmbiguousExpression("invoke null with (1, 2, 3)");
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "invoke <expression> with <list>(null, (1, 2, 3))");
+	TEST_ASSERT(log == "invoke <expression> with <list>(null, (list: 1, 2, 3))");
 	TEST_ASSERT(code == "(invoke (null) with (1, 2, 3))");
+}
+
+Expression::Ptr ParseNonAmbiguousStatement(const string& code)
+{
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	Tokenize(code, tokens);
+	stack->ParseStatement(tokens.begin(), tokens.end(), result);
+	TEST_ASSERT(result.size() == 1);
+	return result[0].second;
+}
+
+Expression::List ParseAmbiguousStatement(const string& code)
+{
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	Tokenize(code, tokens);
+	stack->ParseStatement(tokens.begin(), tokens.end(), result);
+
+	Expression::List expressionResult;
+	for (auto r : result)
+	{
+		expressionResult.push_back(r.second);
+	}
+	return expressionResult;
 }
 
 TEST_CASE(TestParseStatement)
 {
+	{
+		auto stat = ParseNonAmbiguousStatement("end");
+		auto log = stat->ToLog();
+		auto code = stat->ToCode();
+		TEST_ASSERT(log == "end()");
+		TEST_ASSERT(code == "(end)");
+	}
+	{
+		auto stat = ParseNonAmbiguousStatement("select item 1 of array new array of 10 items + 1");
+		auto log = stat->ToLog();
+		auto code = stat->ToCode();
+		TEST_ASSERT(log == "select <expression>(+(item <expression> of array <primitive>(1, new array of <expression> items(10)), 1))");
+		TEST_ASSERT(code == "(select ((item 1 of array (new array of 10 items)) + 1))");
+	}
+	{
+		auto stat = ParseNonAmbiguousStatement("set true to false");
+		auto log = stat->ToLog();
+		auto code = stat->ToCode();
+		TEST_ASSERT(log == "set <assignable> to <expression>(true, false)");
+		TEST_ASSERT(code == "(set (true) to (false))");
+	}
+	{
+		auto stat = ParseNonAmbiguousStatement("set new variable to false");
+		auto log = stat->ToLog();
+		auto code = stat->ToCode();
+		TEST_ASSERT(log == "set <assignable> to <expression>((argument: new variable), false)");
+		TEST_ASSERT(code == "(set (new variable) to (false))");
+	}
+	{
+		auto stats = ParseAmbiguousStatement("set field something wrong of null to true");
+		TEST_ASSERT(stats.size() == 2);
+		{
+			auto stat = stats[0];
+			auto log = stat->ToLog();
+			auto code = stat->ToCode();
+			TEST_ASSERT(log == "set <assignable> to <expression>((argument: field something wrong of null), true)");
+			TEST_ASSERT(code == "(set (field something wrong of null) to (true))");
+		}
+		{
+			auto stat = stats[1];
+			auto log = stat->ToLog();
+			auto code = stat->ToCode();
+			TEST_ASSERT(log == "set field <argument> of <expression> to <expression>((argument: something wrong), null, true)");
+			TEST_ASSERT(code == "(set field (something wrong) of (null) to (true))");
+		}
+	}
 }

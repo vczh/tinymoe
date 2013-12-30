@@ -210,7 +210,7 @@ namespace tinymoe
 
 	string ArgumentExpression::ToLog()
 	{
-		string result = "<argument>(";
+		string result = "(argument: ";
 		for (auto i = tokens.begin(); i != tokens.end(); i++)
 		{
 			result += i->value;
@@ -245,7 +245,7 @@ namespace tinymoe
 
 	string ListExpression::ToLog()
 	{
-		string result = "(";
+		string result = "(list: ";
 		for (auto i = elements.begin(); i != elements.end(); i++)
 		{
 			result += (*i)->ToLog();
@@ -1084,5 +1084,40 @@ namespace tinymoe
 		BinaryOperator binaryOperators[] = { BinaryOperator::Or };
 		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
 		return ParseBinary(input, end, &GrammarStack::ParseExp5, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseStatement(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeError resultError;
+		ResultList expressionResult;
+		auto it = availableSymbols.begin();
+		while (it != availableSymbols.end())
+		{
+			it = availableSymbols.upper_bound(it->first);
+			it--;
+			if (it->second->type == GrammarSymbolType::Sentence || it->second->type == GrammarSymbolType::Block)
+			{
+				auto symbol = it->second;
+				switch (symbol->fragments[0]->type)
+				{
+				case GrammarFragmentType::Primitive:
+				case GrammarFragmentType::Expression:
+					break;
+				default:
+					auto error = ParseGrammarSymbol(symbol, input, end, expressionResult);
+					resultError = FoldError(resultError, error);
+				}
+			}
+			it++;
+		}
+
+		for (auto er : expressionResult)
+		{
+			if (er.first == end)
+			{
+				result.push_back(er);
+			}
+		}
+		return resultError;
 	}
 }
