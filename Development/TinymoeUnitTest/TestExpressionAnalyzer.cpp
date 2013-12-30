@@ -273,7 +273,7 @@ Expression::Ptr ParseNonAmbiguousStatement(const string& code)
 	return result[0].second;
 }
 
-Expression::List ParseAmbiguousStatement(const string& code)
+GrammarStack::Ptr ParseAmbiguousStatement(const string& code, Expression::List& expressionResult)
 {
 	auto item = make_shared<GrammarStackItem>();
 	item->FillPredefinedSymbols();
@@ -286,12 +286,11 @@ Expression::List ParseAmbiguousStatement(const string& code)
 	Tokenize(code, tokens);
 	stack->ParseStatement(tokens.begin(), tokens.end(), result);
 
-	Expression::List expressionResult;
 	for (auto r : result)
 	{
 		expressionResult.push_back(r.second);
 	}
-	return expressionResult;
+	return stack;
 }
 
 TEST_CASE(TestParseStatement)
@@ -324,22 +323,31 @@ TEST_CASE(TestParseStatement)
 		TEST_ASSERT(log == "set <assignable> to <expression>((argument: new variable), false)");
 		TEST_ASSERT(code == "(set (new variable) to (false))");
 	}
+}
+
+TEST_CASE(TestParseAmbiguousStatement)
+{
 	{
-		auto stats = ParseAmbiguousStatement("set field something wrong of null to true");
+		Expression::List stats;
+		auto stack = ParseAmbiguousStatement("set field something wrong of null to true", stats);
 		TEST_ASSERT(stats.size() == 2);
 		{
 			auto stat = stats[0];
 			auto log = stat->ToLog();
 			auto code = stat->ToCode();
+			auto assignable = stack->CountStatementAssignables(stat);
 			TEST_ASSERT(log == "set <assignable> to <expression>((argument: field something wrong of null), true)");
 			TEST_ASSERT(code == "(set (field something wrong of null) to (true))");
+			TEST_ASSERT(assignable == -1);
 		}
 		{
 			auto stat = stats[1];
 			auto log = stat->ToLog();
 			auto code = stat->ToCode();
+			auto assignable = stack->CountStatementAssignables(stat);
 			TEST_ASSERT(log == "set field <argument> of <expression> to <expression>((argument: something wrong), null, true)");
 			TEST_ASSERT(code == "(set field (something wrong) of (null) to (true))");
+			TEST_ASSERT(assignable == 0);
 		}
 	}
 }

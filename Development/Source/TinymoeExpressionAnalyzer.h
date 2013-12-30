@@ -111,6 +111,7 @@ namespace tinymoe
 
 		virtual string				ToLog() = 0;
 		virtual string				ToCode() = 0;
+		virtual void				CollectNewAssignable(Expression::List& assignables) = 0;
 	};
 
 	// for numbers and strings
@@ -121,6 +122,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	// for new created symbols in <assignable> and <argument>
@@ -131,6 +133,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	// for symbol referencing
@@ -141,6 +144,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	// for function invoking
@@ -152,6 +156,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	// for <list>
@@ -162,6 +167,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	enum class UnaryOperator
@@ -180,6 +186,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	enum class BinaryOperator
@@ -209,6 +216,7 @@ namespace tinymoe
 
 		string						ToLog()override;
 		string						ToCode()override;
+		void						CollectNewAssignable(Expression::List& assignables)override;
 	};
 
 	/*************************************************************
@@ -274,6 +282,7 @@ namespace tinymoe
 		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);		// or, aka. <expression>
 
 		CodeError					ParseStatement(Iterator input, Iterator end, ResultList& result);
+		int							CountStatementAssignables(Expression::Ptr statement);					// -1: illegal assignable (e.g. the assignable is a legal expression)
 	};
 }
 

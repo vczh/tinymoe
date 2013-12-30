@@ -490,6 +490,71 @@ namespace tinymoe
 	}
 
 	/*************************************************************
+	Expression::CollectNewAssignables
+	*************************************************************/
+
+	void LiteralExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+	}
+
+	void ArgumentExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+	}
+
+	void ReferenceExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+	}
+
+	void InvokeExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+		if (auto reference = dynamic_pointer_cast<ReferenceExpression>(function))
+		{
+			auto it = arguments.begin();
+			for (auto fragment : reference->symbol->fragments)
+			{
+				if (fragment->type == GrammarFragmentType::Assignable)
+				{
+					if (auto argument = dynamic_pointer_cast<ArgumentExpression>(*it))
+					{
+						assignables.push_back(*it);
+					}
+				}
+				if (fragment->type != GrammarFragmentType::Name)
+				{
+					it++;
+				}
+			}
+		}
+		else
+		{
+			function->CollectNewAssignable(assignables);
+			for (auto argument : arguments)
+			{
+				argument->CollectNewAssignable(assignables);
+			}
+		}
+	}
+
+	void ListExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+		for (auto element : elements)
+		{
+			element->CollectNewAssignable(assignables);
+		}
+	}
+
+	void UnaryExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+		operand->CollectNewAssignable(assignables);
+	}
+
+	void BinaryExpression::CollectNewAssignable(Expression::List& assignables)
+	{
+		first->CollectNewAssignable(assignables);
+		second->CollectNewAssignable(assignables);
+	}
+
+	/*************************************************************
 	GrammarStack
 	*************************************************************/
 
@@ -1119,5 +1184,28 @@ namespace tinymoe
 			}
 		}
 		return resultError;
+	}
+
+	int GrammarStack::CountStatementAssignables(Expression::Ptr statement)
+	{
+		Expression::List assignables;
+		statement->CollectNewAssignable(assignables);
+
+		for (auto assignable : assignables)
+		{
+			auto argument = dynamic_pointer_cast<ArgumentExpression>(assignable);
+
+			ResultList result;
+			ParseExpression(argument->tokens.begin(), argument->tokens.end(), result);
+			for (auto r : result)
+			{
+				if (r.first == argument->tokens.end())
+				{
+					return -1;
+				}
+			}
+		}
+
+		return assignables.size();
 	}
 }
