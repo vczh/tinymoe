@@ -99,6 +99,9 @@ namespace tinymoe
 		void						CalculateUniqueId();
 	};
 
+	GrammarSymbol::Ptr				operator+(GrammarSymbol::Ptr symbol, const string& name);
+	GrammarSymbol::Ptr				operator+(GrammarSymbol::Ptr symbol, GrammarFragmentType type);
+
 	/*************************************************************
 	Expression
 	*************************************************************/

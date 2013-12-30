@@ -65,10 +65,6 @@ namespace tinymoe
 		}
 	}
 
-	/*************************************************************
-	GrammarStackItem
-	*************************************************************/
-
 	GrammarSymbol::Ptr operator+(GrammarSymbol::Ptr symbol, const string& name)
 	{
 		GrammarFragment::Ptr fragment;
@@ -88,6 +84,10 @@ namespace tinymoe
 		symbol->fragments.push_back(fragment);
 		return symbol;
 	}
+
+	/*************************************************************
+	GrammarStackItem
+	*************************************************************/
 
 	void GrammarStackItem::FillPredefinedSymbols()
 	{

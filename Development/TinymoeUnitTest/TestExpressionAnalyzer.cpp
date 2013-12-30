@@ -257,12 +257,16 @@ TEST_CASE(TestParseListExpression)
 	TEST_ASSERT(code == "(invoke (null) with (1, 2, 3))");
 }
 
-Expression::Ptr ParseNonAmbiguousStatement(const string& code)
+Expression::Ptr ParseNonAmbiguousStatement(const string& code, GrammarStack::Ptr stack = nullptr)
 {
-	auto item = make_shared<GrammarStackItem>();
-	item->FillPredefinedSymbols();
-	auto stack = make_shared<GrammarStack>();
-	stack->Push(item);
+	if (!stack)
+	{
+		auto item = make_shared<GrammarStackItem>();
+		item->FillPredefinedSymbols();
+		
+		stack = make_shared<GrammarStack>();
+		stack->Push(item);
+	}
 
 	CodeToken::List tokens;
 	GrammarStack::ResultList result;
@@ -273,12 +277,16 @@ Expression::Ptr ParseNonAmbiguousStatement(const string& code)
 	return result[0].second;
 }
 
-GrammarStack::Ptr ParseAmbiguousStatement(const string& code, Expression::List& expressionResult)
+GrammarStack::Ptr ParseAmbiguousStatement(const string& code, Expression::List& expressionResult, GrammarStack::Ptr stack = nullptr)
 {
-	auto item = make_shared<GrammarStackItem>();
-	item->FillPredefinedSymbols();
-	auto stack = make_shared<GrammarStack>();
-	stack->Push(item);
+	if (!stack)
+	{
+		auto item = make_shared<GrammarStackItem>();
+		item->FillPredefinedSymbols();
+
+		stack = make_shared<GrammarStack>();
+		stack->Push(item);
+	}
 
 	CodeToken::List tokens;
 	GrammarStack::ResultList result;
@@ -349,5 +357,37 @@ TEST_CASE(TestParseAmbiguousStatement)
 			TEST_ASSERT(code == "(set field (something wrong) of (null) to (true))");
 			TEST_ASSERT(assignable == 0);
 		}
+	}
+}
+
+TEST_CASE(TestParseStatementInContext)
+{
+	auto stack = make_shared<GrammarStack>();
+	{
+		auto item = make_shared<GrammarStackItem>();
+		item->FillPredefinedSymbols();
+		stack->Push(item);
+	}
+	{
+		auto item = make_shared<GrammarStackItem>();
+		
+		item->symbols.push_back(
+			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence)
+			+ "print" + GrammarFragmentType::Expression
+			);
+
+		item->symbols.push_back(
+			make_shared<GrammarSymbol>(GrammarSymbolType::Phrase)
+			+ "sum" + "from" + GrammarFragmentType::Expression + "to" + GrammarFragmentType::Primitive
+			);
+
+		stack->Push(item);
+	}
+	{
+		auto stat = ParseNonAmbiguousStatement("print \"1+ ... +100 = \" & sum from 1 to 100", stack);
+		auto log = stat->ToLog();
+		auto code = stat->ToCode();
+		TEST_ASSERT(log == "print <expression>(&(\"1+ ... +100 = \", sum from <expression> to <primitive>(1, 100)))");
+		TEST_ASSERT(code == "(print (\"1+ ... +100 = \" & (sum from 1 to 100)))");
 	}
 }
