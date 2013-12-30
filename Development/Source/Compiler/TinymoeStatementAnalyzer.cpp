@@ -14,12 +14,6 @@ namespace tinymoe
 	SymbolAssembly
 	*************************************************************/
 
-	string SymbolAssembly::GetStandardLibraryCode()
-	{
-		return R"tinymoe(
-)tinymoe";
-	}
-
 	void SymbolAssembly::InstallModules(Module::List& modules, CodeFile::List& codeFiles, CodeError::List& errors)
 	{
 		for (int i = 0; (size_t)i < modules.size(); i++)

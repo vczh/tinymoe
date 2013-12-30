@@ -2,4 +2,159 @@
 
 namespace tinymoe
 {
+	/*************************************************************
+	Helper Functions
+	*************************************************************/
+
+	string GetCodeForStandardLibrary()
+	{
+		return R"tinymoe(
+module standard library
+
+symbol breaking repeating
+symbol continuing repeating
+symbol raising exception
+symbol exiting function
+
+type continuation state
+	flag
+	exception
+	continuation
+end
+
+sentence reset continuation state (state) to (flag)
+	set field flag of state to flag
+	set field exception of state to null
+	set field continuation of state to null
+end
+
+cps (state) (continuation)
+sentence break
+	reset continuation state state to breaking repeating
+end
+
+cps (state) (continuation)
+sentence continue
+	reset continuation state state to continuing repeating
+end
+
+cps (state) (continuation)
+sentence raise (exception)
+	reset continuation state state to raising exception
+	set field exception of state to exception
+end
+
+cps (state) (continuation)
+sentence exit
+	reset continuation state state to exiting function
+end
+
+cps (state)
+block (body) repeat : repeat statement
+	invoke body with state
+	select flag field of state
+		case breaking repeating
+			reset continuation state state to null
+		case continuing repeating
+			reset continuation state state to null
+			tail call invoke repeat statement with (state, body)
+	end
+end
+
+block (body) repeat while (expression condition)
+	repeat
+		if not condition
+			break
+		end
+		yield body
+	end
+end
+
+block (phrase deal with (item)) repeat with (argument item) from (start) to (end)
+	set the current number to start
+	repeat while the current number is not greater than end
+		yield deal with the current number
+	end
+end
+
+block (phrase deal with (item)) repeat with (argument item) in (items : enumerable)
+	set cursor to new enumerator from items
+	repeat
+		consume item from cursor
+		if cursor reaches the end
+			break
+		end
+		yield deal with current item of cursor
+	end
+end
+
+cps (state)
+category
+	start IFELSE if
+	closable
+block (body) if (condition)
+	set result to condition
+	select the result
+		case true
+			invoke body
+	end
+end
+
+cps (state)
+category (signal)
+	follow IFELSE if
+	start IFELSE if
+	closable
+block (body) if (condition)
+	set the result to not signal and condition
+	select the result
+		case true
+			invoke body
+	end
+end
+
+cps (state)
+category (signal)
+	follow IFELSE if
+	closable
+block (body) else
+	set the result to not signal
+	select the result
+		case true
+			invoke body
+	end
+end
+
+cps (state)
+category
+	start SEH try
+block (statement body) try
+	body
+	if flag field of state equals to raising exception
+		set the result to flag exception of state
+		reset continuation state state to null
+	end
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	start SEH catch
+	closable
+block (body) catch (argument exception)
+	if signal not equals to null
+		body
+	end	
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	follow SEH catch
+	closable
+block (body) finally
+	body
+end
+)tinymoe";
+	}
 }

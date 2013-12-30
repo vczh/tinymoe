@@ -55,8 +55,6 @@ namespace tinymoe
 
 		SymbolModule::List				symbolModules;
 
-		static string					GetStandardLibraryCode();
-
 		void							InstallModules(Module::List& modules, CodeFile::List& codeFiles, CodeError::List& errors);
 	};
 }

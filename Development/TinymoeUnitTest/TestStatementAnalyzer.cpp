@@ -44,7 +44,7 @@ SymbolAssembly::Ptr CreateAssemblyFromFiles(vector<string>& codes)
 TEST_CASE(TestParseStandardLibraryModule)
 {
 	vector<string> codes;
-	codes.push_back(SymbolAssembly::GetStandardLibraryCode());
+	codes.push_back(GetCodeForStandardLibrary());
 	CreateAssemblyFromFiles(codes);
 }
 
@@ -67,7 +67,7 @@ end
 )tinymoe";
 	
 	vector<string> codes;
-	codes.push_back(SymbolAssembly::GetStandardLibraryCode());
+	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
 	auto assembly = CreateAssemblyFromFiles(codes);
 }
