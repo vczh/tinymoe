@@ -230,6 +230,7 @@ namespace tinymoe
 		typedef shared_ptr<GrammarStack>					Ptr;
 		typedef CodeToken::List::iterator					Iterator;
 		typedef vector<pair<Iterator, Expression::Ptr>>		ResultList;
+		typedef CodeError(GrammarStack::* ParseFunctionType)(Iterator, Iterator, ResultList&);
 
 		GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
 		GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
@@ -253,12 +254,22 @@ namespace tinymoe
 		CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result);
 		CodeError					ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
 		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result);
-		CodeError					ParseType(Iterator input, Iterator end, ResultList& result);
-		CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);
-		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);
-		CodeError					ParseList(Iterator input, Iterator end, ResultList& result);
-		CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);
-		CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);
+
+		CodeError					ParseType(Iterator input, Iterator end, ResultList& result);		// <type>
+		CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);	// <literal>, op <primitive>, (<expression>), <phrase>
+		CodeError					ParseList(Iterator input, Iterator end, ResultList& result);		// (<expression>, ...)
+		CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);	// <symbol> or <argument>
+		CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);	// <argument>
+
+		CodeError					ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result);
+		CodeError					ParseExp0(Iterator input, Iterator end, ResultList& result);		// left recursive <phrase>
+		CodeError					ParseExp1(Iterator input, Iterator end, ResultList& result);		// * /
+		CodeError					ParseExp2(Iterator input, Iterator end, ResultList& result);		// + -
+		CodeError					ParseExp3(Iterator input, Iterator end, ResultList& result);		// &
+		CodeError					ParseExp4(Iterator input, Iterator end, ResultList& result);		// < > <= >= = <>
+		CodeError					ParseExp5(Iterator input, Iterator end, ResultList& result);		// and
+		CodeError					ParseExp6(Iterator input, Iterator end, ResultList& result);		// or
+		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);	// <expression>
 	};
 }
 

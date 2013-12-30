@@ -691,7 +691,80 @@ namespace tinymoe
 
 	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, ResultList& result)
 	{
-		CodeError resultError;
+		if (input == end)
+		{
+			auto token = *(input - 1);
+			CodeError error = {
+				token,
+				token,
+				"Unexpected end of line.",
+			};
+			return error;
+		}
+
+		switch (input->type)
+		{
+		case CodeTokenType::Integer:
+		case CodeTokenType::Float:
+		case CodeTokenType::String:
+			{
+				auto literal = make_shared<LiteralExpression>();
+				literal->token = *input++;
+				result.push_back(make_pair(input, static_pointer_cast<Expression>(literal)));
+				return CodeError();
+			}
+		case CodeTokenType::Add:
+		case CodeTokenType::Sub:
+		case CodeTokenType::Not:
+			{
+				auto unaryType = input->type;
+				ResultList primitiveResult;
+				auto resultError = ParsePrimitive(++input, end, primitiveResult);
+				for (auto pr : primitiveResult)
+				{
+					auto unary = make_shared<UnaryExpression>();
+					unary->operand = pr.second;
+					switch (unaryType)
+					{
+					case CodeTokenType::Add:
+						unary->op = UnaryOperator::Positive;
+						break;
+					case CodeTokenType::Sub:
+						unary->op = UnaryOperator::Negative;
+						break;
+					case CodeTokenType::Not:
+						unary->op = UnaryOperator::Not;
+						break;
+					}
+
+					result.push_back(make_pair(pr.first, static_pointer_cast<Expression>(unary)));
+					return CodeError();
+				}
+				return resultError;
+			}
+		}
+
+		vector<Iterator> tokenResult;
+		auto resultError = ParseToken("(", input, end, tokenResult);
+		if (tokenResult.size() > 0)
+		{
+			ResultList expressionResult;
+			auto error = ParseExpression(tokenResult[0], end, expressionResult);
+			resultError = FoldError(resultError, error);
+
+			for (auto er : expressionResult)
+			{
+				tokenResult.clear();
+				error = ParseToken(")", er.first, end, tokenResult);
+				resultError = FoldError(resultError, error);
+				if (tokenResult.size() > 0)
+				{
+					result.push_back(make_pair(tokenResult[0], er.second));
+				}
+			}
+			return resultError;
+		}
+		
 		auto it = availableSymbols.begin();
 		while (it != availableSymbols.end())
 		{
@@ -715,14 +788,70 @@ namespace tinymoe
 		return resultError;
 	}
 
-	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, ResultList& result)
-	{
-		throw 0;
-	}
-
 	CodeError GrammarStack::ParseList(Iterator input, Iterator end, ResultList& result)
 	{
-		throw 0;
+		vector<Iterator> tokenResult;
+		auto resultError = ParseToken("(", input, end, tokenResult);
+		if (tokenResult.size() == 0) return resultError;
+		input = tokenResult[0];
+		
+		vector<pair<Iterator, ExpressionLink::Ptr>> linkResult, linkFinalResult;
+		linkResult.push_back(make_pair(input, ExpressionLink::Ptr(nullptr)));
+		int linkResultBegin = 0;
+		int linkResultEnd = linkResult.size();
+
+		while (linkResultBegin < linkResultEnd)
+		{
+			for (int i = linkResultBegin; i < linkResultEnd; i++)
+			{
+				auto it = linkResult[i].first;
+				auto previousExpression = linkResult[i].second;
+				ResultList expressionResult;
+				ParseExpression(it, end, expressionResult);
+
+				for (auto er : expressionResult)
+				{
+					auto link = make_shared<ExpressionLink>();
+					link->expression = er.second;
+					link->previous = previousExpression;
+
+					tokenResult.clear();
+					auto error = ParseToken(",", er.first, end, tokenResult);
+					resultError = FoldError(resultError, error);
+					if (tokenResult.size() != 0)
+					{
+						linkResult.push_back(make_pair(tokenResult[0], link));
+					}
+					else
+					{
+						tokenResult.clear();
+						error = ParseToken(")", er.first, end, tokenResult);
+						resultError = FoldError(resultError, error);
+						if (tokenResult.size() != 0)
+						{
+							linkFinalResult.push_back(make_pair(tokenResult[0], link));
+						}
+					}
+				}
+			}
+		}
+
+		for (auto lfr : linkFinalResult)
+		{
+			auto it = lfr.first;
+			auto expr = lfr.second;
+			Expression::List elements;
+			while (expr)
+			{
+				elements.insert(elements.begin(), expr->expression);
+				expr = expr->previous;
+			}
+
+			auto list = make_shared<ListExpression>();
+			list->elements = elements;
+			result.push_back(make_pair(it, static_pointer_cast<Expression>(list)));
+		}
+		return resultError;
 	}
 
 	CodeError GrammarStack::ParseAssignable(Iterator input, Iterator end, ResultList& result)
@@ -793,5 +922,68 @@ namespace tinymoe
 		}
 
 		return CodeError();
+	}
+
+	CodeError GrammarStack::ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseExp0(Iterator input, Iterator end, ResultList& result)
+	{
+		throw 0;
+	}
+
+	CodeError GrammarStack::ParseExp1(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::Mul, CodeTokenType::Div };
+		BinaryOperator binaryOperators[] = { BinaryOperator::Mul, BinaryOperator::Div };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp0, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExp2(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::Add, CodeTokenType::Sub };
+		BinaryOperator binaryOperators[] = { BinaryOperator::Add, BinaryOperator::Sub };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp1, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExp3(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::Concat };
+		BinaryOperator binaryOperators[] = { BinaryOperator::Concat };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp2, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExp4(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::LT, CodeTokenType::GT, CodeTokenType::LE, CodeTokenType::GE, CodeTokenType::EQ, CodeTokenType::NE };
+		BinaryOperator binaryOperators[] = { BinaryOperator::LT, BinaryOperator::GT, BinaryOperator::LE, BinaryOperator::GE, BinaryOperator::EQ, BinaryOperator::NE };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp3, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExp5(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::And };
+		BinaryOperator binaryOperators[] = { BinaryOperator::And };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp4, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExp6(Iterator input, Iterator end, ResultList& result)
+	{
+		CodeTokenType tokenTypes[] = { CodeTokenType::Or };
+		BinaryOperator binaryOperators[] = { BinaryOperator::Or };
+		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
+		return ParseBinary(input, end, &GrammarStack::ParseExp5, tokenTypes, binaryOperators, count, result);
+	}
+
+	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, ResultList& result)
+	{
+		return ParseExp6(input, end, result);
 	}
 }
