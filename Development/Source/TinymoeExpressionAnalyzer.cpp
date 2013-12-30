@@ -11,6 +11,37 @@ namespace tinymoe
 	{
 	}
 
+	string GrammarFragment::GetUniqueIdFragment()
+	{
+		switch (type)
+		{
+		case GrammarFragmentType::Type:
+			return "<type>";
+		case GrammarFragmentType::Primitive:
+			return "<primitive>";
+		case GrammarFragmentType::Expression:
+			return "<expression>";
+		case GrammarFragmentType::List:
+			return "<list>";
+		case GrammarFragmentType::Assignable:
+			return "<assignable>";
+		case GrammarFragmentType::Argument:
+			return "<argument>";
+			break;
+		}
+		
+		string uniqueId;
+		for (auto i = identifiers.begin(); i != identifiers.end(); i++)
+		{
+			uniqueId += *i;
+			if (i + 1 != identifiers.end())
+			{
+				uniqueId += " ";
+			}
+		}
+		return uniqueId;
+	}
+
 	/*************************************************************
 	GrammarSymbol
 	*************************************************************/
@@ -24,34 +55,12 @@ namespace tinymoe
 	void GrammarSymbol::CalculateUniqueId()
 	{
 		uniqueId = "";
-		for (auto fragment : fragments)
+		for (auto i = fragments.begin(); i != fragments.end(); i++)
 		{
-			switch (fragment->type)
+			uniqueId += (*i)->GetUniqueIdFragment();
+			if (i + 1 != fragments.end())
 			{
-			case GrammarFragmentType::Type:
-				uniqueId += "<type> ";
-				break;
-			case GrammarFragmentType::Primitive:
-				uniqueId += "<primitive> ";
-				break;
-			case GrammarFragmentType::Expression:
-				uniqueId += "<expression> ";
-				break;
-			case GrammarFragmentType::List:
-				uniqueId += "<list> ";
-				break;
-			case GrammarFragmentType::Assignable:
-				uniqueId += "<assignable> ";
-				break;
-			case GrammarFragmentType::Argument:
-				uniqueId += "<argument> ";
-				break;
-			case GrammarFragmentType::Name:
-				for (auto name : fragment->identifiers)
-				{
-					uniqueId += name + " ";
-				}
-				break;
+				uniqueId += " ";
 			}
 		}
 	}
@@ -202,9 +211,13 @@ namespace tinymoe
 	string ArgumentExpression::ToLog()
 	{
 		string result = "<argument>(";
-		for (auto token : tokens)
+		for (auto i = tokens.begin(); i != tokens.end(); i++)
 		{
-			result += token.value + " ";
+			result += i->value;
+			if (i + 1 != tokens.end())
+			{
+				result += " ";
+			}
 		}
 		result += ")";
 		return result;
@@ -218,10 +231,10 @@ namespace tinymoe
 	string InvokeExpression::ToLog()
 	{
 		string result = function->ToLog() + "(";
-		for (auto argument : arguments)
+		for (auto i = arguments.begin(); i != arguments.end(); i++)
 		{
-			result += argument->ToLog();
-			if (argument != arguments.back())
+			result += (*i)->ToLog();
+			if (i + 1 != arguments.end())
 			{
 				result += ", ";
 			}
@@ -233,10 +246,10 @@ namespace tinymoe
 	string ListExpression::ToLog()
 	{
 		string result = "(";
-		for (auto element : elements)
+		for (auto i = elements.begin(); i != elements.end(); i++)
 		{
-			result += element->ToLog();
-			if (element != elements.back())
+			result += (*i)->ToLog();
+			if (i + 1 != elements.end())
 			{
 				result += ", ";
 			}
@@ -332,9 +345,13 @@ namespace tinymoe
 	string ArgumentExpression::ToCode()
 	{
 		string result = "(";
-		for (auto token : tokens)
+		for (auto i = tokens.begin(); i != tokens.end(); i++)
 		{
-			result += token.value + " ";
+			result += i->value;
+			if (i + 1 != tokens.end())
+			{
+				result += " ";
+			}
 		}
 		result += ")";
 		return result;
@@ -354,31 +371,33 @@ namespace tinymoe
 		case GrammarSymbolType::Sentence:
 		case GrammarSymbolType::Block:
 			{
-				string result;
+				string result = "(";
 				auto it = arguments.begin();
-				for (auto fragment : reference->symbol->fragments)
+				for (auto i = reference->symbol->fragments.begin(); i != reference->symbol->fragments.end(); i++)
 				{
-					if (fragment->type == GrammarFragmentType::Name)
+					if ((*i)->type == GrammarFragmentType::Name)
 					{
-						for (auto id : fragment->identifiers)
-						{
-							result += id + " ";
-						}
+						result += (*i)->GetUniqueIdFragment();
 					}
 					else
 					{
-						result += (*it++)->ToCode() + " ";
+						result += (*it++)->ToCode();
+					}
+					if (i + 1 != reference->symbol->fragments.end())
+					{
+						result += " ";
 					}
 				}
+				result += ")";
 				return result;
 			}
 		}
 
 		string result = "invoke " + function->ToCode() + " with (";
-		for (auto argument : arguments)
+		for (auto i = arguments.begin(); i != arguments.end(); i++)
 		{
-			result += argument->ToCode();
-			if (argument != arguments.back())
+			result += (*i)->ToCode();
+			if (i + 1 != arguments.end())
 			{
 				result += ", ";
 			}
@@ -390,10 +409,10 @@ namespace tinymoe
 	string ListExpression::ToCode()
 	{
 		string result = "(";
-		for (auto element : elements)
+		for (auto i = elements.begin(); i != elements.end(); i++)
 		{
-			result += element->ToCode();
-			if (element != elements.back())
+			result += (*i)->ToCode();
+			if (i + 1 != elements.end())
 			{
 				result += ", ";
 			}
@@ -555,7 +574,7 @@ namespace tinymoe
 		case GrammarFragmentType::Type:
 			return ParseType(input, end, result);
 		case GrammarFragmentType::Primitive:
-			return ParsePrimitive(input, end, result);
+			return ParseShortPrimitive(input, end, result);
 		case GrammarFragmentType::Expression:
 			return ParseExpression(input, end, result);
 		case GrammarFragmentType::List:
@@ -694,7 +713,7 @@ namespace tinymoe
 		return resultError;
 	}
 
-	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, ResultList& result)
+	CodeError GrammarStack::ParseShortPrimitive(Iterator input, Iterator end, ResultList& result)
 	{
 		if (input == end)
 		{
@@ -707,7 +726,6 @@ namespace tinymoe
 			return error;
 		}
 
-		CodeError resultError;
 		int resultBegin = result.size();
 		switch (input->type)
 		{
@@ -718,15 +736,15 @@ namespace tinymoe
 				auto literal = make_shared<LiteralExpression>();
 				literal->token = *input++;
 				result.push_back(make_pair(input, static_pointer_cast<Expression>(literal)));
+				return CodeError();
 			}
-			goto END_OF_PRIMITIVE_FRAGMENT;
 		case CodeTokenType::Add:
 		case CodeTokenType::Sub:
 		case CodeTokenType::Not:
 			{
 				auto unaryType = input->type;
 				ResultList primitiveResult;
-				resultError = ParsePrimitive(++input, end, primitiveResult);
+				auto resultError = ParsePrimitive(++input, end, primitiveResult);
 				for (auto pr : primitiveResult)
 				{
 					auto unary = make_shared<UnaryExpression>();
@@ -745,15 +763,14 @@ namespace tinymoe
 					}
 
 					result.push_back(make_pair(pr.first, static_pointer_cast<Expression>(unary)));
-					return CodeError();
 				}
+				return resultError;
 			}
-			goto END_OF_PRIMITIVE_FRAGMENT;
 		}
 
 		{
 			vector<Iterator> tokenResult;
-			resultError = ParseToken("(", input, end, tokenResult);
+			auto resultError = ParseToken("(", input, end, tokenResult);
 			if (tokenResult.size() > 0)
 			{
 				ResultList expressionResult;
@@ -771,34 +788,38 @@ namespace tinymoe
 					}
 				}
 
-				goto END_OF_PRIMITIVE_FRAGMENT;
+				return resultError;
 			}
 		}
 
+		CodeError resultError;
+		auto it = availableSymbols.begin();
+		while (it != availableSymbols.end())
 		{
-			auto it = availableSymbols.begin();
-			while (it != availableSymbols.end())
+			it = availableSymbols.upper_bound(it->first);
+			it--;
+			if (it->second->type == GrammarSymbolType::Symbol || it->second->type == GrammarSymbolType::Phrase)
 			{
-				it = availableSymbols.upper_bound(it->first);
-				it--;
-				if (it->second->type == GrammarSymbolType::Symbol || it->second->type == GrammarSymbolType::Phrase)
+				auto symbol = it->second;
+				switch (symbol->fragments[0]->type)
 				{
-					auto symbol = it->second;
-					switch (symbol->fragments[0]->type)
-					{
-					case GrammarFragmentType::Primitive:
-					case GrammarFragmentType::Expression:
-						break;
-					default:
-						auto error = ParseGrammarSymbol(symbol, input, end, result);
-						resultError = FoldError(resultError, error);
-					}
+				case GrammarFragmentType::Primitive:
+				case GrammarFragmentType::Expression:
+					break;
+				default:
+					auto error = ParseGrammarSymbol(symbol, input, end, result);
+					resultError = FoldError(resultError, error);
 				}
-				it++;
 			}
+			it++;
 		}
+		return resultError;
+	}
 
-	END_OF_PRIMITIVE_FRAGMENT:
+	CodeError GrammarStack::ParsePrimitive(Iterator input, Iterator end, ResultList& result)
+	{
+		int resultBegin = result.size();
+		auto resultError = ParseShortPrimitive(input, end, result);
 		int resultEnd = result.size();
 
 		while (resultBegin < resultEnd)
@@ -1009,17 +1030,12 @@ namespace tinymoe
 		return resultError;
 	}
 
-	CodeError GrammarStack::ParseExp0(Iterator input, Iterator end, ResultList& result)
-	{
-		return ParsePrimitive(input, end, result);
-	}
-
 	CodeError GrammarStack::ParseExp1(Iterator input, Iterator end, ResultList& result)
 	{
 		CodeTokenType tokenTypes[] = { CodeTokenType::Mul, CodeTokenType::Div };
 		BinaryOperator binaryOperators[] = { BinaryOperator::Mul, BinaryOperator::Div };
 		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
-		return ParseBinary(input, end, &GrammarStack::ParseExp0, tokenTypes, binaryOperators, count, result);
+		return ParseBinary(input, end, &GrammarStack::ParsePrimitive, tokenTypes, binaryOperators, count, result);
 	}
 
 	CodeError GrammarStack::ParseExp2(Iterator input, Iterator end, ResultList& result)
@@ -1054,16 +1070,11 @@ namespace tinymoe
 		return ParseBinary(input, end, &GrammarStack::ParseExp4, tokenTypes, binaryOperators, count, result);
 	}
 
-	CodeError GrammarStack::ParseExp6(Iterator input, Iterator end, ResultList& result)
+	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, ResultList& result)
 	{
 		CodeTokenType tokenTypes[] = { CodeTokenType::Or };
 		BinaryOperator binaryOperators[] = { BinaryOperator::Or };
 		int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
 		return ParseBinary(input, end, &GrammarStack::ParseExp5, tokenTypes, binaryOperators, count, result);
-	}
-
-	CodeError GrammarStack::ParseExpression(Iterator input, Iterator end, ResultList& result)
-	{
-		return ParseExp6(input, end, result);
 	}
 }

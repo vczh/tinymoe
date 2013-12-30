@@ -53,7 +53,7 @@ TEST_CASE(TestParseNameExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "true ");
+		TEST_ASSERT(expr->symbol->uniqueId == "true");
 	}
 	{
 		Tokenize("false", tokens);
@@ -63,7 +63,7 @@ TEST_CASE(TestParseNameExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "false ");
+		TEST_ASSERT(expr->symbol->uniqueId == "false");
 	}
 	{
 		Tokenize("null", tokens);
@@ -73,7 +73,7 @@ TEST_CASE(TestParseNameExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "null ");
+		TEST_ASSERT(expr->symbol->uniqueId == "null");
 	}
 }
 
@@ -95,7 +95,7 @@ TEST_CASE(TestParseTypeExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "array ");
+		TEST_ASSERT(expr->symbol->uniqueId == "array");
 	}
 	{
 		Tokenize("integer", tokens);
@@ -105,7 +105,7 @@ TEST_CASE(TestParseTypeExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "integer ");
+		TEST_ASSERT(expr->symbol->uniqueId == "integer");
 	}
 	{
 		Tokenize("float", tokens);
@@ -115,7 +115,7 @@ TEST_CASE(TestParseTypeExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "float ");
+		TEST_ASSERT(expr->symbol->uniqueId == "float");
 	}
 	{
 		Tokenize("string", tokens);
@@ -125,7 +125,7 @@ TEST_CASE(TestParseTypeExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "string ");
+		TEST_ASSERT(expr->symbol->uniqueId == "string");
 	}
 	{
 		Tokenize("symbol", tokens);
@@ -135,7 +135,7 @@ TEST_CASE(TestParseTypeExpression)
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "symbol ");
+		TEST_ASSERT(expr->symbol->uniqueId == "symbol");
 	}
 }
 
@@ -179,13 +179,12 @@ TEST_CASE(TestParseAssignableExpression)
 	GrammarStack::ResultList result;
 
 	Tokenize("true end", tokens);
-	result.clear();
 	stack->ParseAssignable(tokens.begin(), tokens.end(), result);
 	TEST_ASSERT(result.size() == 2);
 	{
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "true ");
+		TEST_ASSERT(expr->symbol->uniqueId == "true");
 	}
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
@@ -198,6 +197,31 @@ TEST_CASE(TestParseAssignableExpression)
 
 TEST_CASE(TestParsePrimitiveExpression)
 {
+	auto item = make_shared<GrammarStackItem>();
+	item->FillPredefinedSymbols();
+	auto stack = make_shared<GrammarStack>();
+	stack->Push(item);
+
+	CodeToken::List tokens;
+	GrammarStack::ResultList result;
+
+	Tokenize("item 1 of array new array of 10 items is not integer", tokens);
+	stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
+
+	Expression::List fullExpressions;
+	for (auto r : result)
+	{
+		if (r.first == tokens.end())
+		{
+			fullExpressions.push_back(r.second);
+		}
+	}
+
+	TEST_ASSERT(fullExpressions.size() == 1);
+	auto log = fullExpressions[0]->ToLog();
+	auto code = fullExpressions[0]->ToCode();
+	TEST_ASSERT(log == "<primitive> is not <type>(item <expression> of array <primitive>(1, new array of <expression> items(10)), integer)");
+	TEST_ASSERT(code == "((item 1 of array (new array of 10 items)) is not (integer))");
 }
 
 TEST_CASE(TestParseUnaryExpression)

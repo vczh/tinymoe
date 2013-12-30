@@ -33,6 +33,8 @@ namespace tinymoe
 		vector<string>				identifiers;
 
 		GrammarFragment(GrammarFragmentType _type);
+
+		string						GetUniqueIdFragment();
 	};
 
 	enum class GrammarSymbolTarget
@@ -256,21 +258,20 @@ namespace tinymoe
 		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, int beginFragment, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, ResultList& result);
 		CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result);
 
-		CodeError					ParseType(Iterator input, Iterator end, ResultList& result);		// <type>
-		CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);	// <literal>, op <primitive>, (<expression>), <phrase>
-		CodeError					ParseList(Iterator input, Iterator end, ResultList& result);		// (<expression>, ...)
-		CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);	// <symbol> or <argument>
-		CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);	// <argument>
+		CodeError					ParseType(Iterator input, Iterator end, ResultList& result);			// <type>
+		CodeError					ParseShortPrimitive(Iterator input, Iterator end, ResultList& result);	// <literal>, op <primitive>, (<expression>), <phrase>
+		CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);		// left recursive <phrase>
+		CodeError					ParseList(Iterator input, Iterator end, ResultList& result);			// (<expression>, ...)
+		CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);		// <symbol> or <argument>
+		CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);		// <argument>
 
 		CodeError					ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result);
-		CodeError					ParseExp0(Iterator input, Iterator end, ResultList& result);		// left recursive <phrase>
-		CodeError					ParseExp1(Iterator input, Iterator end, ResultList& result);		// * /
-		CodeError					ParseExp2(Iterator input, Iterator end, ResultList& result);		// + -
-		CodeError					ParseExp3(Iterator input, Iterator end, ResultList& result);		// &
-		CodeError					ParseExp4(Iterator input, Iterator end, ResultList& result);		// < > <= >= = <>
-		CodeError					ParseExp5(Iterator input, Iterator end, ResultList& result);		// and
-		CodeError					ParseExp6(Iterator input, Iterator end, ResultList& result);		// or
-		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);	// <expression>
+		CodeError					ParseExp1(Iterator input, Iterator end, ResultList& result);			// * /
+		CodeError					ParseExp2(Iterator input, Iterator end, ResultList& result);			// + -
+		CodeError					ParseExp3(Iterator input, Iterator end, ResultList& result);			// &
+		CodeError					ParseExp4(Iterator input, Iterator end, ResultList& result);			// < > <= >= = <>
+		CodeError					ParseExp5(Iterator input, Iterator end, ResultList& result);			// and
+		CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);		// or, aka. <expression>
 	};
 }
 
