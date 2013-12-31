@@ -493,19 +493,19 @@ namespace tinymoe
 	Expression::CollectNewAssignables
 	*************************************************************/
 
-	void LiteralExpression::CollectNewAssignable(Expression::List& assignables)
+	void LiteralExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
 	}
 
-	void ArgumentExpression::CollectNewAssignable(Expression::List& assignables)
+	void ArgumentExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
 	}
 
-	void ReferenceExpression::CollectNewAssignable(Expression::List& assignables)
+	void ReferenceExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
 	}
 
-	void InvokeExpression::CollectNewAssignable(Expression::List& assignables)
+	void InvokeExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
 		if (auto reference = dynamic_pointer_cast<ReferenceExpression>(function))
 		{
@@ -516,7 +516,14 @@ namespace tinymoe
 				{
 					if (auto argument = dynamic_pointer_cast<ArgumentExpression>(*it))
 					{
-						assignables.push_back(*it);
+						newAssignables.push_back(*it);
+					}
+				}
+				else if (fragment->type == GrammarFragmentType::Argument)
+				{
+					if (auto argument = dynamic_pointer_cast<ArgumentExpression>(*it))
+					{
+						newArguments.push_back(*it);
 					}
 				}
 				if (fragment->type != GrammarFragmentType::Name)
@@ -527,31 +534,31 @@ namespace tinymoe
 		}
 		else
 		{
-			function->CollectNewAssignable(assignables);
+			function->CollectNewAssignable(newAssignables, newArguments);
 			for (auto argument : arguments)
 			{
-				argument->CollectNewAssignable(assignables);
+				argument->CollectNewAssignable(newAssignables, newArguments);
 			}
 		}
 	}
 
-	void ListExpression::CollectNewAssignable(Expression::List& assignables)
+	void ListExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
 		for (auto element : elements)
 		{
-			element->CollectNewAssignable(assignables);
+			element->CollectNewAssignable(newAssignables, newArguments);
 		}
 	}
 
-	void UnaryExpression::CollectNewAssignable(Expression::List& assignables)
+	void UnaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
-		operand->CollectNewAssignable(assignables);
+		operand->CollectNewAssignable(newAssignables, newArguments);
 	}
 
-	void BinaryExpression::CollectNewAssignable(Expression::List& assignables)
+	void BinaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
 	{
-		first->CollectNewAssignable(assignables);
-		second->CollectNewAssignable(assignables);
+		first->CollectNewAssignable(newAssignables, newArguments);
+		second->CollectNewAssignable(newAssignables, newArguments);
 	}
 
 	/*************************************************************
@@ -1186,11 +1193,8 @@ namespace tinymoe
 		return resultError;
 	}
 
-	int GrammarStack::CountStatementAssignables(Expression::Ptr statement)
+	int GrammarStack::CountStatementAssignables(Expression::List& assignables)
 	{
-		Expression::List assignables;
-		statement->CollectNewAssignable(assignables);
-
 		for (auto assignable : assignables)
 		{
 			auto argument = dynamic_pointer_cast<ArgumentExpression>(assignable);

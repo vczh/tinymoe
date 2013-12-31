@@ -343,7 +343,11 @@ TEST_CASE(TestParseAmbiguousStatement)
 			auto stat = stats[0];
 			auto log = stat->ToLog();
 			auto code = stat->ToCode();
-			auto assignable = stack->CountStatementAssignables(stat);
+			
+			Expression::List assignables, arguments;
+			stat->CollectNewAssignable(assignables, arguments);
+			auto assignable = stack->CountStatementAssignables(assignables);
+
 			TEST_ASSERT(log == "set <assignable> to <expression>((argument: field something wrong of null), true)");
 			TEST_ASSERT(code == "(set (field something wrong of null) to (true))");
 			TEST_ASSERT(assignable == -1);
@@ -352,7 +356,11 @@ TEST_CASE(TestParseAmbiguousStatement)
 			auto stat = stats[1];
 			auto log = stat->ToLog();
 			auto code = stat->ToCode();
-			auto assignable = stack->CountStatementAssignables(stat);
+			
+			Expression::List assignables, arguments;
+			stat->CollectNewAssignable(assignables, arguments);
+			auto assignable = stack->CountStatementAssignables(assignables);
+
 			TEST_ASSERT(log == "set field <argument> of <expression> to <expression>((argument: something wrong), null, true)");
 			TEST_ASSERT(code == "(set field (something wrong) of (null) to (true))");
 			TEST_ASSERT(assignable == 0);
