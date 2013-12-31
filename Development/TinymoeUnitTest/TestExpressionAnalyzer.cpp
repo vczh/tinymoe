@@ -17,7 +17,6 @@ TEST_CASE(TestGrammarStack)
 	auto stack = make_shared<GrammarStack>();
 	auto item = make_shared<GrammarStackItem>();
 	item->FillPredefinedSymbols();
-	TEST_ASSERT(item->symbols.size() == 24);
 
 	stack->Push(item);
 	TEST_ASSERT(stack->stackItems.size() == 1);

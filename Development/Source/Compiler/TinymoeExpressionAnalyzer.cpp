@@ -163,12 +163,16 @@ namespace tinymoe
 			+ "end"
 			);
 		symbols.push_back(
-			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Select)
+			make_shared<GrammarSymbol>(GrammarSymbolType::Block, GrammarSymbolTarget::Select)
 			+ "select" + GrammarFragmentType::Expression
 			);
 		symbols.push_back(
 			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Case)
 			+ "case" + GrammarFragmentType::Expression
+			);
+		symbols.push_back(
+			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
+			+ "call" + GrammarFragmentType::Expression
 			);
 		symbols.push_back(
 			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::TailCall)

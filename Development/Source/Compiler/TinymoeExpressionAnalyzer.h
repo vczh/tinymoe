@@ -61,8 +61,9 @@ namespace tinymoe
 		GetField,				// (primitive)	field <argument> of <primitive>
 
 		End,					// (sentence)	end
-		Select,					// (sentence)	select <expression>
+		Select,					// (block)		select <expression>
 		Case,					// (sentence)	case <expression>
+		Call,					// (sentence)	call <expression>
 		TailCall,				// (sentence)	tail call <expression>
 		RedirectTo,				// (sentence)	redirect to <expression>
 		Assign,					// (sentence)	set <assignable> to <expression>

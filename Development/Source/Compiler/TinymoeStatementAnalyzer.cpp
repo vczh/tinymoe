@@ -243,6 +243,14 @@ namespace tinymoe
 				symbolFunction->function = function;
 				declarationFunctions.insert(make_pair(declaration, symbolFunction));
 
+				if (function->bodyName)
+				{
+					if (auto symbol = function->bodyName->CreateSymbol())
+					{
+						symbolFunction->arguments.insert(make_pair(symbol, function->bodyName));
+					}
+				}
+
 				for (auto fragment : function->name)
 				{
 					if (auto symbol = fragment->CreateSymbol())
@@ -331,35 +339,118 @@ namespace tinymoe
 		token = tokens[0];
 	}
 
-	void SymbolModule::ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
+	Statement::Ptr SymbolModule::ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
 	{
-		while (lineIndex <= endLineIndex)
+		int pushCount = 0;
+
+#define PUSH_STACK(ITEM)\
+		do\
+		{\
+			stack->Push(ITEM); \
+			pushCount++;\
+		}while (0)
+
+#define POP_STACK\
+		do\
+		{\
+			for (int i = 0; i<pushCount; i++)\
+			{\
+				stack->Pop();\
+			}\
+		}while (0)
+
+		try
 		{
-			auto line = codeFile->lines[lineIndex++];
-			GrammarStack::ResultList result;
-			auto error = stack->ParseStatement(line->tokens.begin(), line->tokens.end(), result);
-			if (result.size() == 0)
+			while (lineIndex <= endLineIndex)
 			{
-				errors.push_back(error);
-				if ((size_t)lineIndex < codeFile->lines.size())
+				auto line = codeFile->lines[lineIndex++];
+				GrammarStack::ResultList result;
+				auto error = stack->ParseStatement(line->tokens.begin(), line->tokens.end(), result);
+				if (result.size() == 0)
 				{
-					if (line->tokens[0].column < codeFile->lines[lineIndex]->tokens[0].column)
+					errors.push_back(error);
+					if ((size_t)lineIndex < codeFile->lines.size())
 					{
-						throw ParsingFailedException();
+						if (line->tokens[0].column < codeFile->lines[lineIndex]->tokens[0].column)
+						{
+							throw ParsingFailedException();
+						}
 					}
 				}
-			}
-			else
-			{
-			}
-		}
+				else if (result.size() > 1)
+				{
+					CodeError error =
+					{
+						line->tokens[0],
+						"Ambiguous statement."
+					};
+					for (auto r : result)
+					{
+						error.message += "\r\n\t¡¾" + r.second->ToCode() + "¡¿";
+					}
+					throw ParsingFailedException();
+				}
+				else
+				{
+					auto invoke = dynamic_pointer_cast<InvokeExpression>(result[0].second);
+					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
+					switch (symbol->target)
+					{
+					case GrammarSymbolTarget::End:
+						return nullptr;
+					case GrammarSymbolTarget::Case:
+						if (!statement || statement->statementSymbol->target != GrammarSymbolTarget::Select)
+						{
+							CodeError error =
+							{
+								line->tokens[0],
+								"Case sentence should appear inside select block.",
+							};
+							errors.push_back(error);
+						}
+					}
+
+					auto newStatement = make_shared<Statement>();
+					newStatement->statementSymbol = symbol;
+					newStatement->statementExpression = invoke;
+					
+					Expression::List assignables, arguments;
+					invoke->CollectNewAssignable(assignables, arguments);
+
+					for (auto expr : assignables)
+					{
+						auto argument = dynamic_pointer_cast<ArgumentExpression>(expr);
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(argument->tokens, symbol, token);
+						newStatement->newVariables.insert(make_pair(symbol, expr));
+					}
+					for (auto expr : arguments)
+					{
+						auto argument = dynamic_pointer_cast<ArgumentExpression>(expr);
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(argument->tokens, symbol, token);
+						newStatement->blockArguments.insert(make_pair(symbol, expr));
+					}
+
+					statement->statements.push_back(newStatement);
+				}
+			}
+			POP_STACK;
+		}
+		catch (const ParsingFailedException&)
+		{
+			POP_STACK;
+			throw;
+		}
 		if (statement->statements.size()>0)
 		{
 			auto last = statement->statements.back();
 			if (last->statementSymbol && last->statementSymbol->target == GrammarSymbolTarget::End)
 			{
-				return;
+				return nullptr;
 			}
 		}
 
@@ -368,6 +459,7 @@ namespace tinymoe
 			codeFile->lines[lineIndex - 1]->tokens[0],
 			"Block should be closed using \"end\".",
 		};
+		return nullptr;
 	}
 
 	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
@@ -419,6 +511,14 @@ namespace tinymoe
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}
+					if (funcdecl->alias)
+					{
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(funcdecl->alias->identifiers, symbol, token);
+						item->symbols.push_back(symbol);
+						symbolTokens.insert(make_pair(symbol, token));
+					}
 				}
 
 				for (auto argument : func->arguments)
@@ -459,6 +559,15 @@ namespace tinymoe
 					try
 					{
 						ParseBlock(codeFile, stack, statement, lineIndex, endLineIndex, errors);
+						if (lineIndex <= endLineIndex)
+						{
+							CodeError error =
+							{
+								codeFile->lines[lineIndex]->tokens[0],
+								"Too many code."
+							};
+							errors.push_back(error);
+						}
 					}
 					catch (const ParsingFailedException&)
 					{

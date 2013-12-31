@@ -51,8 +51,8 @@ end
 
 cps (state)
 block (body) repeat : repeat statement
-	invoke body with (state)
-	select flag field of state
+	call invoke body with (state)
+	select field flag of state
 		case breaking repeating
 			reset continuation state state to null
 		case continuing repeating

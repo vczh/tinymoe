@@ -15,13 +15,14 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<Statement>								Ptr;
 		typedef vector<Ptr>											List;
-		typedef map<GrammarSymbol::Ptr, Expression::Ptr>			GrammarExpressionMap;
+		typedef map<GrammarSymbol::Ptr, Expression::Ptr>			SymbolExpressionMap;
 
 		GrammarSymbol::Ptr				statementSymbol;
 		InvokeExpression::Ptr			statementExpression;
+		SymbolExpressionMap				newVariables;
+		SymbolExpressionMap				blockArguments;
 		Statement::List					statements;
-		GrammarExpressionMap			newVariables;
-		GrammarExpressionMap			blockArguments;
+		bool							connectToPreviousBlock = false;
 	};
 
 	/*************************************************************
@@ -69,7 +70,7 @@ namespace tinymoe
 
 		void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
 		void							BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token);
-		void							ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
+		Statement::Ptr					ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
 		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 	};
 
