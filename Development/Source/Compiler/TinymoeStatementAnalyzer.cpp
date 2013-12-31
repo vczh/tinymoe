@@ -321,8 +321,43 @@ namespace tinymoe
 		}
 	}
 
-	void SymbolModule::ParseBlock(GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
+	void SymbolModule::ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
 	{
+		while (lineIndex <= endLineIndex)
+		{
+			auto line = codeFile->lines[lineIndex++];
+			GrammarStack::ResultList result;
+			auto error = stack->ParseStatement(line->tokens.begin(), line->tokens.end(), result);
+			if (result.size() == 0)
+			{
+				errors.push_back(error);
+				if ((size_t)lineIndex < codeFile->lines.size())
+				{
+					if (line->tokens[0].column < codeFile->lines[lineIndex]->tokens[0].column)
+					{
+						throw ParsingFailedException();
+					}
+				}
+			}
+			else
+			{
+			}
+		}
+
+		if (statement->statements.size()>0)
+		{
+			auto last = statement->statements.back();
+			if (last->statementSymbol && last->statementSymbol->target == GrammarSymbolTarget::End)
+			{
+				return;
+			}
+		}
+
+		CodeError error =
+		{
+			codeFile->lines[lineIndex - 1]->tokens[0],
+			"Block should be closed using \"end\".",
+		};
 	}
 
 	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
@@ -371,18 +406,30 @@ namespace tinymoe
 					};
 					errors.push_back(error);
 				}
-
-				try
+				
+				if (funcdecl->codeLineIndex == -1)
 				{
-					int lineIndex = funcdecl->beginLineIndex;
+					CodeError error =
+					{
+						funcdecl->keywordToken,
+						"Block should be closed using \"end\".",
+					};
+					errors.push_back(error);
+				}
+				else
+				{
+					int lineIndex = funcdecl->codeLineIndex;
 					int endLineIndex = funcdecl->endLineIndex;
 					auto statement = make_shared<Statement>();
 					func->statement = statement;
-
-					ParseBlock(stack, statement, lineIndex, endLineIndex, errors);
-				}
-				catch (const ParsingFailedException&)
-				{
+					
+					try
+					{
+						ParseBlock(codeFile, stack, statement, lineIndex, endLineIndex, errors);
+					}
+					catch (const ParsingFailedException&)
+					{
+					}
 				}
 
 				stack->Pop();

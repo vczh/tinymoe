@@ -619,11 +619,10 @@ namespace tinymoe
 		}
 		else if (input->value != token)
 		{
-			auto token = *input;
 			CodeError error =
 			{
-				token,
-				"\"" + token.value + "\" expected but \"" + input->value + "\" found.",
+				*input,
+				"\"" + token + "\" expected but \"" + input->value + "\" found.",
 			};
 			return error;
 		}
