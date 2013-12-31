@@ -60,7 +60,6 @@ namespace tinymoe
 
 		bool							IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b);
 		bool							IsMultipleDispatchingChild(FunctionDeclaration::Ptr func);
-		bool							IsMultipleDispatchingRoot(FunctionDeclaration::Ptr root, FunctionDeclaration::Ptr child);
 		void							CheckOverloading(SymbolModule* modulea, GrammarSymbol::Ptr symbola, Declaration::Ptr decla, SymbolModule* moduleb, GrammarSymbol::Ptr symbolb, Declaration::Ptr declb, bool foreignCheck, CodeError::List& errors);
 		void							BuildSymbols(CodeError::List& errors);									// sync step: build all declaration symbols
 		void							BuildFunctions(CodeError::List& errors);								// sync step: build all symbol functions

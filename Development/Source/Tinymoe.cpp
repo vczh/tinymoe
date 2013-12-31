@@ -77,6 +77,10 @@ block (phrase deal with (item)) repeat with (argument item) from (start) to (end
 	end
 end
 
+block (phrase deal with (item)) repeat with (argument item) in (items)
+	raise "Only enumerable object (like containers) can be go through using the repeat-with-in statement."
+end
+
 block (phrase deal with (item)) repeat with (argument item) in (items : enumerable)
 	set cursor to new enumerator from items
 	repeat
@@ -105,7 +109,7 @@ category (signal)
 	follow IFELSE if
 	start IFELSE if
 	closable
-block (body) if (condition)
+block (body) else if (condition)
 	set the result to not signal and condition
 	select the result
 		case true

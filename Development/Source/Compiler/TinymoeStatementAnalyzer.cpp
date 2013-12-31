@@ -152,8 +152,13 @@ namespace tinymoe
 					{
 						return false;
 					}
+					itfa++;
+					itfb++;
 				}
 			}
+
+			ita++;
+			itb++;
 		}
 
 		return true;
@@ -161,11 +166,16 @@ namespace tinymoe
 
 	bool SymbolModule::IsMultipleDispatchingChild(FunctionDeclaration::Ptr func)
 	{
-		return false;
-	}
-
-	bool SymbolModule::IsMultipleDispatchingRoot(FunctionDeclaration::Ptr root, FunctionDeclaration::Ptr child)
-	{
+		for (auto fragment : func->name)
+		{
+			if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(fragment))
+			{
+				if (var->receivingType)
+				{
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -180,34 +190,37 @@ namespace tinymoe
 			{
 				bool childa = IsMultipleDispatchingChild(funca);
 				bool childb = IsMultipleDispatchingChild(funcb);
-				if (childa && childb)
+				if (childa)
 				{
-					return;
-				}
-				else if (childa ^ childb)
-				{
-					if (!foreignCheck && IsMultipleDispatchingRoot(funca, funcb))
+					if (childb)
 					{
-						moduleb->declarationFunctions.find(declb)->second->multipleDispatchingRoot = modulea->declarationFunctions.find(decla)->second;
 						return;
 					}
-					else if (IsMultipleDispatchingRoot(funcb, funca))
+					else
 					{
 						modulea->declarationFunctions.find(decla)->second->multipleDispatchingRoot = moduleb->declarationFunctions.find(declb)->second;
 						return;
 					}
 				}
+				else if (childb)
+				{
+					if (!foreignCheck)
+					{
+						moduleb->declarationFunctions.find(declb)->second->multipleDispatchingRoot = modulea->declarationFunctions.find(decla)->second;
+						return;
+					}
+				}
 			}
-		}
 
-		if (!foreignCheck)
-		{
-			CodeError error =
+			if (!foreignCheck)
 			{
-				declb->keywordToken,
-				"Symbol redefinition.",
-			};
-			errors.push_back(error);
+				CodeError error =
+				{
+					declb->keywordToken,
+					"Symbol redefinition.",
+				};
+				errors.push_back(error);
+			}
 		}
 	}
 
@@ -249,15 +262,36 @@ namespace tinymoe
 			{
 				CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, false, errors);
 			}
+		}
 
-			if (declarationFunctions.find(ita->second)->second->multipleDispatchingRoot.expired())
+		for (auto ita = symbolDeclarations.begin(); ita != symbolDeclarations.end(); ita++)
+		{
+			auto decl = ita->second;
+			if (auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(decl))
 			{
-				for (auto weakRef : usingSymbolModules)
+				if (IsMultipleDispatchingChild(funcdecl))
 				{
-					auto ref = weakRef.lock();
-					for (auto itb = ref->symbolDeclarations.begin(); itb != ref->symbolDeclarations.end(); itb++)
+					auto func = declarationFunctions.find(decl)->second;
+					if (func->multipleDispatchingRoot.expired())
 					{
-						CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, true, errors);
+						for (auto weakRef : usingSymbolModules)
+						{
+							auto ref = weakRef.lock();
+							for (auto itb = ref->symbolDeclarations.begin(); itb != ref->symbolDeclarations.end(); itb++)
+							{
+								CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, true, errors);
+							}
+						}
+					}
+
+					if (func->multipleDispatchingRoot.expired())
+					{
+						CodeError error =
+						{
+							decl->keywordToken,
+							"Cannot find the root definition for this multple dispatching child function.",
+						};
+						errors.push_back(error);
 					}
 				}
 			}

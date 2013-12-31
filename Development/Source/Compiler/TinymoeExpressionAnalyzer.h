@@ -87,7 +87,6 @@ namespace tinymoe
 		typedef multimap<string, Ptr>				MultiMap;
 
 		GrammarFragment::List		fragments;		// grammar fragments for this symbol
-		bool						statement;		// true means this symbol is a statement
 		// a statement cannot be an expression
 		// the top invoke expression's function of a statement should reference to a statement symbol
 		string						uniqueId;		// a string that identifies the grammar structure
