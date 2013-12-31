@@ -366,6 +366,38 @@ namespace tinymoe
 		token = tokens[0];
 	}
 
+	FunctionDeclaration::Ptr SymbolModule::FindSymbolFunction(GrammarSymbol::Ptr symbol)
+	{
+		if (symbol->type == GrammarSymbolType::Block)
+		{
+			{
+				auto itblock = symbolDeclarations.find(symbol);
+				if (itblock != symbolDeclarations.end())
+				{
+					if (auto block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second))
+					{
+						return block;
+					}
+				}
+			}
+
+			for (auto weakRef : usingSymbolModules)
+			{
+				auto ref = weakRef.lock();
+				auto itblock = ref->symbolDeclarations.find(symbol);
+				if (itblock != ref->symbolDeclarations.end())
+				{
+					if (auto block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second))
+					{
+						return block;
+					}
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
 	Statement::Ptr SymbolModule::ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
 	{
 		int pushCount = 0;
@@ -423,23 +455,8 @@ namespace tinymoe
 					auto invoke = dynamic_pointer_cast<InvokeExpression>(result[0].second);
 					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
-					FunctionDeclaration::Ptr parent, block;
-					if (statement->statementSymbol && statement->statementSymbol->type == GrammarSymbolType::Block)
-					{
-						auto itparent = symbolDeclarations.find(statement->statementSymbol);
-						if (itparent != symbolDeclarations.end())
-						{
-							parent = dynamic_pointer_cast<FunctionDeclaration>(itparent->second);
-						}
-					}
-					if (symbol->type == GrammarSymbolType::Block)
-					{
-						auto itblock = symbolDeclarations.find(symbol);
-						if (itblock != symbolDeclarations.end())
-						{
-							block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second);
-						}
-					}
+					auto parent = statement->statementSymbol ? FindSymbolFunction(statement->statementSymbol) : nullptr;
+					auto block = FindSymbolFunction(symbol);
 
 					switch (symbol->target)
 					{
