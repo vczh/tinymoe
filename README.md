@@ -6,6 +6,10 @@ tinymoe
 
 	module hello world
 	using standard library
+
+	sentence print (message)
+		redirect to "printf"
+	end
 	
 	phrase sum from (start) to (end)
 		set the result to 0
