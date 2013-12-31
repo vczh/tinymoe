@@ -374,16 +374,17 @@ namespace tinymoe
 		do\
 		{\
 			stack->Push(ITEM); \
-			pushCount++;\
+			pushCount++; \
 		}while (0)
 
 #define POP_STACK\
 		do\
 		{\
-			for (int i = 0; i<pushCount; i++)\
+			for (int i = 0; i < pushCount; i++)\
 			{\
-				stack->Pop();\
+				stack->Pop(); \
 			}\
+			pushCount = 0;\
 		}while (0)
 
 		try
@@ -445,7 +446,7 @@ namespace tinymoe
 					case GrammarSymbolTarget::End:
 						if (statement->statementSymbol && statement->statementSymbol->target != GrammarSymbolTarget::Select)
 						{
-							if (!parent || !parent->category || !parent->category->closable)
+							if (!parent || (parent->category && !parent->category->closable))
 							{
 								CodeError error =
 								{
@@ -455,6 +456,7 @@ namespace tinymoe
 								errors.push_back(error);
 							}
 						}
+						POP_STACK;
 						return nullptr;
 					case GrammarSymbolTarget::Case:
 						if (!statement->statementSymbol || statement->statementSymbol->target != GrammarSymbolTarget::Select)
@@ -556,7 +558,7 @@ namespace tinymoe
 								{
 									item->symbols.push_back(v.first);
 								}
-								PUSH_STACK(item);
+								stack->Push(item);
 
 								GrammarSymbol::List symbols;
 								FindOverridedSymbols(stack, item, symbols);
