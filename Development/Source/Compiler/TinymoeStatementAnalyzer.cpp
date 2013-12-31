@@ -321,6 +321,16 @@ namespace tinymoe
 		}
 	}
 
+	void SymbolModule::BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token)
+	{
+		symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
+		for (auto token : tokens)
+		{
+			symbol + token.value;
+		}
+		token = tokens[0];
+	}
+
 	void SymbolModule::ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
 	{
 		while (lineIndex <= endLineIndex)
@@ -388,10 +398,33 @@ namespace tinymoe
 			auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(dfp.first);
 			auto func = dfp.second;
 			{
+				map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 				auto item = make_shared<GrammarStackItem>();
+
+				if (funcdecl->cps)
+				{
+					if (funcdecl->cps->stateName)
+					{
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(funcdecl->cps->stateName->identifiers, symbol, token);
+						item->symbols.push_back(symbol);
+						symbolTokens.insert(make_pair(symbol, token));
+					}
+					if (funcdecl->cps->continuationName)
+					{
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(funcdecl->cps->continuationName->identifiers, symbol, token);
+						item->symbols.push_back(symbol);
+						symbolTokens.insert(make_pair(symbol, token));
+					}
+				}
+
 				for (auto argument : func->arguments)
 				{
 					item->symbols.push_back(argument.first);
+					symbolTokens.insert(make_pair(argument.first, func->arguments.find(argument.first)->second->keywordToken));
 				}
 				stack->Push(item);
 
@@ -401,7 +434,7 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						func->arguments.find(symbol)->second->keywordToken,
+						symbolTokens.find(symbol)->second,
 						"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
 					};
 					errors.push_back(error);
