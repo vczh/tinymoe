@@ -395,9 +395,36 @@ namespace tinymoe
 					auto invoke = dynamic_pointer_cast<InvokeExpression>(result[0].second);
 					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
+					FunctionDeclaration::Ptr parent, block;
+					if (statement && statement->statementSymbol->type == GrammarSymbolType::Block)
+					{
+						auto itparent = symbolDeclarations.find(statement->statementSymbol);
+						if (itparent != symbolDeclarations.end())
+						{
+							parent = dynamic_pointer_cast<FunctionDeclaration>(itparent->second);
+						}
+					}
+					if (symbol->type == GrammarSymbolType::Block)
+					{
+						auto itblock = symbolDeclarations.find(symbol);
+						if (itblock != symbolDeclarations.end())
+						{
+							block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second);
+						}
+					}
+
 					switch (symbol->target)
 					{
 					case GrammarSymbolTarget::End:
+						if (!parent || !parent->category || !parent->category->closable)
+						{
+							CodeError error =
+							{
+								line->tokens[0],
+								"A non-closable block cannot be closed using \"end\".",
+							};
+							errors.push_back(error);
+						}
 						return nullptr;
 					case GrammarSymbolTarget::Case:
 						if (!statement || statement->statementSymbol->target != GrammarSymbolTarget::Select)
@@ -418,6 +445,7 @@ namespace tinymoe
 					Expression::List assignables, arguments;
 					invoke->CollectNewAssignable(assignables, arguments);
 
+					map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 					for (auto expr : assignables)
 					{
 						auto argument = dynamic_pointer_cast<ArgumentExpression>(expr);
@@ -425,6 +453,7 @@ namespace tinymoe
 						CodeToken token;
 						BuildNameSymbol(argument->tokens, symbol, token);
 						newStatement->newVariables.insert(make_pair(symbol, expr));
+						symbolTokens.insert(make_pair(symbol, token));
 					}
 					for (auto expr : arguments)
 					{
@@ -433,9 +462,50 @@ namespace tinymoe
 						CodeToken token;
 						BuildNameSymbol(argument->tokens, symbol, token);
 						newStatement->blockArguments.insert(make_pair(symbol, expr));
+						symbolTokens.insert(make_pair(symbol, token));
+					}
+
+					if (parent && block && parent->category && parent->category->categoryName && block->category)
+					{
+						auto category = parent->category->categoryName->GetName();
+						for (auto blockCategory : block->category->followCategories)
+						{
+							if (blockCategory->GetName() == category)
+							{
+								POP_STACK;
+								newStatement->connectToPreviousBlock = true;
+								return newStatement;
+							}
+						}
 					}
 
 					statement->statements.push_back(newStatement);
+
+					if (newStatement->newVariables.size() > 0)
+					{
+						auto item = make_shared<GrammarStackItem>();
+						for (auto v : newStatement->newVariables)
+						{
+							item->symbols.push_back(v.first);
+						}
+						PUSH_STACK(item);
+
+						GrammarSymbol::List symbols;
+						FindOverridedSymbols(stack, item, symbols);
+						for (auto symbol : symbols)
+						{
+							CodeError error =
+							{
+								symbolTokens.find(symbol)->second,
+								"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+							};
+							errors.push_back(error);
+						}
+					}
+
+					if (symbol->type == GrammarSymbolType::Block)
+					{
+					}
 				}
 			}
 			POP_STACK;
@@ -508,6 +578,14 @@ namespace tinymoe
 						GrammarSymbol::Ptr symbol;
 						CodeToken token;
 						BuildNameSymbol(funcdecl->cps->continuationName->identifiers, symbol, token);
+						item->symbols.push_back(symbol);
+						symbolTokens.insert(make_pair(symbol, token));
+					}
+					if (funcdecl->category->signalName)
+					{
+						GrammarSymbol::Ptr symbol;
+						CodeToken token;
+						BuildNameSymbol(funcdecl->category->signalName->identifiers, symbol, token);
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}
