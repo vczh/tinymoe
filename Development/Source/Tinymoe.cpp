@@ -81,14 +81,9 @@ block (phrase deal with (item)) repeat with (argument item) in (items)
 	raise "Only enumerable object (like containers) can be go through using the repeat-with-in statement."
 end
 
-block (sentence deal with (item)) repeat with (argument item) in (items : enumerable)
-	set cursor to new enumerator from items
-	repeat
-		consume item from cursor
-		if cursor reaches the end
-			break
-		end
-		deal with current item of cursor
+block (sentence deal with (item)) repeat with (argument item) in (items : array)
+	repeat with index from 1 to length of array items
+		deal with item index of array items
 	end
 end
 
@@ -97,7 +92,7 @@ category
 	start IFELSE if
 	closable
 block (sentence body) if (condition)
-	set result to condition
+	set the result to condition
 	select the result
 		case true
 			body
@@ -134,8 +129,8 @@ category
 	start SEH try
 block (sentence body) try
 	body
-	if flag field of state equals to raising exception
-		set the result to flag exception of state
+	if field flag of state = raising exception
+		set the result to field exception of state
 		reset continuation state state to null
 	end
 end
@@ -146,7 +141,7 @@ category (signal)
 	start SEH catch
 	closable
 block (sentence body) catch (argument exception)
-	if signal not equals to null
+	if signal <> null
 		body
 	end	
 end

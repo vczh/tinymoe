@@ -138,6 +138,10 @@ namespace tinymoe
 			+ "item" + GrammarFragmentType::Expression + "of" + "array" + GrammarFragmentType::Primitive
 			);
 		symbols.push_back(
+			make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::GetArrayLength)
+			+ "length" + "of" + "array" + GrammarFragmentType::Primitive
+			);
+		symbols.push_back(
 			make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::Invoke)
 			+ "invoke" + GrammarFragmentType::Primitive
 			);
