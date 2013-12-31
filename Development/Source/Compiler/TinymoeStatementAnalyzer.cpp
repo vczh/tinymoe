@@ -298,8 +298,81 @@ namespace tinymoe
 		}
 	}
 
+	void SymbolModule::FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols)
+	{
+		for (auto symbol : item->symbols)
+		{
+			auto lower = stack->availableSymbols.lower_bound(symbol->uniqueId);
+			auto upper = stack->availableSymbols.upper_bound(symbol->uniqueId);
+
+			bool found = false;
+			for (auto it = lower; it != upper; it++)
+			{
+				if (!found)
+				{
+					found = true;
+				}
+				else
+				{
+					symbols.push_back(symbol);
+					break;
+				}
+			}
+		}
+	}
+
 	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
 	{
+		{
+			auto item = make_shared<GrammarStackItem>();
+			for (auto weakRef : usingSymbolModules)
+			{
+				auto ref = weakRef.lock();
+				for (auto sdr : ref->symbolDeclarations)
+				{
+					item->symbols.push_back(sdr.first);
+				}
+			}
+			stack->Push(item);
+		}
+		{
+			auto item = make_shared<GrammarStackItem>();
+			for (auto sdp : symbolDeclarations)
+			{
+				item->symbols.push_back(sdp.first);
+			}
+			stack->Push(item);
+		}
+
+		for (auto dfp : declarationFunctions)
+		{
+			auto func = dfp.second;
+			{
+				auto item = make_shared<GrammarStackItem>();
+				for (auto argument : func->arguments)
+				{
+					item->symbols.push_back(argument.first);
+				}
+				stack->Push(item);
+
+				GrammarSymbol::List symbols;
+				FindOverridedSymbols(stack, item, symbols);
+				for (auto symbol : symbols)
+				{
+					CodeError error =
+					{
+						func->arguments.find(symbol)->second->keywordToken,
+						"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+					};
+					errors.push_back(error);
+				}
+
+				stack->Pop();
+			}
+		}
+
+		stack->Pop();
+		stack->Pop();
 	}
 
 	/*************************************************************

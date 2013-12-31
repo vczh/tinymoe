@@ -19,9 +19,9 @@ TEST_CASE(TestParseHelloWorldModule)
 module hello world
 using standard library
 
-phrase sum from (start) to (end)
+phrase sum from (first number) to (last number)
     set the result to 0
-    repeat with the current number from start to end
+    repeat with the current number from first number to last number
         add the current number to the result
     end
 end

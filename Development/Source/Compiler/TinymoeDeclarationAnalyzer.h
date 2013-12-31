@@ -76,6 +76,8 @@ namespace tinymoe
 		typedef shared_ptr<FunctionFragment>	Ptr;
 		typedef vector<Ptr>						List;
 
+		CodeToken							keywordToken;
+
 		virtual shared_ptr<GrammarSymbol>	CreateSymbol() = 0;
 		virtual void						AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive) = 0;
 	};

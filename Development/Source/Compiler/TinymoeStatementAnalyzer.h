@@ -64,6 +64,8 @@ namespace tinymoe
 		void							BuildSymbols(CodeError::List& errors);									// sync step: build all declaration symbols
 		void							BuildFunctions(CodeError::List& errors);								// sync step: build all symbol functions
 		void							BuildFunctionLinkings(CodeError::List& errors);							// sync step: link all multiple-dispatching functions to it's parent
+
+		void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
 		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 	};
 

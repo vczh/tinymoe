@@ -433,6 +433,10 @@ namespace tinymoe
 			{
 				auto nameFragment = make_shared<NameFragment>();
 				nameFragment->name = SymbolName::ParseToFarest(it, end, "Function", ownerToken, errors);
+				if (nameFragment->name->identifiers.size() > 0)
+				{
+					nameFragment->keywordToken = nameFragment->name->identifiers[0];
+				}
 				decl->name.push_back(nameFragment);
 			}
 			else
@@ -699,12 +703,14 @@ namespace tinymoe
 		if (it->type == CodeTokenType::Phrase || it->type == CodeTokenType::Sentence)
 		{
 			auto decl = make_shared<FunctionArgumentFragment>();
+			decl->keywordToken = *it;
 			decl->declaration = FunctionDeclaration::Parse(it, end, nullptr, ownerToken, errors);
 			return decl;
 		}
 		if (it->IsNameFragmentToken() && it->type != CodeTokenType::Block)
 		{
 			auto decl = make_shared<VariableArgumentFragment>();
+			decl->keywordToken = *it;
 			if (it->type == CodeTokenType::Expression)
 			{
 				decl->type = FunctionArgumentType::Expression;

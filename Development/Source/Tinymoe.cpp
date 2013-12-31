@@ -70,9 +70,9 @@ block (sentence body) repeat while (expression condition)
 	end
 end
 
-block (sentence deal with (item)) repeat with (argument item) from (start) to (end)
-	set the current number to start
-	repeat while the current number is not greater than end
+block (sentence deal with (item)) repeat with (argument item) from (lower bound) to (upper bound)
+	set the current number to lower bound
+	repeat while the current number <= upper bound
 		deal with the current number
 	end
 end
