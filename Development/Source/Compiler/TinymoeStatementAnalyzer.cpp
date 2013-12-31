@@ -41,7 +41,7 @@ namespace tinymoe
 			symbolType = GrammarSymbolType::Block;
 			break;
 		}
-		
+
 		auto symbol = make_shared<GrammarSymbol>(symbolType);
 		for (auto i = name.begin(); i != name.end(); i++)
 		{
@@ -49,7 +49,7 @@ namespace tinymoe
 		}
 		return symbol;
 	}
-	
+
 	/*************************************************************
 	FunctionArgument::AppendFunctionSymbol
 	*************************************************************/
@@ -88,7 +88,7 @@ namespace tinymoe
 	{
 		symbol + (primitive ? GrammarFragmentType::Primitive : GrammarFragmentType::Expression);
 	}
-	
+
 	/*************************************************************
 	FunctionArgument::CreateSymbol
 	*************************************************************/
@@ -151,6 +151,64 @@ namespace tinymoe
 
 		if (errors.size() == 0)
 		{
+			function<bool(SymbolName::Ptr, SymbolName::Ptr)> comp = [](SymbolName::Ptr a, SymbolName::Ptr b)
+			{
+				auto ita = a->identifiers.begin();
+				auto itb = b->identifiers.begin();
+				auto ea = a->identifiers.end();
+				auto eb = b->identifiers.end();
+
+				while (ita != ea&&itb != eb)
+				{
+					auto compare = ita->value.compare(itb->value);
+					if (compare < 0)return true;
+					if (compare>0)return false;
+					ita++;
+					itb++;
+				}
+				return ita == ea;
+			};
+			multimap<SymbolName::Ptr, SymbolModule::Ptr, decltype(comp)> moduleMap(comp);
+
+			for (auto module : assembly->symbolModules)
+			{
+				moduleMap.insert(make_pair(module->module->name, module));
+			}
+
+			for (auto module : assembly->symbolModules)
+			{
+				auto lower = moduleMap.lower_bound(module->module->name);
+				auto upper = moduleMap.upper_bound(module->module->name);
+				for (auto it = lower; it != upper; it++)
+				{
+					if (it->second != module)
+					{
+						module->usingSymbolModules.push_back(it->second);
+					}
+				}
+
+				for (auto ref : module->module->usings)
+				{
+					auto lower = moduleMap.lower_bound(ref);
+					auto upper = moduleMap.upper_bound(ref);
+					if (lower == moduleMap.end())
+					{
+						CodeError error =
+						{
+							ref->identifiers[0],
+							ref->identifiers[0],
+							"Cannot find the referencing module.",
+						};
+					}
+					else
+					{
+						for (auto it = lower; it != upper; it++)
+						{
+							module->usingSymbolModules.push_back(it->second);
+						}
+					}
+				}
+			}
 		}
 		return assembly;
 	}

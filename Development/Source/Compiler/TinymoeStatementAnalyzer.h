@@ -10,7 +10,7 @@ namespace tinymoe
 	Statement
 	*************************************************************/
 
-	class Statement
+	class Statement : public CodeFragment
 	{
 	public:
 		typedef shared_ptr<Statement>								Ptr;
