@@ -6,8 +6,9 @@ namespace tinymoe
 	Declaration::CreateSymbol
 	*************************************************************/
 
-	shared_ptr<GrammarSymbol> SymbolDeclaration::CreateSymbol()
+	shared_ptr<GrammarSymbol> SymbolDeclaration::CreateSymbol(bool secondary)
 	{
+		if (secondary) return nullptr;
 		auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
 		for (auto token : name->identifiers)
 		{
@@ -16,8 +17,9 @@ namespace tinymoe
 		return symbol;
 	}
 
-	shared_ptr<GrammarSymbol> TypeDeclaration::CreateSymbol()
+	shared_ptr<GrammarSymbol> TypeDeclaration::CreateSymbol(bool secondary)
 	{
+		if (secondary) return nullptr;
 		auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Type);
 		for (auto token : name->identifiers)
 		{
@@ -26,28 +28,47 @@ namespace tinymoe
 		return symbol;
 	}
 
-	shared_ptr<GrammarSymbol> FunctionDeclaration::CreateSymbol()
+	shared_ptr<GrammarSymbol> FunctionDeclaration::CreateSymbol(bool secondary)
 	{
-		auto symbolType = GrammarSymbolType::Phrase;
-		switch (type)
+		if (secondary)
 		{
-		case FunctionDeclarationType::Phrase:
-			symbolType = GrammarSymbolType::Phrase;
-			break;
-		case FunctionDeclarationType::Sentence:
-			symbolType = GrammarSymbolType::Sentence;
-			break;
-		case FunctionDeclarationType::Block:
-			symbolType = GrammarSymbolType::Block;
-			break;
+			if (alias)
+			{
+				auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
+				for (auto token : alias->identifiers)
+				{
+					symbol + token.value;
+				}
+				return symbol;
+			}
+			else
+			{
+				return nullptr;
+			}
 		}
+		else
+		{
+			auto symbolType = GrammarSymbolType::Phrase;
+			switch (type)
+			{
+			case FunctionDeclarationType::Phrase:
+				symbolType = GrammarSymbolType::Phrase;
+				break;
+			case FunctionDeclarationType::Sentence:
+				symbolType = GrammarSymbolType::Sentence;
+				break;
+			case FunctionDeclarationType::Block:
+				symbolType = GrammarSymbolType::Block;
+				break;
+			}
 
-		auto symbol = make_shared<GrammarSymbol>(symbolType);
-		for (auto i = name.begin(); i != name.end(); i++)
-		{
-			(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i == name.end() - 1)));
+			auto symbol = make_shared<GrammarSymbol>(symbolType);
+			for (auto i = name.begin(); i != name.end(); i++)
+			{
+				(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i == name.end() - 1)));
+			}
+			return symbol;
 		}
-		return symbol;
 	}
 
 	/*************************************************************
@@ -110,7 +131,7 @@ namespace tinymoe
 
 	shared_ptr<GrammarSymbol> FunctionArgumentFragment::CreateSymbol()
 	{
-		return declaration->CreateSymbol();
+		return declaration->CreateSymbol(false);
 	}
 
 	/*************************************************************
@@ -228,8 +249,14 @@ namespace tinymoe
 	{
 		for (auto declaration : module->declarations)
 		{
-			auto symbol = declaration->CreateSymbol();
-			symbolDeclarations.insert(make_pair(symbol, declaration));
+			if (auto symbol = declaration->CreateSymbol(false))
+			{
+				symbolDeclarations.insert(make_pair(symbol, declaration));
+			}
+			if (auto symbol = declaration->CreateSymbol(true))
+			{
+				symbolDeclarations.insert(make_pair(symbol, declaration));
+			}
 		}
 	}
 
@@ -396,7 +423,7 @@ namespace tinymoe
 					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
 					FunctionDeclaration::Ptr parent, block;
-					if (statement && statement->statementSymbol->type == GrammarSymbolType::Block)
+					if (statement->statementSymbol && statement->statementSymbol->type == GrammarSymbolType::Block)
 					{
 						auto itparent = symbolDeclarations.find(statement->statementSymbol);
 						if (itparent != symbolDeclarations.end())
@@ -416,18 +443,21 @@ namespace tinymoe
 					switch (symbol->target)
 					{
 					case GrammarSymbolTarget::End:
-						if (!parent || !parent->category || !parent->category->closable)
+						if (statement->statementSymbol && statement->statementSymbol->target != GrammarSymbolTarget::Select)
 						{
-							CodeError error =
+							if (!parent || !parent->category || !parent->category->closable)
 							{
-								line->tokens[0],
-								"A non-closable block cannot be closed using \"end\".",
-							};
-							errors.push_back(error);
+								CodeError error =
+								{
+									line->tokens[0],
+									"A non-closable block cannot be closed using \"end\".",
+								};
+								errors.push_back(error);
+							}
 						}
 						return nullptr;
 					case GrammarSymbolTarget::Case:
-						if (!statement || statement->statementSymbol->target != GrammarSymbolTarget::Select)
+						if (!statement->statementSymbol || statement->statementSymbol->target != GrammarSymbolTarget::Select)
 						{
 							CodeError error =
 							{
@@ -505,6 +535,53 @@ namespace tinymoe
 
 					if (symbol->type == GrammarSymbolType::Block)
 					{
+						if (symbol->target != GrammarSymbolTarget::Select)
+						{
+							if (!block || (block->category && !block->category->categoryName))
+							{
+								CodeError error =
+								{
+									line->tokens[0],
+									"This is not a initial block.",
+								};
+								errors.push_back(error);
+							}
+						}
+
+						while (true)
+						{
+							{
+								auto item = make_shared<GrammarStackItem>();
+								for (auto v : newStatement->blockArguments)
+								{
+									item->symbols.push_back(v.first);
+								}
+								PUSH_STACK(item);
+
+								GrammarSymbol::List symbols;
+								FindOverridedSymbols(stack, item, symbols);
+								for (auto symbol : symbols)
+								{
+									CodeError error =
+									{
+										symbolTokens.find(symbol)->second,
+										"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+									};
+									errors.push_back(error);
+								}
+							}
+							try
+							{
+								newStatement = ParseBlock(codeFile, stack, newStatement, lineIndex, endLineIndex, errors);
+								stack->Pop();
+							}
+							catch (const ParsingFailedException&)
+							{
+								stack->Pop();
+							}
+							if (!newStatement) break;
+							statement->statements.push_back(newStatement);
+						}
 					}
 				}
 			}
@@ -529,7 +606,8 @@ namespace tinymoe
 			codeFile->lines[lineIndex - 1]->tokens[0],
 			"Block should be closed using \"end\".",
 		};
-		return nullptr;
+		errors.push_back(error);
+		throw ParsingFailedException();
 	}
 
 	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
@@ -581,19 +659,14 @@ namespace tinymoe
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}
+				}
+				if (funcdecl->category)
+				{
 					if (funcdecl->category->signalName)
 					{
 						GrammarSymbol::Ptr symbol;
 						CodeToken token;
 						BuildNameSymbol(funcdecl->category->signalName->identifiers, symbol, token);
-						item->symbols.push_back(symbol);
-						symbolTokens.insert(make_pair(symbol, token));
-					}
-					if (funcdecl->alias)
-					{
-						GrammarSymbol::Ptr symbol;
-						CodeToken token;
-						BuildNameSymbol(funcdecl->alias->identifiers, symbol, token);
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}

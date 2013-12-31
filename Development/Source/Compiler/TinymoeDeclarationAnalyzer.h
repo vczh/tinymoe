@@ -94,7 +94,7 @@ namespace tinymoe
 
 		CodeToken							keywordToken;
 
-		virtual shared_ptr<GrammarSymbol>	CreateSymbol() = 0;
+		virtual shared_ptr<GrammarSymbol>	CreateSymbol(bool secondary) = 0;
 	};
 
 	class SymbolDeclaration : public Declaration
@@ -106,7 +106,7 @@ namespace tinymoe
 
 		static SymbolDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 
-		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		shared_ptr<GrammarSymbol>			CreateSymbol(bool secondary)override;
 	};
 
 	class TypeDeclaration : public Declaration
@@ -120,7 +120,7 @@ namespace tinymoe
 		
 		static TypeDeclaration::Ptr			Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 		
-		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		shared_ptr<GrammarSymbol>			CreateSymbol(bool secondary)override;
 	};
 
 	class FunctionDeclaration : public Declaration
@@ -141,7 +141,7 @@ namespace tinymoe
 		static FunctionDeclaration::Ptr		Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, FunctionDeclaration::Ptr decl, CodeToken ownerToken, CodeError::List& errors);
 		static FunctionDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 		
-		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		shared_ptr<GrammarSymbol>			CreateSymbol(bool secondary)override;
 	};
 
 	/*************************************************************
