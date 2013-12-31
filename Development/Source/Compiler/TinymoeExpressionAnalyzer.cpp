@@ -1202,6 +1202,12 @@ namespace tinymoe
 
 	int GrammarStack::CountStatementAssignables(Expression::List& assignables)
 	{
+		Expression::Ptr illegalConvertedAssignable;
+		return CountStatementAssignables(assignables, illegalConvertedAssignable);
+	}
+
+	int	 GrammarStack::CountStatementAssignables(Expression::List& assignables, Expression::Ptr& illegalConvertedAssignable)
+	{
 		for (auto assignable : assignables)
 		{
 			auto argument = dynamic_pointer_cast<ArgumentExpression>(assignable);
@@ -1212,6 +1218,7 @@ namespace tinymoe
 			{
 				if (r.first == argument->tokens.end())
 				{
+					illegalConvertedAssignable = r.second;
 					return -1;
 				}
 			}

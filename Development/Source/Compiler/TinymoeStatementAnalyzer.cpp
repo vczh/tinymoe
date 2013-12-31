@@ -425,10 +425,53 @@ namespace tinymoe
 			{
 				auto line = codeFile->lines[lineIndex++];
 				GrammarStack::ResultList result;
-				auto error = stack->ParseStatement(line->tokens.begin(), line->tokens.end(), result);
-				if (result.size() == 0)
+				auto statementError = stack->ParseStatement(line->tokens.begin(), line->tokens.end(), result);
+
+				CodeError illegalAssignableError =
 				{
-					errors.push_back(error);
+					line->tokens[0],
+					"Illegal new variable name.",
+				};
+				multimap<int, Expression::Ptr> statementScores;
+				for (auto r : result)
+				{
+					Expression::List assignables, arguments;
+					r.second->CollectNewAssignable(assignables, arguments);
+
+					Expression::Ptr illegalConvertedAssignable;
+					int score = stack->CountStatementAssignables(assignables, illegalConvertedAssignable);
+					if (score == -1)
+					{
+						illegalAssignableError.message += "\r\n\tVariable can be parsed as ¡¾" + illegalConvertedAssignable->ToCode() + "¡¿ in ¡¾" + r.second->ToCode() + "¡¿";
+					}
+					else
+					{
+						statementScores.insert(make_pair(score, r.second));
+					}
+				}
+
+				Expression::List legalExpressions;
+				if (statementScores.size() > 0)
+				{
+					auto score = statementScores.begin()->first;
+					auto lower = statementScores.lower_bound(score);
+					auto upper = statementScores.upper_bound(score);
+					for (auto it = lower; it != upper; it++)
+					{
+						legalExpressions.push_back(it->second);
+					}
+				}
+
+				if (legalExpressions.size() == 0)
+				{
+					if (result.size() == 0)
+					{
+						errors.push_back(statementError);
+					}
+					else
+					{
+						errors.push_back(illegalAssignableError);
+					}
 					if ((size_t)lineIndex < codeFile->lines.size())
 					{
 						if (line->tokens[0].column < codeFile->lines[lineIndex]->tokens[0].column)
@@ -437,22 +480,22 @@ namespace tinymoe
 						}
 					}
 				}
-				else if (result.size() > 1)
+				else if (legalExpressions.size() > 1)
 				{
 					CodeError error =
 					{
 						line->tokens[0],
 						"Ambiguous statement."
 					};
-					for (auto r : result)
+					for (auto r : legalExpressions)
 					{
-						error.message += "\r\n\t¡¾" + r.second->ToCode() + "¡¿";
+						error.message += "\r\n\tStatement can be parsed as ¡¾" + r->ToCode() + "¡¿";
 					}
 					throw ParsingFailedException();
 				}
 				else
 				{
-					auto invoke = dynamic_pointer_cast<InvokeExpression>(result[0].second);
+					auto invoke = dynamic_pointer_cast<InvokeExpression>(legalExpressions[0]);
 					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
 					auto parent = statement->statementSymbol ? FindSymbolFunction(statement->statementSymbol) : nullptr;

@@ -287,6 +287,7 @@ namespace tinymoe
 
 		CodeError					ParseStatement(Iterator input, Iterator end, ResultList& result);
 		int							CountStatementAssignables(Expression::List& assignables);				// -1: illegal assignable (e.g. the assignable is a legal expression)
+		int							CountStatementAssignables(Expression::List& assignables, Expression::Ptr& illegalConvertedAssignable);
 	};
 }
 
