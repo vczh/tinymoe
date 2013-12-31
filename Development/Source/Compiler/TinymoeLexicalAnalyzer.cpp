@@ -190,7 +190,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				token,
-				token,
 				message,
 			};
 			errors.push_back(error);

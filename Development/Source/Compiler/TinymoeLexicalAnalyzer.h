@@ -71,8 +71,7 @@ namespace tinymoe
 	{
 		typedef vector<CodeError>				List;
 
-		CodeToken						begin;
-		CodeToken						end;
+		CodeToken						position;
 		string							message;
 	};
 

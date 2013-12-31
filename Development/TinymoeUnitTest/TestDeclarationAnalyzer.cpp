@@ -40,8 +40,7 @@ symbol
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "symbol");
-		TEST_ASSERT(errors[0].end.value == "symbol");
+		TEST_ASSERT(errors[0].position.value == "symbol");
 	}
 	{
 		string code = R"tinymoe(
@@ -57,8 +56,7 @@ symbol illegal + name
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "+");
-		TEST_ASSERT(errors[0].end.value == "+");
+		TEST_ASSERT(errors[0].position.value == "+");
 	}
 }
 
@@ -162,8 +160,7 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "type");
-		TEST_ASSERT(errors[0].end.value == "type");
+		TEST_ASSERT(errors[0].position.value == "type");
 	}
 	{
 		string code = R"tinymoe(
@@ -180,8 +177,7 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "+");
-		TEST_ASSERT(errors[0].end.value == "+");
+		TEST_ASSERT(errors[0].position.value == "+");
 	}
 	{
 		string code = R"tinymoe(
@@ -199,8 +195,7 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "+");
-		TEST_ASSERT(errors[0].end.value == "+");
+		TEST_ASSERT(errors[0].position.value == "+");
 	}
 }
 
@@ -266,8 +261,7 @@ cps
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -283,8 +277,7 @@ cps +
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "+");
-		TEST_ASSERT(errors[0].end.value == "+");
+		TEST_ASSERT(errors[0].position.value == "+");
 	}
 	{
 		string code = R"tinymoe(
@@ -300,8 +293,7 @@ cps ()
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -317,8 +309,7 @@ cps (state
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -334,10 +325,8 @@ cps (state) (
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
-		TEST_ASSERT(errors[1].begin.value == "cps");
-		TEST_ASSERT(errors[1].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[1].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -353,8 +342,7 @@ cps (state) )
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == ")");
-		TEST_ASSERT(errors[0].end.value == ")");
+		TEST_ASSERT(errors[0].position.value == ")");
 	}
 	{
 		string code = R"tinymoe(
@@ -370,8 +358,7 @@ cps (state) (continuation) (too many parameters)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "(");
-		TEST_ASSERT(errors[0].end.value == "(");
+		TEST_ASSERT(errors[0].position.value == "(");
 	}
 }
 
@@ -451,10 +438,8 @@ category (state
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].begin.value == "category");
-		TEST_ASSERT(errors[0].end.value == "category");
-		TEST_ASSERT(errors[1].begin.value == "category");
-		TEST_ASSERT(errors[1].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "category");
+		TEST_ASSERT(errors[1].position.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -472,10 +457,8 @@ category (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].begin.value == "+");
-		TEST_ASSERT(errors[0].end.value == "+");
-		TEST_ASSERT(errors[1].begin.value == "category");
-		TEST_ASSERT(errors[1].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "+");
+		TEST_ASSERT(errors[1].position.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -494,8 +477,7 @@ category (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "follow");
-		TEST_ASSERT(errors[0].end.value == "follow");
+		TEST_ASSERT(errors[0].position.value == "follow");
 	}
 	{
 		string code = R"tinymoe(
@@ -511,10 +493,8 @@ category (signal)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].begin.value == "category");
-		TEST_ASSERT(errors[0].end.value == "category");
-		TEST_ASSERT(errors[1].begin.value == "category");
-		TEST_ASSERT(errors[1].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "category");
+		TEST_ASSERT(errors[1].position.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -531,8 +511,7 @@ category (signal)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "category");
-		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -549,8 +528,7 @@ category
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].begin.value == "category");
-		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "category");
 	}
 }
 
@@ -894,8 +872,7 @@ cps (state)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -916,8 +893,7 @@ category
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].begin.value == "category");
-		TEST_ASSERT(errors[0].end.value == "category");
+		TEST_ASSERT(errors[0].position.value == "category");
 	}
 	{
 		string code = R"tinymoe(
@@ -939,8 +915,7 @@ category
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -962,8 +937,7 @@ cps (state)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].begin.value == "cps");
-		TEST_ASSERT(errors[0].end.value == "cps");
+		TEST_ASSERT(errors[0].position.value == "cps");
 	}
 	{
 		string code = R"tinymoe(
@@ -984,8 +958,7 @@ phrase whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].begin.value == "phrase");
-		TEST_ASSERT(errors[0].end.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == "phrase");
 	}
 	{
 		string code = R"tinymoe(
@@ -1007,8 +980,7 @@ phrase whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].begin.value == "phrase");
-		TEST_ASSERT(errors[0].end.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == "phrase");
 	}
 	{
 		string code = R"tinymoe(
@@ -1030,8 +1002,7 @@ sentence whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].begin.value == "sentence");
-		TEST_ASSERT(errors[0].end.value == "sentence");
+		TEST_ASSERT(errors[0].position.value == "sentence");
 	}
 	{
 		string code = R"tinymoe(
@@ -1051,8 +1022,7 @@ block whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "block");
-		TEST_ASSERT(errors[0].end.value == "block");
+		TEST_ASSERT(errors[0].position.value == "block");
 	}
 	{
 		string code = R"tinymoe(
@@ -1072,8 +1042,7 @@ sentence (x) y
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "sentence");
-		TEST_ASSERT(errors[0].end.value == "sentence");
+		TEST_ASSERT(errors[0].position.value == "sentence");
 	}
 	{
 		string code = R"tinymoe(
@@ -1093,8 +1062,7 @@ block (body) (x) y
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "block");
-		TEST_ASSERT(errors[0].end.value == "block");
+		TEST_ASSERT(errors[0].position.value == "block");
 	}
 	{
 		string code = R"tinymoe(
@@ -1114,8 +1082,7 @@ phrase
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "phrase");
-		TEST_ASSERT(errors[0].end.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == "phrase");
 	}
 	{
 		string code = R"tinymoe(
@@ -1135,8 +1102,7 @@ phrase (x)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "phrase");
-		TEST_ASSERT(errors[0].end.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == "phrase");
 	}
 	{
 		string code = R"tinymoe(
@@ -1156,10 +1122,8 @@ phrase (x) (y)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == "phrase");
-		TEST_ASSERT(errors[0].end.value == "phrase");
-		TEST_ASSERT(errors[1].begin.value == "phrase");
-		TEST_ASSERT(errors[1].end.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == "phrase");
+		TEST_ASSERT(errors[1].position.value == "phrase");
 	}
 	{
 		string code = R"tinymoe(
@@ -1179,8 +1143,7 @@ phrase a : b )
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].begin.value == ")");
-		TEST_ASSERT(errors[0].end.value == ")");
+		TEST_ASSERT(errors[0].position.value == ")");
 	}
 }
 

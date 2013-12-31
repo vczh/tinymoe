@@ -603,8 +603,8 @@ namespace tinymoe
 		if (input == end)
 		{
 			auto token = *(input - 1);
-			CodeError error = {
-				token,
+			CodeError error =
+			{
 				token,
 				"Unexpected end of line.",
 			};
@@ -613,8 +613,8 @@ namespace tinymoe
 		else if (input->value != token)
 		{
 			auto token = *input;
-			CodeError error = {
-				token,
+			CodeError error =
+			{
 				token,
 				"\"" + token.value + "\" expected but \"" + input->value + "\" found.",
 			};
@@ -629,7 +629,7 @@ namespace tinymoe
 
 	CodeError GrammarStack::FoldError(CodeError error1, CodeError error2)
 	{
-		return error1.begin.column > error2.begin.column ? error1 : error2;
+		return error1.position.column > error2.position.column ? error1 : error2;
 	}
 
 	CodeError GrammarStack::ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result)
@@ -783,8 +783,8 @@ namespace tinymoe
 		if (input == end)
 		{
 			auto token = *(input - 1);
-			CodeError error = {
-				token,
+			CodeError error =
+			{
 				token,
 				"Unexpected end of line.",
 			};
@@ -1042,8 +1042,8 @@ namespace tinymoe
 		if (input == end)
 		{
 			auto token = *(input - 1);
-			CodeError error = {
-				token,
+			CodeError error =
+			{
 				token,
 				"Unexpected end of line.",
 			};

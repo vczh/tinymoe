@@ -63,7 +63,7 @@ TEST_CASE(TestLexerNumber)
 	LAST_LINE;
 
 	TEST_ASSERT(errors.size() == 1);
-	TEST_ASSERT(errors[0].begin.value == ".");
+	TEST_ASSERT(errors[0].position.value == ".");
 }
 
 TEST_CASE(TestLexerOperators)
@@ -161,6 +161,6 @@ TEST_CASE(TestLexerString)
 	LAST_LINE;
 
 	TEST_ASSERT(errors.size() == 2);
-	TEST_ASSERT(errors[0].begin.value == "\"Unfinished line");
-	TEST_ASSERT(errors[1].begin.value == "\"Unfinished escaping\\");
+	TEST_ASSERT(errors[0].position.value == "\"Unfinished line");
+	TEST_ASSERT(errors[1].position.value == "\"Unfinished escaping\\");
 }

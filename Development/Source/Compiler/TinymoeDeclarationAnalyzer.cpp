@@ -13,7 +13,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				ownerToken,
-				ownerToken,
 				"Incomplete code, \"" + content + "\" expected.",
 			};
 			errors.push_back(error);
@@ -24,7 +23,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				*it,
 				*it,
 				"\"" + content + "\" expected but \"" + it->value + "\" found.",
 			};
@@ -50,7 +48,6 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					*it,
 					"Token is not a legal name: \"" + it->value + "\".",
 				};
 				errors.push_back(error);
@@ -62,7 +59,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				ownerToken,
 				ownerToken,
 				ownerName + " name should not be empty.",
 			};
@@ -91,7 +87,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				ownerToken,
-				ownerToken,
 				ownerName + " name should not be empty.",
 			};
 			errors.push_back(error);
@@ -114,7 +109,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				*it,
-				*it,
 				"CPS definition should begin with \"cps\".",
 			};
 			errors.push_back(error);
@@ -135,7 +129,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				*it,
 				*it,
 				"Too many tokens.",
 			};
@@ -160,7 +153,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				*it,
-				*it,
 				"Category definition should begin with \"category\".",
 			};
 			errors.push_back(error);
@@ -180,7 +172,6 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					*it,
 					"Too many tokens.",
 				};
 				errors.push_back(error);
@@ -199,7 +190,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						*it,
 						*it,
 						"Too many start category name.",
 					};
@@ -224,7 +214,6 @@ namespace tinymoe
 					CodeError error =
 					{
 						*it,
-						*it,
 						"Too many tokens.",
 					};
 					errors.push_back(error);
@@ -244,7 +233,6 @@ namespace tinymoe
 				CodeError error =
 				{
 					categoryToken,
-					categoryToken,
 					"A category with signal parameter should have follow categories.",
 				};
 				errors.push_back(error);
@@ -257,7 +245,6 @@ namespace tinymoe
 			{
 				CodeError error =
 				{
-					categoryToken,
 					categoryToken,
 					"A category without start category name should be closable.",
 				};
@@ -280,7 +267,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				*it,
 				*it,
 				"Symbol definition should begin with \"symbol\".",
 			};
@@ -308,7 +294,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				*it,
-				*it,
 				"Type definition should begin with \"type\".",
 			};
 			errors.push_back(error);
@@ -328,7 +313,6 @@ namespace tinymoe
 			{
 				CodeError error =
 				{
-					*it,
 					*it,
 					"Inheriting from a type should begin with a \":\".",
 				};
@@ -356,7 +340,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				typeToken,
-				typeToken,
 				"Ending of the type is not found.",
 			};
 			errors.push_back(error);
@@ -378,7 +361,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				ownerToken,
 				ownerToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 			};
@@ -402,7 +384,6 @@ namespace tinymoe
 			{
 				CodeError error =
 				{
-					ownerToken,
 					ownerToken,
 					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 				};
@@ -457,7 +438,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				ownerToken,
-				ownerToken,
 				"Function name should not be empty.",
 			};
 			errors.push_back(error);
@@ -470,7 +450,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						ownerToken,
 						ownerToken,
 						"Sentence and block's name should not begin with an argument.",
 					};
@@ -494,7 +473,6 @@ namespace tinymoe
 						CodeError error =
 						{
 							ownerToken,
-							ownerToken,
 							"Function argument cannot appear just after another function argument.",
 						};
 						errors.push_back(error);
@@ -511,7 +489,6 @@ namespace tinymoe
 								CodeError error =
 								{
 									ownerToken,
-									ownerToken,
 									"Argument of type \"argument\" is only allowed in block declaration.",
 								};
 								errors.push_back(error);
@@ -523,7 +500,6 @@ namespace tinymoe
 							{
 								CodeError error =
 								{
-									ownerToken,
 									ownerToken,
 									"Argument of type \"assignable\" or \"expression\" is only allowed in sentence or block declaration.",
 								};
@@ -539,7 +515,6 @@ namespace tinymoe
 			{
 				CodeError error =
 				{
-					ownerToken,
 					ownerToken,
 					"Function name should not be form just by function arguments.",
 				};
@@ -566,7 +541,6 @@ namespace tinymoe
 			CodeError error =
 			{
 				functionToken,
-				functionToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 			};
 			errors.push_back(error);
@@ -580,7 +554,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				functionToken,
 				functionToken,
 				"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 			};
@@ -604,7 +577,6 @@ namespace tinymoe
 					CodeError error =
 					{
 						*it,
-						*it,
 						"Too many tokens.",
 					};
 					errors.push_back(error);
@@ -614,7 +586,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						functionToken,
 						functionToken,
 						"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
 					};
@@ -631,7 +602,6 @@ namespace tinymoe
 					CodeError error =
 					{
 						functionToken,
-						functionToken,
 						"Phrase should not have a continuation definition.",
 					};
 					errors.push_back(error);
@@ -644,7 +614,6 @@ namespace tinymoe
 					CodeError error =
 					{
 						functionToken,
-						functionToken,
 						"Phrase and sentence should not have a category definition.",
 					};
 					errors.push_back(error);
@@ -656,7 +625,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						functionToken,
 						functionToken,
 						"Block name should start with an argument for the block body.",
 					};
@@ -704,7 +672,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				ownerToken,
 				ownerToken,
 				"Function argument needed.",
 			};
@@ -754,7 +721,6 @@ namespace tinymoe
 					CodeError error =
 					{
 						*it,
-						*it,
 						"Argument type for multiple dispatch is only allowed for value argument (that is, not \"list\", \"expression\", \"assignable\" and \"argument\").",
 					};
 				}
@@ -766,7 +732,6 @@ namespace tinymoe
 		{
 			CodeError error =
 			{
-				*it,
 				*it,
 				"Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name.",
 			};
@@ -795,7 +760,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						*it,
 						*it,
 						"A module can only have one name.",
 					};
@@ -832,7 +796,6 @@ namespace tinymoe
 				{
 					CodeError error =
 					{
-						*it,
 						*it,
 						"Cannot process a declaration that begins with \"" + it->value + "\".",
 					};

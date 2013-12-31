@@ -197,7 +197,6 @@ namespace tinymoe
 						CodeError error =
 						{
 							ref->identifiers[0],
-							ref->identifiers[0],
 							"Cannot find the referencing module.",
 						};
 					}
