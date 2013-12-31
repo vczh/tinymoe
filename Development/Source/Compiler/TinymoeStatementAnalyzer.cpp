@@ -125,6 +125,24 @@ namespace tinymoe
 	SymbolAssembly
 	*************************************************************/
 
+	bool CompareSymbolName(SymbolName::Ptr a, SymbolName::Ptr b)
+	{
+		auto ita = a->identifiers.begin();
+		auto itb = b->identifiers.begin();
+		auto ea = a->identifiers.end();
+		auto eb = b->identifiers.end();
+
+		while (ita != ea&&itb != eb)
+		{
+			auto compare = ita->value.compare(itb->value);
+			if (compare < 0) return true;
+			if (compare > 0) return false;
+			ita++;
+			itb++;
+		}
+		return ita == ea && itb != eb;
+	}
+
 	SymbolAssembly::Ptr SymbolAssembly::Parse(vector<string>& codes, CodeError::List& errors)
 	{
 		Module::List modules;
@@ -151,24 +169,7 @@ namespace tinymoe
 
 		if (errors.size() == 0)
 		{
-			function<bool(SymbolName::Ptr, SymbolName::Ptr)> comp = [](SymbolName::Ptr a, SymbolName::Ptr b)
-			{
-				auto ita = a->identifiers.begin();
-				auto itb = b->identifiers.begin();
-				auto ea = a->identifiers.end();
-				auto eb = b->identifiers.end();
-
-				while (ita != ea&&itb != eb)
-				{
-					auto compare = ita->value.compare(itb->value);
-					if (compare < 0)return true;
-					if (compare>0)return false;
-					ita++;
-					itb++;
-				}
-				return ita == ea;
-			};
-			multimap<SymbolName::Ptr, SymbolModule::Ptr, decltype(comp)> moduleMap(comp);
+			multimap<SymbolName::Ptr, SymbolModule::Ptr, decltype(&CompareSymbolName)> moduleMap(&CompareSymbolName);
 
 			for (auto module : assembly->symbolModules)
 			{
