@@ -19,6 +19,8 @@ namespace tinymoe
 
 		vector<CodeToken>					identifiers;
 
+		string								GetName();
+
 		static bool							ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors);
 		static SymbolName::Ptr				ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
 		static SymbolName::Ptr				ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
@@ -87,6 +89,8 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<Declaration>				Ptr;
 		typedef vector<Ptr>							List;
+
+		CodeToken							keywordToken;
 
 		virtual shared_ptr<GrammarSymbol>	CreateSymbol() = 0;
 	};

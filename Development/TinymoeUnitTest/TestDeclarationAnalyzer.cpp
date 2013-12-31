@@ -19,6 +19,7 @@ symbol symbol name
 	TEST_ASSERT(lineIndex == 1);
 	TEST_ASSERT(errors.size() == 0);
 
+	TEST_ASSERT(decl->keywordToken.value == "symbol");
 	TEST_ASSERT(decl->name->identifiers.size() == 2);
 	TEST_ASSERT(decl->name->identifiers[0].value == "symbol");
 	TEST_ASSERT(decl->name->identifiers[1].value == "name");
@@ -77,7 +78,8 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 0);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "type");
 		TEST_ASSERT(decl->name->identifiers.size() == 2);
 		TEST_ASSERT(decl->name->identifiers[0].value == "empty");
 		TEST_ASSERT(decl->name->identifiers[1].value == "type");
@@ -101,7 +103,8 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 0);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "type");
 		TEST_ASSERT(decl->name->identifiers.size() == 1);
 		TEST_ASSERT(decl->name->identifiers[0].value == "pair");
 		TEST_ASSERT(!decl->parent);
@@ -129,7 +132,8 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 0);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "type");
 		TEST_ASSERT(decl->name->identifiers.size() == 1);
 		TEST_ASSERT(decl->name->identifiers[0].value == "derived");
 		TEST_ASSERT(decl->parent->identifiers.size() == 1);
@@ -557,7 +561,8 @@ sentence abort
 		TEST_ASSERT(!decl->bodyName);
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "sentence");
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
@@ -594,7 +599,8 @@ end
 		TEST_ASSERT(!decl->bodyName);
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "sentence");
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
@@ -628,7 +634,8 @@ sentence abort : an alias
 		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
 		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "sentence");
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
@@ -669,7 +676,8 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f
 		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
 		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
-
+		
+		TEST_ASSERT(decl->keywordToken.value == "block");
 		TEST_ASSERT(decl->name.size() == 14);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
@@ -791,6 +799,7 @@ block (body) abort
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
 		
+		TEST_ASSERT(decl->keywordToken.value == "block");
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
@@ -822,6 +831,7 @@ sentence remove (item) from (items : collection)
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
 		
+		TEST_ASSERT(decl->keywordToken.value == "sentence");
 		TEST_ASSERT(decl->name.size() == 4);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);

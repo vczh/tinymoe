@@ -6,6 +6,20 @@ namespace tinymoe
 	SymbolName
 	*************************************************************/
 
+	string SymbolName::GetName()
+	{
+		string result;
+		for (auto it = identifiers.begin(); it != identifiers.end(); it++)
+		{
+			result += it->value;
+			if (it + 1 != identifiers.end())
+			{
+				result += " ";
+			}
+		}
+		return result;
+	}
+
 	bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors)
 	{
 		if (it == end)
@@ -275,6 +289,7 @@ namespace tinymoe
 		}
 
 		auto decl = make_shared<SymbolDeclaration>();
+		decl->keywordToken = *it;
 		decl->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Symbol", line->tokens[0], errors);
 		return decl;
 	}
@@ -301,6 +316,7 @@ namespace tinymoe
 		}
 
 		auto decl = make_shared<TypeDeclaration>();
+		decl->keywordToken = *it;
 		decl->name = SymbolName::ParseToFarest(++it, line->tokens.end(), "Type", line->tokens[0], errors);
 		if (it != line->tokens.end())
 		{
@@ -391,6 +407,7 @@ namespace tinymoe
 				goto END_OF_PARSING;
 			}
 		}
+		decl->keywordToken = *it;
 		it++;
 
 		while (it != end)

@@ -117,31 +117,160 @@ namespace tinymoe
 	SymbolModule
 	*************************************************************/
 
-	void SymbolModule::Build(GrammarStack::Ptr stack, CodeError::List& errors)
+	bool SymbolModule::IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b)
+	{
+		if (a->fragments.size() != b->fragments.size())
+		{
+			return false;
+		}
+
+		auto ita = a->fragments.begin();
+		auto itb = b->fragments.begin();
+		while (ita != a->fragments.end() && itb != b->fragments.end())
+		{
+			auto fa = *ita;
+			auto fb = *itb;
+
+			if (fa->type != fb->type)
+			{
+				return false;
+			}
+
+			if (fa->type == GrammarFragmentType::Name)
+			{
+				if (fa->identifiers.size() != fb->identifiers.size())
+				{
+					return false;
+				}
+
+				auto itfa = fa->identifiers.begin();
+				auto itfb = fb->identifiers.begin();
+
+				while (itfa != fa->identifiers.end() && itfb != fb->identifiers.end())
+				{
+					if (*itfa != *itfb)
+					{
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	bool SymbolModule::IsMultipleDispatchingChild(FunctionDeclaration::Ptr func)
+	{
+		return false;
+	}
+
+	bool SymbolModule::IsMultipleDispatchingRoot(FunctionDeclaration::Ptr root, FunctionDeclaration::Ptr child)
+	{
+		return false;
+	}
+
+	void SymbolModule::CheckOverloading(SymbolModule* modulea, GrammarSymbol::Ptr symbola, Declaration::Ptr decla, SymbolModule* moduleb, GrammarSymbol::Ptr symbolb, Declaration::Ptr declb, bool foreignCheck, CodeError::List& errors)
+	{
+		if (IsOverloading(symbola, symbolb))
+		{
+			auto funca = dynamic_pointer_cast<FunctionDeclaration>(decla);
+			auto funcb = dynamic_pointer_cast<FunctionDeclaration>(declb);
+
+			if (funca && funcb)
+			{
+				bool childa = IsMultipleDispatchingChild(funca);
+				bool childb = IsMultipleDispatchingChild(funcb);
+				if (childa && childb)
+				{
+					return;
+				}
+				else if (childa ^ childb)
+				{
+					if (!foreignCheck && IsMultipleDispatchingRoot(funca, funcb))
+					{
+						moduleb->declarationFunctions.find(declb)->second->multipleDispatchingRoot = modulea->declarationFunctions.find(decla)->second;
+						return;
+					}
+					else if (IsMultipleDispatchingRoot(funcb, funca))
+					{
+						modulea->declarationFunctions.find(decla)->second->multipleDispatchingRoot = moduleb->declarationFunctions.find(declb)->second;
+						return;
+					}
+				}
+			}
+		}
+
+		if (!foreignCheck)
+		{
+			CodeError error =
+			{
+				declb->keywordToken,
+				"Symbol redefinition.",
+			};
+			errors.push_back(error);
+		}
+	}
+
+	void SymbolModule::BuildSymbols(CodeError::List& errors)
+	{
+		for (auto declaration : module->declarations)
+		{
+			auto symbol = declaration->CreateSymbol();
+			symbolDeclarations.insert(make_pair(symbol, declaration));
+		}
+	}
+
+	void SymbolModule::BuildFunctions(CodeError::List& errors)
+	{
+		for (auto declaration : module->declarations)
+		{
+			if (auto function = dynamic_pointer_cast<FunctionDeclaration>(declaration))
+			{
+				auto symbolFunction = make_shared<SymbolFunction>();
+				symbolFunction->function = function;
+				declarationFunctions.insert(make_pair(declaration, symbolFunction));
+
+				for (auto fragment : function->name)
+				{
+					if (auto symbol = fragment->CreateSymbol())
+					{
+						symbolFunction->arguments.insert(make_pair(symbol, fragment));
+					}
+				}
+			}
+		}
+	}
+
+	void SymbolModule::BuildFunctionLinkings(CodeError::List& errors)
+	{
+		for (auto ita = symbolDeclarations.begin(); ita != symbolDeclarations.end(); ita++)
+		{
+			for (auto itb = ita; ++itb != symbolDeclarations.end();)
+			{
+				CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, false, errors);
+			}
+
+			if (declarationFunctions.find(ita->second)->second->multipleDispatchingRoot.expired())
+			{
+				for (auto weakRef : usingSymbolModules)
+				{
+					auto ref = weakRef.lock();
+					for (auto itb = ref->symbolDeclarations.begin(); itb != ref->symbolDeclarations.end(); itb++)
+					{
+						CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, true, errors);
+					}
+				}
+			}
+		}
+	}
+
+	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
 	{
 	}
 
 	/*************************************************************
 	SymbolAssembly
 	*************************************************************/
-
-	bool CompareSymbolName(SymbolName::Ptr a, SymbolName::Ptr b)
-	{
-		auto ita = a->identifiers.begin();
-		auto itb = b->identifiers.begin();
-		auto ea = a->identifiers.end();
-		auto eb = b->identifiers.end();
-
-		while (ita != ea&&itb != eb)
-		{
-			auto compare = ita->value.compare(itb->value);
-			if (compare < 0) return true;
-			if (compare > 0) return false;
-			ita++;
-			itb++;
-		}
-		return ita == ea && itb != eb;
-	}
 
 	SymbolAssembly::Ptr SymbolAssembly::Parse(vector<string>& codes, CodeError::List& errors)
 	{
@@ -169,17 +298,18 @@ namespace tinymoe
 
 		if (errors.size() == 0)
 		{
-			multimap<SymbolName::Ptr, SymbolModule::Ptr, decltype(&CompareSymbolName)> moduleMap(&CompareSymbolName);
+			multimap<string, SymbolModule::Ptr> moduleMap;
 
 			for (auto module : assembly->symbolModules)
 			{
-				moduleMap.insert(make_pair(module->module->name, module));
+				moduleMap.insert(make_pair(module->module->name->GetName(), module));
 			}
 
 			for (auto module : assembly->symbolModules)
 			{
-				auto lower = moduleMap.lower_bound(module->module->name);
-				auto upper = moduleMap.upper_bound(module->module->name);
+				string moduleName = module->module->name->GetName();
+				auto lower = moduleMap.lower_bound(moduleName);
+				auto upper = moduleMap.upper_bound(moduleName);
 				for (auto it = lower; it != upper; it++)
 				{
 					if (it->second != module)
@@ -190,14 +320,15 @@ namespace tinymoe
 
 				for (auto ref : module->module->usings)
 				{
-					auto lower = moduleMap.lower_bound(ref);
-					auto upper = moduleMap.upper_bound(ref);
+					string refName = ref->GetName();
+					auto lower = moduleMap.lower_bound(refName);
+					auto upper = moduleMap.upper_bound(refName);
 					if (lower == moduleMap.end())
 					{
 						CodeError error =
 						{
 							ref->identifiers[0],
-							"Cannot find the referencing module.",
+							"Cannot find the referencing module \"" + refName + "\".",
 						};
 					}
 					else
@@ -210,6 +341,44 @@ namespace tinymoe
 				}
 			}
 		}
+
+		if (errors.size() == 0)
+		{
+			for (auto module : assembly->symbolModules)
+			{
+				module->BuildSymbols(errors);
+			}
+		}
+
+		if (errors.size() == 0)
+		{
+			for (auto module : assembly->symbolModules)
+			{
+				module->BuildFunctions(errors);
+			}
+		}
+
+		if (errors.size() == 0)
+		{
+			for (auto module : assembly->symbolModules)
+			{
+				module->BuildFunctionLinkings(errors);
+			}
+		}
+
+		if (errors.size() == 0)
+		{
+			auto item = make_shared<GrammarStackItem>();
+			item->FillPredefinedSymbols();
+			auto stack = make_shared<GrammarStack>();
+			stack->Push(item);
+
+			for (auto module : assembly->symbolModules)
+			{
+				module->BuildStatements(stack, errors);
+			}
+		}
+
 		return assembly;
 	}
 }

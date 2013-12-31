@@ -32,11 +32,14 @@ namespace tinymoe
 	{
 	public:
 		typedef shared_ptr<SymbolFunction>							Ptr;
+		typedef weak_ptr<SymbolFunction>							WeakPtr;
 		typedef vector<Ptr>											List;
 		typedef map<GrammarSymbol::Ptr, FunctionFragment::Ptr>		SymbolFragmentMap;
 
-		SymbolFragmentMap				arguments;
-		Statement::Ptr					statement;
+		FunctionDeclaration::Ptr		function;					// the original function
+		SymbolFunction::WeakPtr			multipleDispatchingRoot;	// the multiple-dispatching root declaration
+		SymbolFragmentMap				arguments;					// all arguments
+		Statement::Ptr					statement;					// the function body
 	};
 
 	class SymbolModule
@@ -46,18 +49,23 @@ namespace tinymoe
 		typedef vector<Ptr>											List;
 		typedef weak_ptr<SymbolModule>								WeakPtr;
 		typedef vector<WeakPtr>										WeakList;
-		typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
-		typedef map < Declaration::Ptr, Declaration::Ptr>			DeclarationDeclarationMap;
 		typedef map<GrammarSymbol::Ptr, Declaration::Ptr>			SymbolDeclarationMap;
-		
+		typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
+
 		CodeFile::Ptr					codeFile;					// the original code file
 		Module::Ptr						module;						// the original module
 		WeakList						usingSymbolModules;			// all referenced modules
-		DeclarationFunctionMap			declarationStatements;		// map a declaration to function body
-		DeclarationDeclarationMap		declarationParents;			// map a multiple-dispatching declaration to it's parent
 		SymbolDeclarationMap			symbolDeclarations;			// map a grammar symbol to the creator declaration
+		DeclarationFunctionMap			declarationFunctions;		// map a declaration to the symbol function
 
-		void							Build(GrammarStack::Ptr stack, CodeError::List& errors);
+		bool							IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b);
+		bool							IsMultipleDispatchingChild(FunctionDeclaration::Ptr func);
+		bool							IsMultipleDispatchingRoot(FunctionDeclaration::Ptr root, FunctionDeclaration::Ptr child);
+		void							CheckOverloading(SymbolModule* modulea, GrammarSymbol::Ptr symbola, Declaration::Ptr decla, SymbolModule* moduleb, GrammarSymbol::Ptr symbolb, Declaration::Ptr declb, bool foreignCheck, CodeError::List& errors);
+		void							BuildSymbols(CodeError::List& errors);									// sync step: build all declaration symbols
+		void							BuildFunctions(CodeError::List& errors);								// sync step: build all symbol functions
+		void							BuildFunctionLinkings(CodeError::List& errors);							// sync step: link all multiple-dispatching functions to it's parent
+		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 	};
 
 	class SymbolAssembly
