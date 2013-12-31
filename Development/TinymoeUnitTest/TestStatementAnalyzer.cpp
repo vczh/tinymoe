@@ -19,6 +19,10 @@ TEST_CASE(TestParseHelloWorldModule)
 module hello world
 using standard library
 
+sentence print (message)
+	redirect to "printf"
+end
+
 phrase sum from (first number) to (last number)
     set the result to 0
     repeat with the current number from first number to last number

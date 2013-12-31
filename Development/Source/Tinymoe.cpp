@@ -154,6 +154,14 @@ category (signal)
 block (sentence body) finally
 	body
 end
+
+sentence add (value) to (assignable variable)
+	set variable to variable + value
+end
+
+sentence substract (value) from (assignable variable)
+	set variable to variable - value
+end
 )tinymoe";
 	}
 }
