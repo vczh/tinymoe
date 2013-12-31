@@ -61,19 +61,19 @@ block (body) repeat : repeat statement
 	end
 end
 
-block (body) repeat while (expression condition)
+block (sentence body) repeat while (expression condition)
 	repeat
 		if not condition
 			break
 		end
-		yield body
+		body
 	end
 end
 
-block (phrase deal with (item)) repeat with (argument item) from (start) to (end)
+block (sentence deal with (item)) repeat with (argument item) from (start) to (end)
 	set the current number to start
 	repeat while the current number is not greater than end
-		yield deal with the current number
+		deal with the current number
 	end
 end
 
@@ -81,14 +81,14 @@ block (phrase deal with (item)) repeat with (argument item) in (items)
 	raise "Only enumerable object (like containers) can be go through using the repeat-with-in statement."
 end
 
-block (phrase deal with (item)) repeat with (argument item) in (items : enumerable)
+block (sentence deal with (item)) repeat with (argument item) in (items : enumerable)
 	set cursor to new enumerator from items
 	repeat
 		consume item from cursor
 		if cursor reaches the end
 			break
 		end
-		yield deal with current item of cursor
+		deal with current item of cursor
 	end
 end
 
@@ -96,11 +96,11 @@ cps (state)
 category
 	start IFELSE if
 	closable
-block (body) if (condition)
+block (sentence body) if (condition)
 	set result to condition
 	select the result
 		case true
-			invoke body
+			body
 	end
 end
 
@@ -109,11 +109,11 @@ category (signal)
 	follow IFELSE if
 	start IFELSE if
 	closable
-block (body) else if (condition)
+block (sentence body) else if (condition)
 	set the result to not signal and condition
 	select the result
 		case true
-			invoke body
+			body
 	end
 end
 
@@ -121,18 +121,18 @@ cps (state)
 category (signal)
 	follow IFELSE if
 	closable
-block (body) else
+block (sentence body) else
 	set the result to not signal
 	select the result
 		case true
-			invoke body
+			body
 	end
 end
 
 cps (state)
 category
 	start SEH try
-block (statement body) try
+block (sentence body) try
 	body
 	if flag field of state equals to raising exception
 		set the result to flag exception of state
@@ -145,7 +145,7 @@ category (signal)
 	follow SEH try
 	start SEH catch
 	closable
-block (body) catch (argument exception)
+block (sentence body) catch (argument exception)
 	if signal not equals to null
 		body
 	end	
@@ -156,7 +156,7 @@ category (signal)
 	follow SEH try
 	follow SEH catch
 	closable
-block (body) finally
+block (sentence body) finally
 	body
 end
 )tinymoe";
