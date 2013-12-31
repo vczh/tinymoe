@@ -660,6 +660,13 @@ namespace tinymoe
 				map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 				auto item = make_shared<GrammarStackItem>();
 
+				{
+					auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
+					symbol + "the" + "result";
+					func->resultVariable = symbol;
+					item->symbols.push_back(symbol);
+					symbolTokens.insert(make_pair(symbol, funcdecl->keywordToken));
+				}
 				if (funcdecl->cps)
 				{
 					if (funcdecl->cps->stateName)
@@ -667,6 +674,7 @@ namespace tinymoe
 						GrammarSymbol::Ptr symbol;
 						CodeToken token;
 						BuildNameSymbol(funcdecl->cps->stateName->identifiers, symbol, token);
+						func->cpsStateVariable = symbol;
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}
@@ -675,6 +683,7 @@ namespace tinymoe
 						GrammarSymbol::Ptr symbol;
 						CodeToken token;
 						BuildNameSymbol(funcdecl->cps->continuationName->identifiers, symbol, token);
+						func->cpsContinuationVariable = symbol;
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}
@@ -686,6 +695,7 @@ namespace tinymoe
 						GrammarSymbol::Ptr symbol;
 						CodeToken token;
 						BuildNameSymbol(funcdecl->category->signalName->identifiers, symbol, token);
+						func->categorySignalVariable = symbol;
 						item->symbols.push_back(symbol);
 						symbolTokens.insert(make_pair(symbol, token));
 					}

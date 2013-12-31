@@ -40,6 +40,12 @@ namespace tinymoe
 		FunctionDeclaration::Ptr		function;					// the original function
 		SymbolFunction::WeakPtr			multipleDispatchingRoot;	// the multiple-dispatching root declaration
 		SymbolFragmentMap				arguments;					// all arguments
+
+		GrammarSymbol::Ptr				resultVariable;				// "the result"
+		GrammarSymbol::Ptr				cpsStateVariable;
+		GrammarSymbol::Ptr				cpsContinuationVariable;
+		GrammarSymbol::Ptr				categorySignalVariable;
+
 		Statement::Ptr					statement;					// the function body
 	};
 
