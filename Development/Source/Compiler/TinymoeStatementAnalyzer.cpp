@@ -321,6 +321,10 @@ namespace tinymoe
 		}
 	}
 
+	void SymbolModule::ParseBlock(GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors)
+	{
+	}
+
 	void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
 	{
 		{
@@ -346,6 +350,7 @@ namespace tinymoe
 
 		for (auto dfp : declarationFunctions)
 		{
+			auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(dfp.first);
 			auto func = dfp.second;
 			{
 				auto item = make_shared<GrammarStackItem>();
@@ -365,6 +370,19 @@ namespace tinymoe
 						"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
 					};
 					errors.push_back(error);
+				}
+
+				try
+				{
+					int lineIndex = funcdecl->beginLineIndex;
+					int endLineIndex = funcdecl->endLineIndex;
+					auto statement = make_shared<Statement>();
+					func->statement = statement;
+
+					ParseBlock(stack, statement, lineIndex, endLineIndex, errors);
+				}
+				catch (const ParsingFailedException&)
+				{
 				}
 
 				stack->Pop();

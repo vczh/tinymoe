@@ -52,6 +52,8 @@ namespace tinymoe
 		typedef map<GrammarSymbol::Ptr, Declaration::Ptr>			SymbolDeclarationMap;
 		typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
 
+		struct ParsingFailedException{};
+
 		CodeFile::Ptr					codeFile;					// the original code file
 		Module::Ptr						module;						// the original module
 		WeakList						usingSymbolModules;			// all referenced modules
@@ -66,6 +68,7 @@ namespace tinymoe
 		void							BuildFunctionLinkings(CodeError::List& errors);							// sync step: link all multiple-dispatching functions to it's parent
 
 		void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
+		void							ParseBlock(GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
 		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 	};
 
