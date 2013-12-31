@@ -5,6 +5,8 @@
 
 namespace tinymoe
 {
+	class GrammarSymbol;
+
 	/*************************************************************
 	Common
 	*************************************************************/
@@ -71,6 +73,9 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<FunctionFragment>	Ptr;
 		typedef vector<Ptr>						List;
+
+		virtual shared_ptr<GrammarSymbol>	CreateSymbol() = 0;
+		virtual void						AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive) = 0;
 	};
 
 	/*************************************************************
@@ -82,6 +87,8 @@ namespace tinymoe
 	public:
 		typedef shared_ptr<Declaration>				Ptr;
 		typedef vector<Ptr>							List;
+
+		virtual shared_ptr<GrammarSymbol>	CreateSymbol() = 0;
 	};
 
 	class SymbolDeclaration : public Declaration
@@ -92,6 +99,8 @@ namespace tinymoe
 		SymbolName::Ptr						name;
 
 		static SymbolDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
+
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
 	};
 
 	class TypeDeclaration : public Declaration
@@ -104,6 +113,8 @@ namespace tinymoe
 		SymbolName::List					fields;
 		
 		static TypeDeclaration::Ptr			Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
+		
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
 	};
 
 	class FunctionDeclaration : public Declaration
@@ -123,6 +134,8 @@ namespace tinymoe
 		
 		static FunctionDeclaration::Ptr		Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, FunctionDeclaration::Ptr decl, CodeToken ownerToken, CodeError::List& errors);
 		static FunctionDeclaration::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
+		
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
 	};
 
 	/*************************************************************
@@ -141,6 +154,9 @@ namespace tinymoe
 	{
 	public:
 		SymbolName::Ptr						name;				// part of the function name
+		
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		void								AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 	};
 
 	class VariableArgumentFragment : public ArgumentFragment
@@ -149,12 +165,18 @@ namespace tinymoe
 		FunctionArgumentType				type;				// type of the form
 		SymbolName::Ptr						name;				// name of the argument
 		SymbolName::Ptr						receivingType;		// (optional) receiving type for Normal argument only to do multiple dispatching
+		
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		void								AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 	};
 
 	class FunctionArgumentFragment : public ArgumentFragment
 	{
 	public:
 		FunctionDeclaration::Ptr			declaration;		// declaration for the argument representing a function
+		
+		shared_ptr<GrammarSymbol>			CreateSymbol()override;
+		void								AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 	};
 
 	/*************************************************************

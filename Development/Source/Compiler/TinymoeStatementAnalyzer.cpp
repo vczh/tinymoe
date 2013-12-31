@@ -3,6 +3,117 @@
 namespace tinymoe
 {
 	/*************************************************************
+	Declaration::CreateSymbol
+	*************************************************************/
+
+	shared_ptr<GrammarSymbol> SymbolDeclaration::CreateSymbol()
+	{
+		auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
+		for (auto token : name->identifiers)
+		{
+			symbol + token.value;
+		}
+		return symbol;
+	}
+
+	shared_ptr<GrammarSymbol> TypeDeclaration::CreateSymbol()
+	{
+		auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Type);
+		for (auto token : name->identifiers)
+		{
+			symbol + token.value;
+		}
+		return symbol;
+	}
+
+	shared_ptr<GrammarSymbol> FunctionDeclaration::CreateSymbol()
+	{
+		auto symbolType = GrammarSymbolType::Phrase;
+		switch (type)
+		{
+		case FunctionDeclarationType::Phrase:
+			symbolType = GrammarSymbolType::Phrase;
+			break;
+		case FunctionDeclarationType::Sentence:
+			symbolType = GrammarSymbolType::Sentence;
+			break;
+		case FunctionDeclarationType::Block:
+			symbolType = GrammarSymbolType::Block;
+			break;
+		}
+		
+		auto symbol = make_shared<GrammarSymbol>(symbolType);
+		for (auto i = name.begin(); i != name.end(); i++)
+		{
+			(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i == name.end() - 1)));
+		}
+		return symbol;
+	}
+	
+	/*************************************************************
+	FunctionArgument::AppendFunctionSymbol
+	*************************************************************/
+
+	void NameFragment::AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)
+	{
+		for (auto token : name->identifiers)
+		{
+			symbol + token.value;
+		}
+	}
+
+	void VariableArgumentFragment::AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)
+	{
+		switch (type)
+		{
+		case FunctionArgumentType::Argument:
+			symbol + GrammarFragmentType::Argument;
+			break;
+		case FunctionArgumentType::Assignable:
+			symbol + GrammarFragmentType::Assignable;
+			break;
+		case FunctionArgumentType::Expression:
+			symbol + (primitive ? GrammarFragmentType::Primitive : GrammarFragmentType::Expression);
+			break;
+		case FunctionArgumentType::List:
+			symbol + GrammarFragmentType::List;
+			break;
+		case FunctionArgumentType::Normal:
+			symbol + (primitive ? GrammarFragmentType::Primitive : GrammarFragmentType::Expression);
+			break;
+		}
+	}
+
+	void FunctionArgumentFragment::AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)
+	{
+		symbol + (primitive ? GrammarFragmentType::Primitive : GrammarFragmentType::Expression);
+	}
+	
+	/*************************************************************
+	FunctionArgument::CreateSymbol
+	*************************************************************/
+
+	shared_ptr<GrammarSymbol> NameFragment::CreateSymbol()
+	{
+		return nullptr;
+	}
+
+	shared_ptr<GrammarSymbol> VariableArgumentFragment::CreateSymbol()
+	{
+		auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
+		for (auto token : name->identifiers)
+		{
+			symbol + token.value;
+		}
+		return symbol;
+	}
+
+	shared_ptr<GrammarSymbol> FunctionArgumentFragment::CreateSymbol()
+	{
+		return declaration->CreateSymbol();
+	}
+
+	/*************************************************************
 	SymbolModule
 	*************************************************************/
 
