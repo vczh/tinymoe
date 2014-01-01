@@ -86,3 +86,44 @@ end
 		cout << "  > " << s->statementExpression->ToCode() << endl;
 	}
 }
+
+TEST_CASE(TestParseConnectedBlocks)
+{
+	string code = R"tinymoe(
+module hello world
+using standard library
+
+sentence print (message)
+	redirect to "printf"
+end
+
+phrase console input
+	redirect to "scanf"
+end
+
+phrase main
+	set the score to console input
+	if the score < 0 or the score > 100
+		print "Illegal score."
+	else if the score = 100
+		print "Perfect!"
+	else if the score >= 90
+		print "Good!"
+	else if the score >= 70
+		print "Normal."
+	else if the score >- 60
+		print "OK."
+	else
+		print "Unacceptable."
+	end
+end
+)tinymoe";
+	
+	vector<string> codes;
+	CodeError::List errors;
+	codes.push_back(GetCodeForStandardLibrary());
+	codes.push_back(code);
+	auto assembly = SymbolAssembly::Parse(codes, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(assembly->symbolModules.size() == 2);
+}

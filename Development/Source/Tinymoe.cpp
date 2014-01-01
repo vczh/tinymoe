@@ -87,7 +87,6 @@ block (sentence deal with (item)) repeat with (argument item) in (items : array)
 	end
 end
 
-cps (state)
 category
 	start IFELSE if
 	closable
@@ -99,7 +98,6 @@ block (sentence body) if (condition)
 	end
 end
 
-cps (state)
 category (signal)
 	follow IFELSE if
 	start IFELSE if
@@ -112,7 +110,6 @@ block (sentence body) else if (condition)
 	end
 end
 
-cps (state)
 category (signal)
 	follow IFELSE if
 	closable
