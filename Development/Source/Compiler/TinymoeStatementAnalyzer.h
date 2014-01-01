@@ -14,9 +14,11 @@ namespace tinymoe
 	{
 	public:
 		typedef shared_ptr<Statement>								Ptr;
+		typedef weak_ptr<Statement>									WeakPtr;
 		typedef vector<Ptr>											List;
 		typedef map<GrammarSymbol::Ptr, Expression::Ptr>			SymbolExpressionMap;
 
+		Statement::WeakPtr				parentStatement;
 		GrammarSymbol::Ptr				statementSymbol;
 		InvokeExpression::Ptr			statementExpression;
 		SymbolExpressionMap				newVariables;

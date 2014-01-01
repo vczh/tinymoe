@@ -1007,7 +1007,7 @@ sentence whatever
 		auto decl = FunctionDeclaration::Parse(codeFile, errors, lineIndex);
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
-		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(errors.size() == 2);
 		TEST_ASSERT(decl->beginLineIndex == 0);
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);

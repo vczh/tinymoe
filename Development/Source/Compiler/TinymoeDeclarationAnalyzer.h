@@ -65,6 +65,7 @@ namespace tinymoe
 		SymbolName::Ptr						signalName;			// (optional) for non-first block (like else if, catch, etc) to access the result from the previous block
 		SymbolName::Ptr						categoryName;		// (optional) category for this block
 		SymbolName::List					followCategories;	// (optional) categories to follow
+		SymbolName::List					insideCategories;	// (optional) categories to be contained
 		bool								closable = false;	// (optional) true means this block can be the end of a block series
 		
 		static FunctionCategory::Ptr		Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);

@@ -220,6 +220,11 @@ namespace tinymoe
 				auto followToken = *it;
 				decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Follow category", followToken, errors));
 			}
+			else if (it->value == "inside")
+			{
+				auto insideToken = *it;
+				decl->insideCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Inside category", insideToken, errors));
+			}
 			else if (it->value == "closable")
 			{
 				decl->closable = true;
@@ -253,14 +258,14 @@ namespace tinymoe
 			}
 		}
 
-		if (!decl->categoryName)
+		if (!decl->categoryName && decl->insideCategories.size() == 0)
 		{
 			if (!decl->closable)
 			{
 				CodeError error =
 				{
 					categoryToken,
-					"A category without start category name should be closable.",
+					"A category without start category name and inside categories should be closable.",
 				};
 				errors.push_back(error);
 			}
@@ -630,14 +635,58 @@ namespace tinymoe
 			}
 			if (decl->category)
 			{
-				if (decl->type != FunctionDeclarationType::Block)
+				switch (decl->type)
 				{
-					CodeError error =
+				case FunctionDeclarationType::Phrase:
 					{
-						functionToken,
-						"Phrase and sentence should not have a category definition.",
-					};
-					errors.push_back(error);
+						CodeError error =
+						{
+							functionToken,
+							"Phrase should not have a category definition.",
+						};
+						errors.push_back(error);
+					}
+					break;
+				case FunctionDeclarationType::Sentence:
+					if (decl->category->insideCategories.size() == 0)
+					{
+						CodeError error =
+						{
+							functionToken,
+							"A category of a sentence should have inside categories.",
+						};
+						errors.push_back(error);
+					}
+					if (decl->category->categoryName || decl->category->signalName || decl->category->followCategories.size() != 0)
+					{
+						CodeError error =
+						{
+							functionToken,
+							"A category of a sentence should not have start category name, signal name or follow categories.",
+						};
+						errors.push_back(error);
+					}
+					if (decl->category->closable)
+					{
+						CodeError error =
+						{
+							functionToken,
+							"A category of a sentence cannot be closable.",
+						};
+						errors.push_back(error);
+					}
+					break;
+				case FunctionDeclarationType::Block:
+					if (decl->category->insideCategories.size() != 0)
+					{
+						CodeError error =
+						{
+							functionToken,
+							"A category of a block cannot have inside categories.",
+						};
+						errors.push_back(error);
+					}
+					break;
 				}
 			}
 			if (decl->type == FunctionDeclarationType::Block)

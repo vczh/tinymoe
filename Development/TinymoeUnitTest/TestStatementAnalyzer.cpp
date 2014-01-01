@@ -44,7 +44,7 @@ end
 	TEST_ASSERT(assembly->symbolModules.size() == 2);
 }
 
-TEST_CASE(TestParsePotentialAmbiguousProgram)
+TEST_CASE(TestParsePotentialAmbiguousModule)
 {
 	string code = R"tinymoe(
 module hello world
@@ -87,7 +87,7 @@ end
 	}
 }
 
-TEST_CASE(TestParseConnectedBlocks)
+TEST_CASE(TestParseConnectedBlocksModule)
 {
 	string code = R"tinymoe(
 module hello world
@@ -116,6 +116,46 @@ phrase main
 	else
 		print "Unacceptable."
 	end
+end
+)tinymoe";
+	
+	vector<string> codes;
+	CodeError::List errors;
+	codes.push_back(GetCodeForStandardLibrary());
+	codes.push_back(code);
+	auto assembly = SymbolAssembly::Parse(codes, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(assembly->symbolModules.size() == 2);
+}
+
+TEST_CASE(TestParseCategorizedSentenceModule)
+{
+	string code = R"tinymoe(
+module hello world
+using standard library
+
+sentence print (message)
+	redirect to "printf"
+end
+
+phrase console input
+	redirect to "scanf"
+end
+
+phrase main
+	set lower bound to console input
+	set upper bound to console input
+	set sum to 0
+	set the current number to lower bound
+
+	repeat
+		add the current number to sum
+		add 1 to the current number
+		if the current number > upper bound
+			break
+		end
+	end
+	print "The sum is " & sum & "."
 end
 )tinymoe";
 	

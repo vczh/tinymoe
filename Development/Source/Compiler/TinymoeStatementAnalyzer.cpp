@@ -571,6 +571,7 @@ namespace tinymoe
 						}
 					}
 
+					newStatement->parentStatement = statement;
 					statement->statements.push_back(newStatement);
 
 					if (newStatement->newVariables.size() > 0)
@@ -642,6 +643,7 @@ namespace tinymoe
 								stack->Pop();
 							}
 							if (!newStatement) break;
+							newStatement->parentStatement = statement;
 							statement->statements.push_back(newStatement);
 						}
 					}
@@ -681,16 +683,24 @@ namespace tinymoe
 				auto ref = weakRef.lock();
 				for (auto sdr : ref->symbolDeclarations)
 				{
-					item->symbols.push_back(sdr.first);
+					auto itdfr = ref->declarationFunctions.find(sdr.second);
+					if (itdfr == ref->declarationFunctions.end() || itdfr->second->multipleDispatchingRoot.expired())
+					{
+						item->symbols.push_back(sdr.first);
+					}
 				}
 			}
 			stack->Push(item);
 		}
 		{
 			auto item = make_shared<GrammarStackItem>();
-			for (auto sdp : symbolDeclarations)
+			for (auto sdr : symbolDeclarations)
 			{
-				item->symbols.push_back(sdp.first);
+				auto itdfr = declarationFunctions.find(sdr.second);
+				if (itdfr == declarationFunctions.end() || itdfr->second->multipleDispatchingRoot.expired())
+				{
+					item->symbols.push_back(sdr.first);
+				}
 			}
 			stack->Push(item);
 		}

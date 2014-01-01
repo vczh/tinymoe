@@ -29,11 +29,15 @@ sentence reset continuation state (state) to (flag)
 end
 
 cps (state) (continuation)
+category
+	inside REPEAT
 sentence break
 	reset continuation state state to breaking repeating
 end
 
 cps (state) (continuation)
+category
+	inside REPEAT
 sentence continue
 	reset continuation state state to continuing repeating
 end
@@ -50,6 +54,9 @@ sentence exit
 end
 
 cps (state)
+category
+	start REPEAT
+	closable
 block (body) repeat : repeat statement
 	call invoke body with (state)
 	select field flag of state
@@ -61,6 +68,9 @@ block (body) repeat : repeat statement
 	end
 end
 
+category
+	start REPEAT
+	closable
 block (sentence body) repeat while (expression condition)
 	repeat
 		if not condition
@@ -70,6 +80,9 @@ block (sentence body) repeat while (expression condition)
 	end
 end
 
+category
+	start REPEAT
+	closable
 block (sentence deal with (item)) repeat with (argument item) from (lower bound) to (upper bound)
 	set the current number to lower bound
 	repeat while the current number <= upper bound
@@ -77,6 +90,9 @@ block (sentence deal with (item)) repeat with (argument item) from (lower bound)
 	end
 end
 
+category
+	start REPEAT
+	closable
 block (phrase deal with (item)) repeat with (argument item) in (items)
 	raise "Only enumerable object (like containers) can be iterated using the repeat-with-in statement."
 end
