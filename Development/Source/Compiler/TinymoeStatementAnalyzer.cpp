@@ -366,9 +366,9 @@ namespace tinymoe
 		token = tokens[0];
 	}
 
-	FunctionDeclaration::Ptr SymbolModule::FindSymbolFunction(GrammarSymbol::Ptr symbol)
+	FunctionDeclaration::Ptr SymbolModule::FindSymbolFunction(GrammarSymbol::Ptr symbol, GrammarSymbolType acceptableType)
 	{
-		if (symbol->type == GrammarSymbolType::Block)
+		if (symbol && symbol->type == acceptableType)
 		{
 			{
 				auto itblock = symbolDeclarations.find(symbol);
@@ -498,8 +498,57 @@ namespace tinymoe
 					auto invoke = dynamic_pointer_cast<InvokeExpression>(legalExpressions[0]);
 					auto symbol = dynamic_pointer_cast<ReferenceExpression>(invoke->function)->symbol;
 
-					auto parent = statement->statementSymbol ? FindSymbolFunction(statement->statementSymbol) : nullptr;
-					auto block = FindSymbolFunction(symbol);
+					if (auto sentence = FindSymbolFunction(symbol, GrammarSymbolType::Sentence))
+					{
+						if (sentence->category && sentence->category->insideCategories.size() > 0)
+						{
+							auto parentStatement = statement;
+							while (parentStatement)
+							{
+								if (auto parent = FindSymbolFunction(parentStatement->statementSymbol, GrammarSymbolType::Block))
+								{
+									if (parent->category && parent->category->categoryName)
+									{
+										auto category = parent->category->categoryName->GetName();
+										for (auto inside : sentence->category->insideCategories)
+										{
+											if (category == inside->GetName())
+											{
+												goto END_OF_INSIDE_CATEGORY_CHECK;
+											}
+										}
+									}
+								}
+								parentStatement = parentStatement->parentStatement.lock();
+							}
+
+						END_OF_INSIDE_CATEGORY_CHECK:
+							if (!parentStatement)
+							{
+								CodeError error =
+								{
+									line->tokens[0],
+									"This sentence can only appear inside a block of category: ",
+								};
+								for (auto it = sentence->category->insideCategories.begin(); it != sentence->category->insideCategories.end(); it++)
+								{
+									error.message += (*it)->GetName();
+									if (it + 1 == sentence->category->insideCategories.end())
+									{
+										error.message += ".";
+									}
+									else
+									{
+										error.message += ", ";
+									}
+								}
+								errors.push_back(error);
+							}
+						}
+					}
+
+					auto parent = FindSymbolFunction(statement->statementSymbol, GrammarSymbolType::Block);
+					auto block = FindSymbolFunction(symbol, GrammarSymbolType::Block);
 
 					switch (symbol->target)
 					{
@@ -600,14 +649,38 @@ namespace tinymoe
 					{
 						if (symbol->target != GrammarSymbolTarget::Select)
 						{
-							if (!block || (block->category && !block->category->categoryName))
+							if (!block || (block->category && (!block->category->categoryName || block->category->followCategories.size() > 0)))
 							{
-								CodeError error =
+								if (block->category->followCategories.size() > 0)
 								{
-									line->tokens[0],
-									"This is not a initial block.",
-								};
-								errors.push_back(error);
+									CodeError error =
+									{
+										line->tokens[0],
+										"This is not a initial block. It should follow a block of category: ",
+									};
+									for (auto it = block->category->followCategories.begin(); it != block->category->followCategories.end(); it++)
+									{
+										error.message += (*it)->GetName();
+										if (it + 1 == block->category->followCategories.end())
+										{
+											error.message += ".";
+										}
+										else
+										{
+											error.message += ", ";
+										}
+									}
+									errors.push_back(error);
+								}
+								else if (!block->category->categoryName)
+								{
+									CodeError error =
+									{
+										line->tokens[0],
+										"This is not a initial block.",
+									};
+									errors.push_back(error);
+								}
 							}
 						}
 

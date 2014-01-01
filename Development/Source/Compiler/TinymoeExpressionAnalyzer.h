@@ -72,13 +72,13 @@ namespace tinymoe
 		SetField,				// (sentence)	set field <argument> of <expression> to <expression>
 	};
 
-	enum class GrammarSymbolType
+	enum class GrammarSymbolType : int
 	{
-		Type,					// <type>
-		Symbol,					// <primitive>
-		Phrase,					// <primitive>
-		Sentence,				// <sentence>
-		Block,					// <block>
+		Type = 1,				// <type>
+		Symbol = 2,				// <primitive>
+		Phrase = 4,				// <primitive>
+		Sentence = 8,			// <sentence>
+		Block = 16,				// <block>
 	};
 
 	class GrammarSymbol

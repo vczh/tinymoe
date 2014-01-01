@@ -34,7 +34,7 @@ phrase main
     print "1+ ... +100 = " & sum from 1 to 100
 end
 )tinymoe";
-	
+
 	vector<string> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
@@ -68,7 +68,7 @@ phrase main
 	print "kula's name is " & field name of kula & "."
 end
 )tinymoe";
-	
+
 	vector<string> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
@@ -118,7 +118,7 @@ phrase main
 	end
 end
 )tinymoe";
-	
+
 	vector<string> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
@@ -158,7 +158,7 @@ phrase main
 	print "The sum is " & sum & "."
 end
 )tinymoe";
-	
+
 	vector<string> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
@@ -166,4 +166,48 @@ end
 	auto assembly = SymbolAssembly::Parse(codes, errors);
 	TEST_ASSERT(errors.size() == 0);
 	TEST_ASSERT(assembly->symbolModules.size() == 2);
+}
+
+TEST_CASE(TestParseWrongModule)
+{
+	{
+		string code = R"tinymoe(
+module hello world
+using standard library
+
+phrase main
+	if true
+	catch the exception
+	end
+end
+)tinymoe";
+
+		vector<string> codes;
+		CodeError::List errors;
+		codes.push_back(GetCodeForStandardLibrary());
+		codes.push_back(code);
+		auto assembly = SymbolAssembly::Parse(codes, errors);
+		TEST_ASSERT(errors.size() == 2);
+		TEST_ASSERT(assembly->symbolModules.size() == 2);
+	}
+	{
+		string code = R"tinymoe(
+module hello world
+using standard library
+
+phrase main
+	if true
+		break
+	end
+end
+)tinymoe";
+
+		vector<string> codes;
+		CodeError::List errors;
+		codes.push_back(GetCodeForStandardLibrary());
+		codes.push_back(code);
+		auto assembly = SymbolAssembly::Parse(codes, errors);
+		TEST_ASSERT(errors.size() == 1);
+		TEST_ASSERT(assembly->symbolModules.size() == 2);
+	}
 }

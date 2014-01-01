@@ -78,7 +78,7 @@ namespace tinymoe
 
 		void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
 		void							BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token);
-		FunctionDeclaration::Ptr		FindSymbolFunction(GrammarSymbol::Ptr symbol);
+		FunctionDeclaration::Ptr		FindSymbolFunction(GrammarSymbol::Ptr symbol, GrammarSymbolType acceptableType);
 		Statement::Ptr					ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
 		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 	};
