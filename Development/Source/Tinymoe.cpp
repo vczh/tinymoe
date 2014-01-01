@@ -78,7 +78,7 @@ block (sentence deal with (item)) repeat with (argument item) from (lower bound)
 end
 
 block (phrase deal with (item)) repeat with (argument item) in (items)
-	raise "Only enumerable object (like containers) can be go through using the repeat-with-in statement."
+	raise "Only enumerable object (like containers) can be iterated using the repeat-with-in statement."
 end
 
 block (sentence deal with (item)) repeat with (argument item) in (items : array)
