@@ -43,3 +43,46 @@ end
 	TEST_ASSERT(errors.size() == 0);
 	TEST_ASSERT(assembly->symbolModules.size() == 2);
 }
+
+TEST_CASE(TestParsePotentialAmbiguousProgram)
+{
+	string code = R"tinymoe(
+module hello world
+using standard library
+
+type dog
+	name
+end
+
+sentence print (message)
+	redirect to "printf"
+end
+
+phrase console input
+	redirect to "scanf"
+end
+
+phrase main
+    set kula to new dog
+	set field name of kula to console input
+	print "kula's name is " & field name of kula & "."
+end
+)tinymoe";
+	
+	vector<string> codes;
+	CodeError::List errors;
+	codes.push_back(GetCodeForStandardLibrary());
+	codes.push_back(code);
+	auto assembly = SymbolAssembly::Parse(codes, errors);
+	TEST_ASSERT(errors.size() == 0);
+	TEST_ASSERT(assembly->symbolModules.size() == 2);
+
+	auto decl = assembly->symbolModules[1]->module->declarations[3];
+	auto func = assembly->symbolModules[1]->declarationFunctions.find(decl)->second;
+	TEST_ASSERT(func->function->name.size() == 1);
+	TEST_ASSERT(dynamic_pointer_cast<NameFragment>(func->function->name[0])->name->GetName() == "main");
+	for (auto s : func->statement->statements)
+	{
+		cout << "  > " << s->statementExpression->ToCode() << endl;
+	}
+}
