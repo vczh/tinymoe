@@ -48,10 +48,37 @@ namespace tinymoe
 		{
 		public:
 			typedef shared_ptr<AstDeclaration>		Ptr;
+			typedef weak_ptr<AstNode>				WeakPtr;
 			typedef vector<Ptr>						List;
 
 			string							moduleName;
 			string							composedName;
+		};
+
+		/*************************************************************
+		Declaration
+		*************************************************************/
+
+		class AstSymbolDeclaration : public AstDeclaration
+		{
+		public:
+			typedef shared_ptr<AstSymbolDeclaration>			Ptr;
+			typedef vector<Ptr>									List;
+		};
+
+		class AstTypeDeclaration : public AstDeclaration
+		{
+		public:
+			AstDeclaration::List			member;				// could be
+																//     AstSymbolDeclaration (field)
+																//     AstFunctionDeclaration (virtual function)
+		};
+
+		class AstFunctionDeclaration : public AstDeclaration
+		{
+		public:
+			AstSymbolDeclaration::List		arguments;
+			AstStatement::Ptr				statement;
 		};
 
 		/*************************************************************
@@ -116,12 +143,9 @@ namespace tinymoe
 		class AstReferenceExpression : public AstExpression
 		{
 		public:
-			AstNode::WeakPtr				reference;			// could be
-																//     AstVariableStatement
+			AstDeclaration::WeakPtr			reference;			// could be
 																//     AstSymbolDeclaration
 																//     AstFunctionDeclaration
-																//     AstFunctionArgument
-																//     AstLambdaArgument
 		};
 
 		class AstUnaryExpression : public AstExpression
@@ -197,7 +221,7 @@ namespace tinymoe
 		class AstLambdaExpression : public AstExpression
 		{
 		public:
-			AstLambdaArgument::List			arguments;
+			AstSymbolDeclaration::List		arguments;
 			AstStatement::Ptr				statement;
 		};
 
@@ -211,10 +235,17 @@ namespace tinymoe
 			AstStatement::List				statements;
 		};
 
-		class AstVariableStatement : public AstStatement
+		class AstExpressionStatement : public AstStatement
 		{
 		public:
-			string							composedName;
+			bool							tailCall = false;
+			AstExpression::Ptr				expression;
+		};
+
+		class AstDeclarationStatement : public AstStatement
+		{
+		public:
+			AstDeclaration::Ptr				declaration;
 		};
 
 		class AstAssignmentStatement : public AstStatement
@@ -239,13 +270,6 @@ namespace tinymoe
 			AstExpression::Ptr				index;
 			AstExpression::Ptr				value;
 		};
-
-		class AstExpressionStatement : public AstStatement
-		{
-		public:
-			bool							tailCall = false;
-			AstExpression::Ptr				expression;
-		};
 		
 		class AstIfStatement : public AstStatement
 		{
@@ -253,37 +277,6 @@ namespace tinymoe
 			AstExpression::Ptr				condition;
 			AstStatement::Ptr				trueBranch;
 			AstStatement::Ptr				falseBranch;		// (optional)
-		};
-
-		/*************************************************************
-		Declaration
-		*************************************************************/
-
-		class AstSymbolDeclaration : public AstDeclaration
-		{
-		public:
-		};
-
-		class AstTypeDeclaration : public AstDeclaration
-		{
-		public:
-			vector<string>					members;
-		};
-
-		class AstFunctionArgument : public AstNode
-		{
-		public:
-			typedef shared_ptr<AstFunctionArgument>	Ptr;
-			typedef vector<Ptr>						List;
-
-			string							composedName;
-		};
-
-		class AstFunctionDeclaration : public AstDeclaration
-		{
-		public:
-			AstFunctionArgument::List		arguments;
-			AstStatement::Ptr				statement;
 		};
 
 		/*************************************************************
