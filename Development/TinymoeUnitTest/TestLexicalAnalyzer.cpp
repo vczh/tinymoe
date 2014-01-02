@@ -1,7 +1,7 @@
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
-using namespace tinymoe;
+using namespace tinymoe::compiler;
 
 #define FIRST_LINE(COUNT)					TEST_ASSERT(codeFile->lines.size() == COUNT); auto lineIterator = codeFile->lines.begin(); {
 #define NEXT_LINE							} lineIterator++; {

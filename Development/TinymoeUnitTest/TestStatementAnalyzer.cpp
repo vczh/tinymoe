@@ -2,6 +2,7 @@
 #include "../Source/Tinymoe.h"
 
 using namespace tinymoe;
+using namespace tinymoe::compiler;
 
 TEST_CASE(TestParseStandardLibraryModule)
 {

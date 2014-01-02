@@ -22,6 +22,9 @@
     <Filter Include="Tinymoe\Compiler">
       <UniqueIdentifier>{9685582c-5f07-44f2-aefd-c88422be8af6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tinymoe\Ast">
+      <UniqueIdentifier>{56cf71b8-87ec-4438-8230-020750d4afa6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -57,6 +60,9 @@
     <ClCompile Include="TestStatementAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
@@ -79,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\Compiler\TinymoeStatementAnalyzer.h">
       <Filter>Tinymoe\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Ast\TinymoeAst.h">
+      <Filter>Tinymoe\Ast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

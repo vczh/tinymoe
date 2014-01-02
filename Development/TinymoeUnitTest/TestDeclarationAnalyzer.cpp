@@ -1,7 +1,7 @@
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
-using namespace tinymoe;
+using namespace tinymoe::compiler;
 
 TEST_CASE(TestParseCorrectSymbol)
 {

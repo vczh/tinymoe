@@ -5,100 +5,103 @@
 
 namespace tinymoe
 {
-	enum class CodeTokenType
+	namespace compiler
 	{
-		Integer,
-		Float,
-		String,
-		Identifier,
+		enum class CodeTokenType
+		{
+			Integer,
+			Float,
+			String,
+			Identifier,
 
-		Module,				// module declaration
-		Using,				// import module declaration
-		Phrase,				// phrase declaration
-		Sentence,			// sentence declaration
-		Block,				// block declaration
-		Symbol,				// symbol declaration
-		Type,				// type declaration
+			Module,				// module declaration
+			Using,				// import module declaration
+			Phrase,				// phrase declaration
+			Sentence,			// sentence declaration
+			Block,				// block declaration
+			Symbol,				// symbol declaration
+			Type,				// type declaration
 
-		CPS,				// continuation decoration
-		Category,			// block category definition
-		Expression,			// expression argument
-		Argument,			// argument argument
-		Assignable,			// assignable argument
-		List,				// list
+			CPS,				// continuation decoration
+			Category,			// block category definition
+			Expression,			// expression argument
+			Argument,			// argument argument
+			Assignable,			// assignable argument
+			List,				// list
 
-		End,				// end of an entity
+			End,				// end of an entity
 
-		OpenBracket,		// (
-		CloseBracket,		// )
-		Comma,				// ,
-		Colon,				// :
-		Concat,				// &
-		Add,				// +
-		Sub,				// -
-		Mul,				// *
-		Div,				// /
-		LT,					// <
-		GT,					// >
-		LE,					// <=
-		GE,					// >=
-		EQ,					// =
-		NE,					// <>
-		And,				// and
-		Or,					// or
-		Not,				// not
+			OpenBracket,		// (
+			CloseBracket,		// )
+			Comma,				// ,
+			Colon,				// :
+			Concat,				// &
+			Add,				// +
+			Sub,				// -
+			Mul,				// *
+			Div,				// /
+			LT,					// <
+			GT,					// >
+			LE,					// <=
+			GE,					// >=
+			EQ,					// =
+			NE,					// <>
+			And,				// and
+			Or,					// or
+			Not,				// not
 
-		Unknown,
-	};
+			Unknown,
+		};
 
-	struct CodeToken
-	{
-		typedef vector<CodeToken>				List;
+		struct CodeToken
+		{
+			typedef vector<CodeToken>				List;
 
-		CodeTokenType					type = CodeTokenType::Unknown;
-		int								row = -1;
-		int								column = -1;
-		string							value;
-		int								codeIndex = -1;
+			CodeTokenType					type = CodeTokenType::Unknown;
+			int								row = -1;
+			int								column = -1;
+			string							value;
+			int								codeIndex = -1;
 
-		bool							IsNameFragmentToken();
+			bool							IsNameFragmentToken();
 
-		static string					EscapeString(string value);
-		static string					UnescapeString(string str);
-	};
+			static string					EscapeString(string value);
+			static string					UnescapeString(string str);
+		};
 
-	struct CodeError
-	{
-		typedef vector<CodeError>				List;
+		struct CodeError
+		{
+			typedef vector<CodeError>				List;
 
-		CodeToken						position;
-		string							message;
-	};
+			CodeToken						position;
+			string							message;
+		};
 
-	struct CodeLine
-	{
-		typedef shared_ptr<CodeLine>			Ptr;
-		typedef vector<Ptr>						List;
+		struct CodeLine
+		{
+			typedef shared_ptr<CodeLine>			Ptr;
+			typedef vector<Ptr>						List;
 
-		CodeToken::List					tokens;
-	};
+			CodeToken::List					tokens;
+		};
 
-	struct CodeFile
-	{
-		typedef shared_ptr<CodeFile>			Ptr;
-		typedef vector<Ptr>						List;
+		struct CodeFile
+		{
+			typedef shared_ptr<CodeFile>			Ptr;
+			typedef vector<Ptr>						List;
 
-		CodeLine::List					lines;
+			CodeLine::List					lines;
 
-		static CodeFile::Ptr			Parse(const string& code, int codeIndex, CodeError::List& errors);
-	};
+			static CodeFile::Ptr			Parse(const string& code, int codeIndex, CodeError::List& errors);
+		};
 
-	class CodeFragment
-	{
-	public:
-		CodeFragment();
-		virtual ~CodeFragment();
-	};
+		class CodeFragment
+		{
+		public:
+			CodeFragment();
+			virtual ~CodeFragment();
+		};
+	}
 }
 
 #endif
