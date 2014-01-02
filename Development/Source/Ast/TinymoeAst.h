@@ -78,6 +78,7 @@ namespace tinymoe
 		{
 		public:
 			AstSymbolDeclaration::List		arguments;
+			AstSymbolDeclaration::Ptr		resultVariable;
 			AstStatement::Ptr				statement;
 		};
 
@@ -251,25 +252,13 @@ namespace tinymoe
 		class AstAssignmentStatement : public AstStatement
 		{
 		public:
-			AstExpression::Ptr				target;
+			AstExpression::Ptr				target;				// could be
+																//     AstReferenceExpression
+																//     AstFieldAccessExpression
+																//     AstArrayAccessExpression
 			AstExpression::Ptr				value;
 		};
 
-		class AstFieldAssignmentStatement : public AstStatement
-		{
-		public:
-			AstExpression::Ptr				target;
-			string							fieldName;
-			AstExpression::Ptr				value;
-		};
-
-		class AstArrayAssignmentStatement : public AstStatement
-		{
-		public:
-			AstExpression::Ptr				target;
-			AstExpression::Ptr				index;
-			AstExpression::Ptr				value;
-		};
 		
 		class AstIfStatement : public AstStatement
 		{
