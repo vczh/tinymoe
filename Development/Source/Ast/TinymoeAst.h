@@ -69,14 +69,13 @@ namespace tinymoe
 		class AstTypeDeclaration : public AstDeclaration
 		{
 		public:
-			AstDeclaration::List			member;				// could be
-																//     AstSymbolDeclaration (field)
-																//     AstFunctionDeclaration (virtual function)
+			AstSymbolDeclaration::List		fields;
 		};
 
 		class AstFunctionDeclaration : public AstDeclaration
 		{
 		public:
+			AstType::Ptr					ownerType;			// (optional) if ownerType is not null, this function is added to this type as a virtual function.
 			AstSymbolDeclaration::List		arguments;
 			AstSymbolDeclaration::Ptr		resultVariable;
 			AstStatement::Ptr				statement;
@@ -115,6 +114,11 @@ namespace tinymoe
 			NE,
 			And,
 			Or,
+		};
+
+		class AstThisExpression : public AstExpression
+		{
+		public:
 		};
 
 		class AstLiteralExpression : public AstExpression
@@ -200,7 +204,7 @@ namespace tinymoe
 		{
 		public:
 			AstExpression::Ptr				target;
-			string							fieldName;
+			string							composedFieldName;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -274,6 +278,7 @@ namespace tinymoe
 
 		enum class AstPredefinedTypeName
 		{
+			Object,
 			Symbol,
 			Array,
 			Integer,
