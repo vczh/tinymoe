@@ -17,45 +17,43 @@ end
 
 ============================================
 
-function do($state, body)
+function do($state, body, $continuation)
 {
-	catch_$argument(
+	try(
 		$state,
-		try(
-			state,
-			function ($state)
-			{
-				body($state);
-				var $continuation = $state.continuation;
-				state.continuation = function $lambda($state)
-				{
-					if($continuation != null)
-					{
-						$continuation($state);
-						$continuation = $state.continuation;
-					}
-					if($continuation == null)
-					{
-						state.continuation = function ($state)
-						{
-							print_$expression("Succeed!");
-						}
-					}
-					else
-					{
-						state.continuation = $lambda;
-					}
-				}
-			}
-		),
-		function ($state, the_exception)
+		function ($state, $continuation_1)
 		{
-			print_$expression(the_exception);
+			body(
+				$state,
+				function ($state)
+				{
+					print_$expression(
+						$state,
+						"Succeed!",
+						$continuation_1
+					);
+				}
+			);
+		},
+		function ($state, $signal)
+		{
+			catch_$expression(
+				$state,
+				$signal,
+				function ($state, $signal, the_exception)
+				{
+					print_$expression(
+						$state,
+						the_exception,
+						$$continuation
+					);
+				}
+			);
 		}
 	);
 }
 
-function main($state)
+function main($state, $continuation)
 {
 	do(
 		$state,
@@ -64,6 +62,7 @@ function main($state)
 			var a = 1;
 			var b = 0;
 			var c = a / b;
-		}
+		},
+		$continuation
 	);
 }

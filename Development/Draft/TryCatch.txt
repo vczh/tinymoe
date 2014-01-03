@@ -10,22 +10,31 @@ end
 
 ============================================
 
-function main($state)
+function main($state, $continuation)
 {
-	catch_$argument(
+	try(
 		$state,
-		try(
-			state,
-			function ($state, state)
-			{
-				var a = 1;
-				var b = 0;
-				var c = a / b;
-			}
-		),
-		function ($state, the_exception)
+		function ($state, $continuation_1)
 		{
-			print_$expression(the_exception);
+			var a = 1;
+			var b = 0;
+			var c = a / b;
+			$continuation_1($state);
+		},
+		function ($state, $signal)
+		{
+			catch_$expression(
+				$state,
+				$signal,
+				function ($state, $signal, the_exception)
+				{
+					print_$expression(
+						$state,
+						the_exception,
+						$$continuation
+					);
+				}
+			);
 		}
 	);
 }

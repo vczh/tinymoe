@@ -12,16 +12,31 @@ end
 
 ============================================
 
-function repeat($state, body)
+function repeat($state, body, $continuation)
 {
-	body($state);
-	if($state.flag == breaking_repeating)
-	{
-		reset_continuation_state_$expression_to_$expression(&state, null);
-	}
-	else if($state.flag == continuing_repeating)
-	{
-		reset_continuation_state_$expression_to_$expression(&state, null);
-		tailcall repeat($state, body);
-	}
+	body(
+		$state,
+		function ($state)
+		{
+			if($state.flag == breaking_repeating)
+			{
+				reset_continuation_state_$expression_to_$expression(
+					&state,
+					null,
+					$continuation
+				);
+			}
+			else if($state.flag == continuing_repeating)
+			{
+				reset_continuation_state_$expression_to_$expression(
+					&state,
+					null,
+					function ($state)
+					{
+						repeat($state, body, $continuation);
+					}
+				);
+			}
+		}
+	);
 }

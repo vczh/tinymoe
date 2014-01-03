@@ -243,7 +243,6 @@ namespace tinymoe
 		class AstExpressionStatement : public AstStatement
 		{
 		public:
-			bool							tailCall = false;
 			AstExpression::Ptr				expression;
 		};
 

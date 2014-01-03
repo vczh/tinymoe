@@ -14,3 +14,50 @@ block (sentence body) repeat (count) times
 end
 
 ============================================
+
+function repeat_$expression_times($state, body, $continuation)
+{
+	var counter = 0;
+	repeat(
+		$state,
+		function ($state, $continuation_1)
+		{
+			body(
+				$state,
+				function ($state)
+				{
+					if_$expression(
+						$state,
+						function ($state, $continuation_2)
+						{
+							if_$expression(
+								$state,
+								function ($state, $continuation_3)
+								{
+									set_continuation_state_$expression_to $expression(
+										$state,
+										null,
+										$continuation_3
+									);
+								},
+								function ($state, $signal)
+								{
+									break(
+										$state,
+										$continuation_2
+									);
+								}
+							);
+						},
+						function ($state, $signal)
+						{
+							counter = counter + 1;
+							$continuation_1($state);
+						}
+					);
+				}
+			);
+		},
+		$continuation
+	);
+}

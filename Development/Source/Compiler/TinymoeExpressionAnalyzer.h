@@ -64,10 +64,10 @@ namespace tinymoe
 			GetField,				// (primitive)	field <argument> of <primitive>
 
 			End,					// (sentence)	end
+			Exit,					// (sentence)	exit
 			Select,					// (block)		select <expression>
 			Case,					// (sentence)	case <expression>
 			Call,					// (sentence)	call <expression>
-			TailCall,				// (sentence)	tail call <expression>
 			RedirectTo,				// (sentence)	redirect to <expression>
 			Assign,					// (sentence)	set <assignable> to <expression>
 			SetArrayItem,			// (sentence)	set item <expression> of array <expression> to <expression>

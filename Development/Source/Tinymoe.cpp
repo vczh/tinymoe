@@ -14,7 +14,7 @@ module standard library
 symbol breaking repeating
 symbol continuing repeating
 symbol raising exception
-symbol exiting function
+symbol aborting program
 
 type continuation state
 	flag
@@ -49,8 +49,8 @@ sentence raise (exception)
 end
 
 cps (state) (continuation)
-sentence exit
-	reset continuation state state to exiting function
+sentence abort
+	reset continuation state state to aborting program
 end
 
 cps (state)
@@ -64,7 +64,7 @@ block (body) repeat : repeat statement
 			reset continuation state state to null
 		case continuing repeating
 			reset continuation state state to null
-			tail call invoke repeat statement with (state, body)
+			call invoke repeat statement with (state, body)
 	end
 end
 

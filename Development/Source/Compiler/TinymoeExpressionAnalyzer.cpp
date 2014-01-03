@@ -169,6 +169,10 @@ namespace tinymoe
 				+ "end"
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Exit)
+				+ "exit"
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Block, GrammarSymbolTarget::Select)
 				+ "select" + GrammarFragmentType::Expression
 				);
@@ -179,10 +183,6 @@ namespace tinymoe
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
 				+ "call" + GrammarFragmentType::Expression
-				);
-			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::TailCall)
-				+ "tail" + "call" + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::RedirectTo)
