@@ -11,3 +11,17 @@ block (body) repeat : repeat statement
 end
 
 ============================================
+
+function repeat($state, body)
+{
+	body($state);
+	if($state.flag == breaking_repeating)
+	{
+		reset_continuation_state_$expression_to_$expression(&state, null);
+	}
+	else if($state.flag == continuing_repeating)
+	{
+		reset_continuation_state_$expression_to_$expression(&state, null);
+		tailcall repeat($state, body);
+	}
+}
