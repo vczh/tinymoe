@@ -34,7 +34,7 @@ function do($state, body)
 						$continuation($state);
 						$continuation = $state.continuation;
 					}
-					if($continuation != null)
+					if($continuation == null)
 					{
 						state.continuation = function ($state)
 						{
