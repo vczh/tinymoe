@@ -105,13 +105,6 @@
     <ClInclude Include="..\Source\TinymoeSTL.h" />
     <ClInclude Include="UnitTest.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\Sample\Continuation.txt" />
-    <Text Include="..\Sample\CustomTypes.txt" />
-    <Text Include="..\Sample\ListManipulation.txt" />
-    <Text Include="..\Sample\MultipleDispatch.txt" />
-    <Text Include="..\Sample\Sum1To100.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -16,9 +16,6 @@
     <Filter Include="Tinymoe">
       <UniqueIdentifier>{12df8507-9cbd-4a6d-9e05-4fb7954e2f9e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sample">
-      <UniqueIdentifier>{3de6a6a2-4689-435d-b6bd-1d65c974390c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tinymoe\Compiler">
       <UniqueIdentifier>{9685582c-5f07-44f2-aefd-c88422be8af6}</UniqueIdentifier>
     </Filter>
@@ -89,22 +86,5 @@
     <ClInclude Include="..\Source\Ast\TinymoeAst.h">
       <Filter>Tinymoe\Ast</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\Sample\Sum1To100.txt">
-      <Filter>Sample</Filter>
-    </Text>
-    <Text Include="..\Sample\ListManipulation.txt">
-      <Filter>Sample</Filter>
-    </Text>
-    <Text Include="..\Sample\CustomTypes.txt">
-      <Filter>Sample</Filter>
-    </Text>
-    <Text Include="..\Sample\MultipleDispatch.txt">
-      <Filter>Sample</Filter>
-    </Text>
-    <Text Include="..\Sample\Continuation.txt">
-      <Filter>Sample</Filter>
-    </Text>
   </ItemGroup>
 </Project>
