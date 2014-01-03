@@ -18,13 +18,13 @@ symbol exiting function
 
 type continuation state
 	flag
-	exception
+	argument
 	continuation
 end
 
 sentence reset continuation state (state) to (flag)
 	set field flag of state to flag
-	set field exception of state to null
+	set field argument of state to null
 	set field continuation of state to null
 end
 
@@ -45,7 +45,7 @@ end
 cps (state) (continuation)
 sentence raise (exception)
 	reset continuation state state to raising exception
-	set field exception of state to exception
+	set field argument of state to exception
 end
 
 cps (state) (continuation)

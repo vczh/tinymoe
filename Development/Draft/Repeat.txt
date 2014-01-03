@@ -1,11 +1,13 @@
 cps (state)
 block (body) repeat : repeat statement
-  call invoke body with (state)
-  select field flag of state
-    case breaking repeating
-      reset continuation state state to null
-    case continuing repeating
-      reset continuation state state to null
-      tail call invoke repeat statement with (state, body)
-  end
+	call invoke body with (state)
+	select field flag of state
+		case breaking repeating
+			reset continuation state state to null
+		case continuing repeating
+			reset continuation state state to null
+			tail call invoke repeat statement with (state, body)
+	end
 end
+
+============================================

@@ -1,15 +1,69 @@
-block (sentence body) Do
-  try
-    body
-  catch the exception
-    print the exception
-  end
+block (sentence body) do
+	try
+		body
+		print "Succeed!"
+	catch the exception
+		print the exception
+	end
 end
 
 phrase main
-  do
-    set a to 1
-    set b to 0
-    set c to a / b
-  end
+	do
+		set a to 1
+		set b to 0
+		set c to a / b
+	end
 end
+
+============================================
+
+function do($state, body)
+{
+	catch_$argument(
+		$state,
+		try(
+			state,
+			function ($state)
+			{
+				body($state);
+				var $continuation = $state.continuation;
+				state.continuation = function $lambda($state)
+				{
+					if($continuation != null)
+					{
+						$continuation($state);
+						$continuation = $state.continuation;
+					}
+					if($continuation != null)
+					{
+						state.continuation = function ($state)
+						{
+							print_$expression("Succeed!");
+						}
+					}
+					else
+					{
+						state.continuation = $lambda;
+					}
+				}
+			}
+		),
+		function ($state, the_exception)
+		{
+			print_$expression(the_exception);
+		}
+	);
+}
+
+function main($state)
+{
+	do(
+		$state,
+		function ($state)
+		{
+			var a = 1;
+			var b = 0;
+			var c = a / b;
+		}
+	);
+}

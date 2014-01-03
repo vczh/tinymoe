@@ -1,9 +1,31 @@
 phrase main
-  try
-    set a to 1
-    set b to 0
-    set c = a / b
-  catch the exception
-    print the exception
-  end
+	try
+		set a to 1
+		set b to 0
+		set c = a / b
+	catch the exception
+		print the exception
+	end
 end
+
+============================================
+
+function main($state)
+{
+	catch_$argument(
+		$state,
+		try(
+			state,
+			function ($state, state)
+			{
+				var a = 1;
+				var b = 0;
+				var c = a / b;
+			}
+		),
+		function ($state, the_exception)
+		{
+			print_$expression(the_exception);
+		}
+	);
+}

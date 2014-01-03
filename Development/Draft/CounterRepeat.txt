@@ -1,14 +1,16 @@
 cps (state)
 block (sentence body) repeat (count) times
-  set counter to 0
-  repeat while counter < count
-    body
-    if field flag of state <> continuing repeating
-      if field flag of state <> exiting function
-        set continuation state state to null
-      end
-      break
-    end
-    add 1 to counter
-  end
+	set counter to 0
+	repeat while counter < count
+		body
+		if field flag of state <> continuing repeating
+			if field flag of state <> exiting function
+				set continuation state state to null
+			end
+			break
+		end
+		add 1 to counter
+	end
 end
+
+============================================
