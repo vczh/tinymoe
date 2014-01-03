@@ -40,14 +40,15 @@ function do($state, body, $continuation)
 			catch_$expression(
 				$state,
 				$signal,
-				function ($state, $signal, the_exception)
+				function ($state, $signal, the_exception, $continuation_2)
 				{
 					print_$expression(
 						$state,
 						the_exception,
-						$$continuation
+						$continuation_2
 					);
-				}
+				},
+				$continuation
 			);
 		}
 	);
