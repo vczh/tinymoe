@@ -1,0 +1,15 @@
+block (sentence body) Do
+  try
+    body
+  catch the exception
+    print the exception
+  end
+end
+
+phrase main
+  do
+    set a to 1
+    set b to 0
+    set c to a / b
+  end
+end

@@ -1,0 +1,9 @@
+phrase main
+  try
+    set a to 1
+    set b to 0
+    set c = a / b
+  catch the exception
+    print the exception
+  end
+end
