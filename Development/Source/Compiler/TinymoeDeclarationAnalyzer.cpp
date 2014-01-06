@@ -22,6 +22,20 @@ namespace tinymoe
 			return result;
 		}
 
+		string SymbolName::GetComposedName()
+		{
+			string result;
+			for (auto it = identifiers.begin(); it != identifiers.end(); it++)
+			{
+				result += it->value;
+				if (it + 1 != identifiers.end())
+				{
+					result += "_";
+				}
+			}
+			return result;
+		}
+
 		bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors)
 		{
 			if (it == end)

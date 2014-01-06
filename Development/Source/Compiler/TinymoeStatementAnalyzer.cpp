@@ -67,7 +67,7 @@ namespace tinymoe
 				auto symbol = make_shared<GrammarSymbol>(symbolType);
 				for (auto i = name.begin(); i != name.end(); i++)
 				{
-					(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i == name.end() - 1)));
+					(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i + 1 == name.end())));
 				}
 				return symbol;
 			}
@@ -788,13 +788,6 @@ namespace tinymoe
 					map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 					auto item = make_shared<GrammarStackItem>();
 
-					{
-						auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
-						symbol + "the" + "result";
-						func->resultVariable = symbol;
-						item->symbols.push_back(symbol);
-						symbolTokens.insert(make_pair(symbol, funcdecl->keywordToken));
-					}
 					if (funcdecl->cps)
 					{
 						if (funcdecl->cps->stateName)

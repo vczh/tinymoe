@@ -73,6 +73,7 @@ namespace tinymoe
 		class AstTypeDeclaration : public AstDeclaration
 		{
 		public:
+			AstType::WeakPtr				baseType;
 			AstSymbolDeclaration::List		fields;
 
 			void							Print(ostream& o, int indentation)override;

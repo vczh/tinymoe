@@ -53,6 +53,7 @@ namespace tinymoe
 			True,					// (primitive)	true
 			False,					// (primitive)	false
 			Null,					// (primitive)	null
+			TheResult,				// (primitive)	the result
 
 			NewType,				// (primitive)	new <type>
 			NewArray,				// (primitive)	new array of <expression> items

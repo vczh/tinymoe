@@ -8,6 +8,14 @@ namespace tinymoe
 		AstNode
 		*************************************************************/
 
+		AstNode::AstNode()
+		{
+		}
+
+		AstNode::~AstNode()
+		{
+		}
+
 		string AstNode::Indent(int indentation)
 		{
 			string s;
@@ -29,7 +37,13 @@ namespace tinymoe
 
 		void AstTypeDeclaration::Print(ostream& o, int indentation)
 		{
-			o << Indent(indentation) << "type " << composedName << endl << Indent(indentation) << "{" << endl;;
+			o << Indent(indentation) << "type " << composedName;
+			if (!baseType.expired())
+			{
+				o << " : ";
+				baseType.lock()->Print(o, indentation);
+			}
+			o << endl << Indent(indentation) << "{" << endl;
 			for (auto field : fields)
 			{
 				field->Print(o, indentation + 1);

@@ -130,6 +130,10 @@ namespace tinymoe
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::Null)
 				+ "null"
 				);
+			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::TheResult)
+				+ "the" + "result"
+				);
 
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewType)
