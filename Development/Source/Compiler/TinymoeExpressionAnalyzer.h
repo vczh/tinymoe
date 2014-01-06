@@ -43,11 +43,12 @@ namespace tinymoe
 		{
 			Custom,					// user defined symbol
 
+			Object,					// (type)		object
 			Array,					// (type)		array
-			String,					// (type)		string
+			Symbol,					// (type)		symbol
 			Integer,				// (type)		integer
 			Float,					// (type)		float
-			Symbol,					// (type)		symbol
+			String,					// (type)		string
 
 			True,					// (primitive)	true
 			False,					// (primitive)	false

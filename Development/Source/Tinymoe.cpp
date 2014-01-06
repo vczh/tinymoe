@@ -14,7 +14,8 @@ module standard library
 symbol breaking repeating
 symbol continuing repeating
 symbol raising exception
-symbol aborting program
+symbol existing program
+symbol existing block
 
 type continuation state
 	flag
@@ -49,8 +50,16 @@ sentence raise (exception)
 end
 
 cps (state) (continuation)
-sentence abort
-	reset continuation state state to aborting program
+sentence exit program
+	reset continuation state state to existing program
+end
+
+cps (state) (continuation)
+category
+	inside NAMEDBLOCK
+sentence exit block (handle)
+	reset continuation state state to existing block
+	set field argument of state to handle
 end
 
 cps (state)
@@ -166,6 +175,18 @@ category (signal)
 	closable
 block (sentence body) finally
 	body
+end
+
+cps (state)
+category
+	start NAMEDBLOCK
+	closable
+block (sentence body (handle)) named block (argument handle)
+	set handle to new object
+	body handle
+	if field flag of state = exiting and field argument of state = handle
+		reset continuation state state to null
+	end
 end
 
 sentence add (value) to (assignable variable)

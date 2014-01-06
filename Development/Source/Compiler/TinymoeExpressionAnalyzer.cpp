@@ -94,12 +94,16 @@ namespace tinymoe
 		void GrammarStackItem::FillPredefinedSymbols()
 		{
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Object)
+				+ "object"
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Array)
 				+ "array"
 				);
 			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::String)
-				+ "string"
+				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Symbol)
+				+ "symbol"
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Integer)
@@ -110,8 +114,8 @@ namespace tinymoe
 				+ "float"
 				);
 			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Symbol)
-				+ "symbol"
+				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::String)
+				+ "string"
 				);
 		
 			symbols.push_back(
