@@ -15,8 +15,8 @@ namespace tinymoe
 	namespace compiler
 	{
 		class GrammarSymbol;
-		class SymbolAssembly;
 		class SymbolModule;
+		class SymbolAstScope;
 
 		/*************************************************************
 		Common
@@ -94,7 +94,9 @@ namespace tinymoe
 			virtual shared_ptr<GrammarSymbol>					CreateSymbol() = 0;
 			virtual void										AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive) = 0;
 			virtual string										GetComposedName(bool primitive) = 0;
-			virtual shared_ptr<ast::AstSymbolDeclaration>		CreateAst(weak_ptr<ast::AstNode> parent) = 0;
+
+			typedef pair<shared_ptr<ast::AstSymbolDeclaration>, shared_ptr<ast::AstSymbolDeclaration>>	AstPair;
+			virtual AstPair										CreateAst(weak_ptr<ast::AstNode> parent) = 0;
 		};
 
 		/*************************************************************
@@ -110,7 +112,7 @@ namespace tinymoe
 			CodeToken											keywordToken;
 
 			virtual shared_ptr<GrammarSymbol>					CreateSymbol(bool secondary) = 0;
-			virtual shared_ptr<ast::AstDeclaration>				GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent) = 0;
+			virtual shared_ptr<ast::AstDeclaration>				GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent) = 0;
 		};
 
 		class SymbolDeclaration : public Declaration
@@ -123,7 +125,7 @@ namespace tinymoe
 			static SymbolDeclaration::Ptr						Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
 		};
 
 		class TypeDeclaration : public Declaration
@@ -138,7 +140,7 @@ namespace tinymoe
 			static TypeDeclaration::Ptr							Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 		
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
 		};
 
 		class FunctionDeclaration : public Declaration
@@ -161,7 +163,7 @@ namespace tinymoe
 		
 			string												GetComposedName();
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
 		};
 
 		/*************************************************************
@@ -184,7 +186,7 @@ namespace tinymoe
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 			string												GetComposedName(bool primitive)override;
-			shared_ptr<ast::AstSymbolDeclaration>				CreateAst(weak_ptr<ast::AstNode> parent)override;
+			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 
 		class VariableArgumentFragment : public ArgumentFragment
@@ -197,7 +199,7 @@ namespace tinymoe
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 			string												GetComposedName(bool primitive)override;
-			shared_ptr<ast::AstSymbolDeclaration>				CreateAst(weak_ptr<ast::AstNode> parent)override;
+			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 
 		class FunctionArgumentFragment : public ArgumentFragment
@@ -208,7 +210,7 @@ namespace tinymoe
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
 			string												GetComposedName(bool primitive)override;
-			shared_ptr<ast::AstSymbolDeclaration>				CreateAst(weak_ptr<ast::AstNode> parent)override;
+			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 
 		/*************************************************************

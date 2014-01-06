@@ -6,6 +6,15 @@ namespace tinymoe
 {
 	namespace compiler
 	{
+		class SymbolAstScope
+		{
+		public:
+			typedef map<GrammarSymbol::Ptr, AstDeclaration::Ptr>		SymbolAstDeclarationMap;
+
+			SymbolAstDeclarationMap			readAsts;
+			SymbolAstDeclarationMap			writeAsts;
+		};
+
 		/*************************************************************
 		FunctionFragment::GetComposedName
 		*************************************************************/
@@ -53,32 +62,46 @@ namespace tinymoe
 		FunctionFragment::GenerateAst
 		*************************************************************/
 
-		shared_ptr<ast::AstSymbolDeclaration> NameFragment::CreateAst(weak_ptr<ast::AstNode> parent)
+		FunctionFragment::AstPair NameFragment::CreateAst(weak_ptr<ast::AstNode> parent)
 		{
-			return nullptr;
+			return AstPair(nullptr, nullptr);
 		}
 
-		shared_ptr<ast::AstSymbolDeclaration> VariableArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
+		FunctionFragment::AstPair VariableArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
 		{
-			auto ast = make_shared<AstSymbolDeclaration>();
-			ast->parent = parent;
-			ast->composedName = name->GetComposedName();
-			return ast;
+			if (type == FunctionArgumentType::Assignable)
+			{
+				auto read = make_shared<AstSymbolDeclaration>();
+				read->parent = parent;
+				read->composedName = "$read_" + name->GetComposedName();
+
+				auto write = make_shared<AstSymbolDeclaration>();
+				write->parent = parent;
+				write->composedName = "$write_" + name->GetComposedName();
+				return AstPair(read, write);
+			}
+			else
+			{
+				auto ast = make_shared<AstSymbolDeclaration>();
+				ast->parent = parent;
+				ast->composedName = name->GetComposedName();
+				return AstPair(ast, nullptr);
+			}
 		}
 
-		shared_ptr<ast::AstSymbolDeclaration> FunctionArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
+		FunctionFragment::AstPair FunctionArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
 			ast->parent = parent;
 			ast->composedName = declaration->GetComposedName();
-			return ast;
+			return AstPair(ast, nullptr);
 		}
 
 		/*************************************************************
 		Declaration::GenerateAst
 		*************************************************************/
 
-		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
 			ast->parent = parent;
@@ -86,7 +109,7 @@ namespace tinymoe
 			return ast;
 		}
 
-		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstTypeDeclaration>();
 			ast->parent = parent;
@@ -115,7 +138,7 @@ namespace tinymoe
 			return result;
 		}
 
-		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstFunctionDeclaration>();
 			ast->parent = parent;
@@ -160,15 +183,20 @@ namespace tinymoe
 			}
 			if (bodyName)
 			{
-				auto argument = bodyName->CreateAst(ast);
+				auto argument = bodyName->CreateAst(ast).first;
 				ast->arguments.push_back(argument);
 				ast->blockBodyArgument = argument;
 			}
 			for (auto it = name.begin(); it != name.end(); it++)
 			{
-				if (auto argument = (*it)->CreateAst(ast))
+				auto pair = (*it)->CreateAst(ast);
+				if (pair.first)
 				{
-					ast->arguments.push_back(argument);
+					ast->arguments.push_back(pair.first);
+				}
+				if (pair.second)
+				{
+					ast->arguments.push_back(pair.second);
 				}
 			}
 			{
@@ -190,11 +218,24 @@ namespace tinymoe
 		ast::AstAssembly::Ptr GenerateAst(SymbolAssembly::Ptr symbolAssembly)
 		{
 			auto assembly = make_shared<AstAssembly>();
+			auto scope = make_shared<SymbolAstScope>();
 			for (auto module : symbolAssembly->symbolModules)
 			{
-				for (auto decl : module->module->declarations)
+				map<Declaration::Ptr, AstDeclaration::Ptr> decls;
+				for (auto sdp : module->symbolDeclarations)
 				{
-					assembly->declarations.push_back(decl->GenerateAst(symbolAssembly, module, AstNode::WeakPtr(assembly)));
+					auto it = decls.find(sdp.second);
+					if (it == decls.end())
+					{
+						auto ast = sdp.second->GenerateAst(scope, module, AstNode::WeakPtr(assembly));
+						assembly->declarations.push_back(ast);
+						decls.insert(make_pair(sdp.second, ast));
+						scope->readAsts.insert(make_pair(sdp.first, ast));
+					}
+					else
+					{
+						scope->readAsts.insert(make_pair(sdp.first, it->second));
+					}
 				}
 			}
 			return assembly;

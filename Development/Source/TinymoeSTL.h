@@ -2,6 +2,7 @@
 #define VCZH_TINYMOESTL
 
 #include <vector>
+#include <set>
 #include <map>
 #include <memory>
 #include <string>
