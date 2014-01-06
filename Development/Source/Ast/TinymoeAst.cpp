@@ -47,6 +47,7 @@ namespace tinymoe
 			for (auto field : fields)
 			{
 				field->Print(o, indentation + 1);
+				o << endl;
 			}
 			o << Indent(indentation) << "}";
 		}

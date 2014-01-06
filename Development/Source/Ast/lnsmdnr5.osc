@@ -83,16 +83,9 @@ namespace tinymoe
 		{
 		public:
 			AstType::Ptr					ownerType;			// (optional) if ownerType is not null, this function is added to this type as a virtual function.
-			AstSymbolDeclaration::List		arguments;
-			AstStatement::Ptr				statement;
-
+			AstSymbolDeclaration::List		arguments;			// including state, continuation, signal, block body (optional in order) and continuation (the last one)
 			AstSymbolDeclaration::Ptr		resultVariable;
-
-			AstSymbolDeclaration::Ptr		cpsStateArgument;			// for function
-			AstSymbolDeclaration::Ptr		cpsContinuationArgument;	// (optional) for cps sentence
-			AstSymbolDeclaration::Ptr		categorySignalArgument;		// (optional) for block
-			AstSymbolDeclaration::Ptr		blockBodyArgument;			// (optional) for block
-			AstSymbolDeclaration::Ptr		continuationArgument;		// for function
+			AstStatement::Ptr				statement;
 
 			void							Print(ostream& o, int indentation)override;
 		};

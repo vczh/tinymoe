@@ -639,14 +639,40 @@ namespace tinymoe
 
 				if (decl->cps)
 				{
-					if (decl->type == FunctionDeclarationType::Phrase)
+					switch (decl->type)
 					{
-						CodeError error =
+					case FunctionDeclarationType::Phrase:
 						{
-							functionToken,
-							"Phrase should not have a continuation definition.",
-						};
-						errors.push_back(error);
+							CodeError error =
+							{
+								functionToken,
+								"Phrase should not have a continuation definition.",
+							};
+							errors.push_back(error);
+						}
+						break;
+					case FunctionDeclarationType::Sentence:
+						if (!decl->cps->continuationName)
+						{
+							CodeError error =
+							{
+								functionToken,
+								"CPS sentence should have a CPS continuation argument.",
+							};
+							errors.push_back(error);
+						}
+						break;
+					case FunctionDeclarationType::Block:
+						if (decl->cps->continuationName)
+						{
+							CodeError error =
+							{
+								functionToken,
+								"CPS block should not have a CPS continuation argument.",
+							};
+							errors.push_back(error);
+						}
+						break;
 					}
 				}
 				if (decl->category)

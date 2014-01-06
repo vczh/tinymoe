@@ -3,3 +3,4 @@
 *.opensdf
 **/Debug/**
 **/Release/**
+*.test.txt

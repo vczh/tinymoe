@@ -12,6 +12,10 @@ TEST_CASE(TestParseStandardLibraryModule)
 	auto assembly = SymbolAssembly::Parse(codes, errors);
 	TEST_ASSERT(errors.size() == 0);
 	TEST_ASSERT(assembly->symbolModules.size() == 1);
+
+	auto ast = GenerateAst(assembly);
+	ofstream o("TestResult.StandardLibraryAst.test.txt");
+	ast->Print(o, 0);
 }
 
 TEST_CASE(TestParseHelloWorldModule)

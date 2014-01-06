@@ -17,20 +17,31 @@ namespace tinymoe
 
 		string VariableArgumentFragment::GetComposedName(bool primitive)
 		{
+			string result;
 			switch (type)
 			{
 			case FunctionArgumentType::Argument:
-				return "$argument";
+				result = "$argument";
+				break;
 			case FunctionArgumentType::Assignable:
-				return "assignable";
+				result = "assignable";
+				break;
 			case FunctionArgumentType::Expression:
-				return (primitive ? "$primitive" : "$expression");
+				result = (primitive ? "$primitive" : "$expression");
+				break;
 			case FunctionArgumentType::List:
-				return "list";
+				result = "list";
+				break;
 			case FunctionArgumentType::Normal:
-				return (primitive ? "$primitive" : "$expression");
+				result = (primitive ? "$primitive" : "$expression");
+				break;
 			}
-			return "";
+			
+			if (receivingType)
+			{
+				result += "<" + receivingType->GetComposedName() + ">";
+			}
+			return result;
 		}
 
 		string FunctionArgumentFragment::GetComposedName(bool primitive)
@@ -71,7 +82,7 @@ namespace tinymoe
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
 			ast->parent = parent;
-			ast->composedName = symbolModule->module->name->GetComposedName() + ":" + name->GetComposedName();
+			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
 			return ast;
 		}
 
@@ -79,7 +90,7 @@ namespace tinymoe
 		{
 			auto ast = make_shared<AstTypeDeclaration>();
 			ast->parent = parent;
-			ast->composedName = symbolModule->module->name->GetComposedName() + ":" + name->GetComposedName();
+			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
 			for (auto field : fields)
 			{
 				auto astField = make_shared<AstSymbolDeclaration>();
@@ -106,33 +117,70 @@ namespace tinymoe
 
 		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolAssembly> symbolAssembly, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
-			auto symbolFunction = symbolModule->declarationFunctions.find(shared_from_this())->second;
-			if (symbolFunction->multipleDispatchingRoot.expired())
+			auto ast = make_shared<AstFunctionDeclaration>();
+			ast->parent = parent;
+			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + GetComposedName();
+			
 			{
-				auto ast = make_shared<AstFunctionDeclaration>();
-				ast->parent = parent;
-
-				ast->resultVariable = make_shared <AstSymbolDeclaration>();
-				ast->resultVariable->parent = ast;
-				ast->resultVariable->composedName = "the_result";
-
-				ast->composedName = symbolModule->module->name->GetComposedName() + ":" + GetComposedName();
-				for (auto it = name.begin(); it != name.end(); it++)
+				auto argument = make_shared<AstSymbolDeclaration>();
+				argument->parent = ast;
+				argument->composedName = "$the_result";
+				ast->resultVariable = argument;
+			}
+			{
+				auto argument = make_shared<AstSymbolDeclaration>();
+				argument->parent = ast;
+				if (cps && cps->stateName)
 				{
-					if (auto argument = (*it)->CreateAst(ast))
-					{
-						ast->arguments.push_back(argument);
-					}
+					argument->composedName = cps->stateName->GetComposedName();
 				}
-
-				ast->statement = make_shared<AstBlockStatement>();
-				ast->statement->parent = ast;
-				return ast;
+				else
+				{
+					argument->composedName = "$state";
+				}
+				ast->arguments.push_back(argument);
+				ast->cpsStateArgument = argument;
 			}
-			else
+			if (cps && cps->continuationName)
 			{
-				return nullptr;
+				auto argument = make_shared<AstSymbolDeclaration>();
+				argument->parent = ast;
+				argument->composedName = cps->continuationName->GetComposedName();
+				ast->arguments.push_back(argument);
+				ast->cpsContinuationArgument = argument;
 			}
+
+			if (category && category->signalName)
+			{
+				auto argument = make_shared<AstSymbolDeclaration>();
+				argument->parent = ast;
+				argument->composedName = category->signalName->GetComposedName();
+				ast->arguments.push_back(argument);
+				ast->categorySignalArgument = argument;
+			}
+			if (bodyName)
+			{
+				auto argument = bodyName->CreateAst(ast);
+				ast->arguments.push_back(argument);
+				ast->blockBodyArgument = argument;
+			}
+			for (auto it = name.begin(); it != name.end(); it++)
+			{
+				if (auto argument = (*it)->CreateAst(ast))
+				{
+					ast->arguments.push_back(argument);
+				}
+			}
+			{
+				auto argument = make_shared<AstSymbolDeclaration>();
+				argument->parent = ast;
+				argument->composedName = "$continuation";
+				ast->arguments.push_back(argument);
+			}
+
+			ast->statement = make_shared<AstBlockStatement>();
+			ast->statement->parent = ast;
+			return ast;
 		}
 
 		/*************************************************************
