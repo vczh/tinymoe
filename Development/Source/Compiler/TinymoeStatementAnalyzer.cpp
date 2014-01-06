@@ -749,6 +749,53 @@ namespace tinymoe
 			throw ParsingFailedException();
 		}
 
+		GrammarSymbol::Ptr SymbolModule::FindType(SymbolName::Ptr name, GrammarStack::Ptr stack, CodeError::List& errors)
+		{
+			GrammarStack::ResultList result;
+			auto error = stack->ParseType(name->identifiers.begin(), name->identifiers.end(), result);
+			auto first = find_if(result.begin(), result.end(), [name](GrammarStack::ResultItem pair)
+			{
+				return pair.first == name->identifiers.end();
+			});
+
+			if (first == result.end())
+			{
+				CodeError error =
+				{
+					name->identifiers[0],
+					"Type \"" + name->GetName() + "\" does not exist.",
+				};
+				errors.push_back(error);
+			}
+			else if (auto ref = dynamic_pointer_cast<ReferenceExpression>(result[0].second))
+			{
+				return ref->symbol;
+			}
+			return nullptr;
+		}
+
+		Declaration::Ptr SymbolModule::FindDeclaration(GrammarSymbol::Ptr symbol)
+		{
+			auto it = symbolDeclarations.find(symbol);
+			if (it != symbolDeclarations.end())
+			{
+				return it->second;
+			}
+			else
+			{
+				for (auto weakModule : usingSymbolModules)
+				{
+					auto module = weakModule.lock();
+					it = module->symbolDeclarations.find(symbol);
+					if (it != module->symbolDeclarations.end())
+					{
+						return it->second;
+					}
+				}
+			}
+			return nullptr;
+		}
+
 		void SymbolModule::BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors)
 		{
 			{
@@ -780,10 +827,37 @@ namespace tinymoe
 				stack->Push(item);
 			}
 
+			for (auto sdp : symbolDeclarations)
+			{
+				if (auto type = dynamic_pointer_cast<TypeDeclaration>(sdp.second))
+				{
+					if (type->parent)
+					{
+						if (auto baseType = FindType(type->parent, stack, errors))
+						{
+							baseTypes.insert(make_pair(sdp.second, baseType));
+						}
+					}
+				}
+			}
+
 			for (auto dfp : declarationFunctions)
 			{
 				auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(dfp.first);
 				auto func = dfp.second;
+				for (auto sfp : func->arguments)
+				{
+					if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(sfp.second))
+					{
+						if (var->receivingType)
+						{
+							if (auto receivingType = FindType(var->receivingType, stack, errors))
+							{
+								func->argumentTypes.insert(make_pair(sfp.second, receivingType));
+							}
+						}
+					}
+				}
 				{
 					map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 					auto item = make_shared<GrammarStackItem>();

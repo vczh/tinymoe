@@ -40,10 +40,12 @@ namespace tinymoe
 			typedef weak_ptr<SymbolFunction>							WeakPtr;
 			typedef vector<Ptr>											List;
 			typedef map<GrammarSymbol::Ptr, FunctionFragment::Ptr>		SymbolFragmentMap;
+			typedef map<FunctionFragment::Ptr, GrammarSymbol::Ptr>		FragmentSymbolMap;
 
 			FunctionDeclaration::Ptr		function;					// the original function
 			SymbolFunction::WeakPtr			multipleDispatchingRoot;	// the multiple-dispatching root declaration
 			SymbolFragmentMap				arguments;					// all arguments
+			FragmentSymbolMap				argumentTypes;				// map an argument to its receiving type
 
 			GrammarSymbol::Ptr				cpsStateVariable;
 			GrammarSymbol::Ptr				cpsContinuationVariable;
@@ -61,6 +63,7 @@ namespace tinymoe
 			typedef vector<WeakPtr>										WeakList;
 			typedef map<GrammarSymbol::Ptr, Declaration::Ptr>			SymbolDeclarationMap;
 			typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
+			typedef map<Declaration::Ptr, GrammarSymbol::Ptr>			DeclarationSymbolMap;
 
 			struct ParsingFailedException{};
 
@@ -69,6 +72,7 @@ namespace tinymoe
 			WeakList						usingSymbolModules;			// all referenced modules
 			SymbolDeclarationMap			symbolDeclarations;			// map a grammar symbol to the creator declaration
 			DeclarationFunctionMap			declarationFunctions;		// map a declaration to the symbol function
+			DeclarationSymbolMap			baseTypes;					// map a type to its base type
 
 			bool							IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b);
 			bool							IsMultipleDispatchingChild(FunctionDeclaration::Ptr func);
@@ -81,6 +85,8 @@ namespace tinymoe
 			void							BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token);
 			FunctionDeclaration::Ptr		FindSymbolFunction(GrammarSymbol::Ptr symbol, GrammarSymbolType acceptableType);
 			Statement::Ptr					ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
+			GrammarSymbol::Ptr				FindType(SymbolName::Ptr name, GrammarStack::Ptr stack, CodeError::List& errors);
+			Declaration::Ptr				FindDeclaration(GrammarSymbol::Ptr symbol);
 			void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
 		};
 

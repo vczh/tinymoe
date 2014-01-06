@@ -106,6 +106,10 @@ namespace tinymoe
 				+ "symbol"
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Boolean)
+				+ "boolean"
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Integer)
 				+ "integer"
 				);

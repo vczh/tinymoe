@@ -325,6 +325,9 @@ namespace tinymoe
 			case AstPredefinedTypeName::Array:
 				o << "$Array";
 				break;
+			case AstPredefinedTypeName::Boolean:
+				o << "$Boolean";
+				break;
 			case AstPredefinedTypeName::Integer:
 				o << "$Integer";
 				break;

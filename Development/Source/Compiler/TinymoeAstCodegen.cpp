@@ -13,6 +13,50 @@ namespace tinymoe
 
 			SymbolAstDeclarationMap			readAsts;
 			SymbolAstDeclarationMap			writeAsts;
+
+			AstType::Ptr GetType(GrammarSymbol::Ptr symbol, AstNode::Ptr parent)
+			{
+				if (symbol->target == GrammarSymbolTarget::Custom)
+				{
+					auto type = make_shared<AstReferenceType>();
+					type->parent = parent;
+					type->typeDeclaration = dynamic_pointer_cast<AstTypeDeclaration>(readAsts.find(symbol)->second);
+					return type;
+				}
+				else
+				{
+					AstPredefinedTypeName typeName = AstPredefinedTypeName::Object;
+					switch (symbol->target)
+					{
+					case GrammarSymbolTarget::Object:
+						typeName = AstPredefinedTypeName::Object;
+						break;
+					case GrammarSymbolTarget::Array:
+						typeName = AstPredefinedTypeName::Array;
+						break;
+					case GrammarSymbolTarget::Symbol:
+						typeName = AstPredefinedTypeName::Symbol;
+						break;
+					case GrammarSymbolTarget::Boolean:
+						typeName = AstPredefinedTypeName::Boolean;
+						break;
+					case GrammarSymbolTarget::Integer:
+						typeName = AstPredefinedTypeName::Integer;
+						break;
+					case GrammarSymbolTarget::Float:
+						typeName = AstPredefinedTypeName::Float;
+						break;
+					case GrammarSymbolTarget::String:
+						typeName = AstPredefinedTypeName::String;
+						break;
+					}
+
+					auto type = make_shared<AstPredefinedType>();
+					type->parent = parent;
+					type->typeName = typeName;
+					return type;
+				}
+			}
 		};
 
 		/*************************************************************
@@ -219,6 +263,8 @@ namespace tinymoe
 		{
 			auto assembly = make_shared<AstAssembly>();
 			auto scope = make_shared<SymbolAstScope>();
+
+			multimap<SymbolFunction::Ptr, SymbolFunction::Ptr> multipleDispatchChildren;
 			for (auto module : symbolAssembly->symbolModules)
 			{
 				map<Declaration::Ptr, AstDeclaration::Ptr> decls;
@@ -237,7 +283,42 @@ namespace tinymoe
 						scope->readAsts.insert(make_pair(sdp.first, it->second));
 					}
 				}
+
+				for (auto dfp : module->declarationFunctions)
+				{
+					if (!dfp.second->multipleDispatchingRoot.expired())
+					{
+						multipleDispatchChildren.insert(make_pair(dfp.second->multipleDispatchingRoot.lock(), dfp.second));
+					}
+				}
 			}
+			
+			for (auto module : symbolAssembly->symbolModules)
+			{
+				for (auto sdp : module->symbolDeclarations)
+				{
+					if (auto typeDecl = dynamic_pointer_cast<TypeDeclaration>(sdp.second))
+					{
+						if (typeDecl->parent)
+						{
+							auto type = scope->readAsts.find(sdp.first)->second;
+							auto baseType = scope->GetType(module->baseTypes.find(typeDecl)->second, type);
+							type->parent = baseType;
+						}
+					}
+				}
+			}
+			{
+				auto it = multipleDispatchChildren.begin();
+				while (it != multipleDispatchChildren.end())
+				{
+					auto lower = multipleDispatchChildren.lower_bound(it->first);
+					auto upper = multipleDispatchChildren.lower_bound(it->second);
+
+					it = upper;
+				}
+			}
+
 			return assembly;
 		}
 	}

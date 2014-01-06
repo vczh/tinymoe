@@ -46,6 +46,7 @@ namespace tinymoe
 			Object,					// (type)		object
 			Array,					// (type)		array
 			Symbol,					// (type)		symbol
+			Boolean,				// (type)		boolean
 			Integer,				// (type)		integer
 			Float,					// (type)		float
 			String,					// (type)		string
@@ -247,7 +248,8 @@ namespace tinymoe
 		public:
 			typedef shared_ptr<GrammarStack>					Ptr;
 			typedef CodeToken::List::iterator					Iterator;
-			typedef vector<pair<Iterator, Expression::Ptr>>		ResultList;
+			typedef pair<Iterator, Expression::Ptr>				ResultItem;
+			typedef vector<ResultItem>							ResultList;
 			typedef CodeError(GrammarStack::* ParseFunctionType)(Iterator, Iterator, ResultList&);
 
 			GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure

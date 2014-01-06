@@ -329,6 +329,7 @@ namespace tinymoe
 			Object,
 			Symbol,
 			Array,
+			Boolean,
 			Integer,
 			Float,
 			String,
