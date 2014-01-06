@@ -1,5 +1,5 @@
-#ifndef VCZH_TINYMOEAST
-#define VCZH_TINYMOEAST
+#ifndef VCZH_AST_TINYMOEAST
+#define VCZH_AST_TINYMOEAST
 
 #include "../TinymoeSTL.h"
 

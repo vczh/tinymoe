@@ -60,6 +60,9 @@
     <ClCompile Include="..\Source\Ast\TinymoeAst.cpp">
       <Filter>Tinymoe\Ast</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\Ast\TinymoeAst.h">
       <Filter>Tinymoe\Ast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Compiler\TinymoeAstCodegen.h">
+      <Filter>Tinymoe\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
