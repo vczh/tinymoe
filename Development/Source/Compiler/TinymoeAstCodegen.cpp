@@ -113,7 +113,11 @@ namespace tinymoe
 
 		FunctionFragment::AstPair VariableArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
 		{
-			if (type == FunctionArgumentType::Assignable)
+			if (type == FunctionArgumentType::Argument)
+			{
+				return AstPair(nullptr, nullptr);
+			}
+			else if (type == FunctionArgumentType::Assignable)
 			{
 				auto read = make_shared<AstSymbolDeclaration>();
 				read->parent = parent;
@@ -249,9 +253,6 @@ namespace tinymoe
 				argument->composedName = "$continuation";
 				ast->arguments.push_back(argument);
 			}
-
-			ast->statement = make_shared<AstBlockStatement>();
-			ast->statement->parent = ast;
 			return ast;
 		}
 
@@ -265,11 +266,33 @@ namespace tinymoe
 			auto scope = make_shared<SymbolAstScope>();
 
 			multimap<SymbolFunction::Ptr, SymbolFunction::Ptr> multipleDispatchChildren;
+			multimap<SymbolFunction::Ptr, SymbolModule::Ptr> functionModules;
+			for (auto module : symbolAssembly->symbolModules)
+			{
+				for (auto dfp : module->declarationFunctions)
+				{
+					functionModules.insert(make_pair(dfp.second, module));
+					if (!dfp.second->multipleDispatchingRoot.expired())
+					{
+						multipleDispatchChildren.insert(make_pair(dfp.second->multipleDispatchingRoot.lock(), dfp.second));
+					}
+				}
+			}
+
 			for (auto module : symbolAssembly->symbolModules)
 			{
 				map<Declaration::Ptr, AstDeclaration::Ptr> decls;
 				for (auto sdp : module->symbolDeclarations)
 				{
+					auto itfunc = module->declarationFunctions.find(sdp.second);
+					if (itfunc != module->declarationFunctions.end())
+					{
+						if (multipleDispatchChildren.find(itfunc->second) != multipleDispatchChildren.end())
+						{
+							continue;
+						}
+					}
+
 					auto it = decls.find(sdp.second);
 					if (it == decls.end())
 					{
@@ -281,14 +304,6 @@ namespace tinymoe
 					else
 					{
 						scope->readAsts.insert(make_pair(sdp.first, it->second));
-					}
-				}
-
-				for (auto dfp : module->declarationFunctions)
-				{
-					if (!dfp.second->multipleDispatchingRoot.expired())
-					{
-						multipleDispatchChildren.insert(make_pair(dfp.second->multipleDispatchingRoot.lock(), dfp.second));
 					}
 				}
 			}
@@ -314,6 +329,69 @@ namespace tinymoe
 				{
 					auto lower = multipleDispatchChildren.lower_bound(it->first);
 					auto upper = multipleDispatchChildren.lower_bound(it->second);
+					string rootName = it->first->function->GetComposedName();
+					{
+						auto module = functionModules.find(it->first)->second;
+						auto ast = it->first->function->GenerateAst(scope, module, assembly);
+						assembly->declarations.push_back(ast);
+					}
+
+					set<int> dispatches;
+					for (it = lower; it != upper; it++)
+					{
+						auto func = it->second;
+						for (auto ita = func->function->name.begin(); ita != func->function->name.end(); ita++)
+						{
+							if (func->argumentTypes.find(*ita) != func->argumentTypes.end())
+							{
+								dispatches.insert(ita - func->function->name.begin());
+							}
+						}
+					}
+
+
+					set<string> createdFunctions;
+					for (it = lower; it != upper; it++)
+					{
+						auto func = it->second;
+						auto module = functionModules.find(func)->second;
+						string signature;
+						for (auto itd = dispatches.begin(); itd != dispatches.end(); itd++)
+						{
+							string methodName = "$dispatch<" + signature + ">" + rootName;
+							auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(scope, module, assembly));
+							ast->composedName = methodName;
+
+							auto ita = func->argumentTypes.find(func->function->name[*itd]);
+							if (ita == func->argumentTypes.end())
+							{
+								auto type = make_shared<AstPredefinedType>();
+								type->parent = ast;
+								type->typeName = AstPredefinedTypeName::Object;
+								ast->ownerType = type;
+							}
+							else
+							{
+								ast->ownerType = scope->GetType(ita->second, ast);
+							}
+
+							{
+								stringstream o;
+								ast->ownerType->Print(o, 0);
+								signature += o.str();
+							}
+							if (itd != dispatches.end())
+							{
+								signature += ", ";
+							}
+
+							string functionName = "$dispatch<" + signature + ">" + rootName;
+							if (createdFunctions.insert(functionName).second)
+							{
+								assembly->declarations.push_back(ast);
+							}
+						}
+					}
 
 					it = upper;
 				}

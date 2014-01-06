@@ -57,8 +57,9 @@ namespace tinymoe
 			o << Indent(indentation) << "function ";
 			if (ownerType)
 			{
+				o << "(";
 				ownerType->Print(o, indentation);
-				o << ":";
+				o << ").";
 			}
 			o << composedName << "(";
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
@@ -69,8 +70,16 @@ namespace tinymoe
 					o << ", ";
 				}
 			}
-			o << ")" << endl;
-			statement->Print(o, indentation + 1);
+
+			if (statement)
+			{
+				o << ")" << endl;
+				statement->Print(o, indentation + 1);
+			}
+			else
+			{
+				o << ");";
+			}
 		}
 
 		/*************************************************************

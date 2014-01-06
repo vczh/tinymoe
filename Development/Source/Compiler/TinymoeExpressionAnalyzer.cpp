@@ -1040,12 +1040,12 @@ namespace tinymoe
 			}
 
 			int resultEnd = result.size();
-			vector<int> symbolSizes;
+			set<int> symbolSizes;
 			for (int i = resultBegin; i < resultEnd; i++)
 			{
 				if (auto reference = dynamic_pointer_cast<ReferenceExpression>(result[i].second))
 				{
-					symbolSizes.push_back(reference->symbol->fragments[0]->identifiers.size());
+					symbolSizes.insert(reference->symbol->fragments[0]->identifiers.size());
 				}
 			}
 
@@ -1054,7 +1054,7 @@ namespace tinymoe
 			{
 				if (auto argument = dynamic_pointer_cast<ArgumentExpression>(result[i].second))
 				{
-					if (find(symbolSizes.begin(), symbolSizes.end(), argument->tokens.size()) != symbolSizes.end())
+					if (symbolSizes.find(argument->tokens.size()) != symbolSizes.end())
 					{
 						result.erase(result.begin() + i);
 					}

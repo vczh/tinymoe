@@ -102,7 +102,7 @@ end
 category
 	start REPEAT
 	closable
-block (phrase deal with (item)) repeat with (argument item) in (items)
+block (sentence deal with (item)) repeat with (argument item) in (items)
 	raise "Only enumerable object (like containers) can be iterated using the repeat-with-in statement."
 end
 
