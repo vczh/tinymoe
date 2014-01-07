@@ -63,6 +63,9 @@
     <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen.cpp">
       <Filter>Tinymoe\Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="TestAstCodegen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
