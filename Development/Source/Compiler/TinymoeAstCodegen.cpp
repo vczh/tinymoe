@@ -9,6 +9,7 @@ namespace tinymoe
 		class SymbolAstScope
 		{
 		public:
+			typedef shared_ptr<SymbolAstScope>							Ptr;
 			typedef map<GrammarSymbol::Ptr, AstDeclaration::Ptr>		SymbolAstDeclarationMap;
 
 			SymbolAstDeclarationMap			readAsts;
@@ -260,15 +261,19 @@ namespace tinymoe
 		GenerateAst
 		*************************************************************/
 
-		ast::AstAssembly::Ptr GenerateAst(SymbolAssembly::Ptr symbolAssembly)
+		typedef multimap<SymbolFunction::Ptr, SymbolFunction::Ptr>			MultipleDispatchMap;
+		typedef map<SymbolFunction::Ptr, SymbolModule::Ptr>					FunctionModuleMap;
+		typedef map<SymbolFunction::Ptr, AstFunctionDeclaration::Ptr>		FunctionAstMap;
+
+		void GenerateStaticAst(
+			SymbolAssembly::Ptr symbolAssembly,
+			AstAssembly::Ptr assembly,
+			SymbolAstScope::Ptr scope,
+			MultipleDispatchMap& mdc,
+			FunctionModuleMap& functionModules,
+			FunctionAstMap& functionAsts
+			)
 		{
-			auto assembly = make_shared<AstAssembly>();
-			auto scope = make_shared<SymbolAstScope>();
-
-			multimap<SymbolFunction::Ptr, SymbolFunction::Ptr> multipleDispatchChildren;
-			map<SymbolFunction::Ptr, SymbolModule::Ptr> functionModules;
-			map<SymbolFunction::Ptr, AstFunctionDeclaration::Ptr> functionAsts;
-
 			for (auto module : symbolAssembly->symbolModules)
 			{
 				for (auto dfp : module->declarationFunctions)
@@ -276,7 +281,7 @@ namespace tinymoe
 					functionModules.insert(make_pair(dfp.second, module));
 					if (!dfp.second->multipleDispatchingRoot.expired())
 					{
-						multipleDispatchChildren.insert(make_pair(dfp.second->multipleDispatchingRoot.lock(), dfp.second));
+						mdc.insert(make_pair(dfp.second->multipleDispatchingRoot.lock(), dfp.second));
 					}
 				}
 			}
@@ -297,7 +302,7 @@ namespace tinymoe
 						auto itfunc = module->declarationFunctions.find(sdp.second);
 						if (itfunc != module->declarationFunctions.end())
 						{
-							functionAsts.insert(make_pair(itfunc->second, ast));
+							functionAsts.insert(make_pair(itfunc->second, dynamic_pointer_cast<AstFunctionDeclaration>(ast)));
 						}
 					}
 					else
@@ -322,81 +327,228 @@ namespace tinymoe
 					}
 				}
 			}
-			{
-				auto it = multipleDispatchChildren.begin();
-				while (it != multipleDispatchChildren.end())
-				{
-					auto lower = multipleDispatchChildren.lower_bound(it->first);
-					auto upper = multipleDispatchChildren.lower_bound(it->second);
-					auto module = functionModules.find(it->first)->second;
-					auto rootFunc = it->first;
-					string rootName = it->first->function->GetComposedName();
+		}
 
-					set<int> dispatches;
-					for (it = lower; it != upper; it++)
+		void FillMultipleDispatchRedirectAst(
+			AstFunctionDeclaration::Ptr ast,
+			AstFunctionDeclaration::Ptr function
+			)
+		{
+			auto astBlock = make_shared<AstBlockStatement>();
+			astBlock->parent = ast;
+			ast->statement = astBlock;
+
+			auto astExprStat = make_shared<AstExpressionStatement>();
+			astExprStat->parent = astBlock;
+			astBlock->statements.push_back(astExprStat);
+
+			auto astInvoke = make_shared<AstInvokeExpression>();
+			astInvoke->parent = astExprStat;
+			astExprStat->expression = astInvoke;
+
+			auto astFunction = make_shared<AstReferenceExpression>();
+			astFunction->parent = astInvoke;
+			astFunction->reference = function;
+			astInvoke->function = astFunction;
+
+			for (auto argument : ast->arguments)
+			{
+				auto astArgument = make_shared<AstReferenceExpression>();
+				astArgument->parent = astInvoke;
+				astArgument->reference = argument;
+				astInvoke->arguments.push_back(astArgument);
+			}
+		}
+
+		void FillMultipleDispatchStepAst(
+			AstFunctionDeclaration::Ptr ast,
+			string functionName,
+			int dispatch
+			)
+		{
+			auto astBlock = make_shared<AstBlockStatement>();
+			astBlock->parent = ast;
+			ast->statement = astBlock;
+
+			auto astExprStat = make_shared<AstExpressionStatement>();
+			astExprStat->parent = astBlock;
+			astBlock->statements.push_back(astExprStat);
+
+			auto astInvoke = make_shared<AstInvokeExpression>();
+			astInvoke->parent = astExprStat;
+			astExprStat->expression = astInvoke;
+
+			auto astFieldAccess = make_shared<AstFieldAccessExpression>();
+			astFieldAccess->parent = astInvoke;
+			astFieldAccess->composedFieldName = functionName;
+			astInvoke->function = astFieldAccess;
+
+			auto astTargetObject = make_shared<AstReferenceExpression>();
+			astTargetObject->parent = astFieldAccess;
+			astTargetObject->reference = ast->arguments[dispatch];
+			astFieldAccess->target = astTargetObject;
+
+			for (auto argument : ast->arguments)
+			{
+				auto astArgument = make_shared<AstReferenceExpression>();
+				astArgument->parent = astInvoke;
+				astArgument->reference = argument;
+				astInvoke->arguments.push_back(astArgument);
+			}
+		}
+
+		void GenerateMultipleDispatchAsts(
+			SymbolAssembly::Ptr symbolAssembly,
+			AstAssembly::Ptr assembly,
+			SymbolAstScope::Ptr scope,
+			MultipleDispatchMap& mdc,
+			FunctionModuleMap& functionModules,
+			FunctionAstMap& functionAsts
+			)
+		{
+			auto it = mdc.begin();
+			while (it != mdc.end())
+			{
+				auto lower = mdc.lower_bound(it->first);
+				auto upper = mdc.lower_bound(it->second);
+				auto module = functionModules.find(it->first)->second;
+				auto rootFunc = it->first;
+				auto rootAst = functionAsts.find(rootFunc)->second;
+
+				map<int, int> dispatchArguments;
+				{
+					int offset = 0;
+					auto ast = functionAsts.find(rootFunc)->second;
+					if (ast->cpsStateArgument) offset++;
+					if (ast->cpsContinuationArgument) offset++;
+					if (ast->categorySignalArgument) offset++;
+					if (ast->blockBodyArgument) offset++;
+
+					int dispatch = 0;
+					for (auto argument : rootFunc->function->name)
 					{
-						auto func = it->second;
-						for (auto ita = func->function->name.begin(); ita != func->function->name.end(); ita++)
+						if (auto variable = dynamic_pointer_cast<VariableArgumentFragment>(argument))
 						{
-							if (func->argumentTypes.find(*ita) != func->argumentTypes.end())
+							if (variable->type != FunctionArgumentType::Argument)
 							{
-								dispatches.insert(ita - func->function->name.begin());
+								dispatchArguments.insert(make_pair(dispatch, offset++));
 							}
 						}
-					}
-					
-					{
-						auto ast = rootFunc->function->GenerateAst(scope, module, assembly);
-						ast->composedName = "$dispatch_fail<>" + rootName;
-						assembly->declarations.push_back(ast);
-					}
-
-					set<string> createdFunctions;
-					for (it = lower; it != upper; it++)
-					{
-						auto func = it->second;
-						auto module = functionModules.find(func)->second;
-						string signature;
-						for (auto itd = dispatches.begin(); itd != dispatches.end(); itd++)
+						else if (dynamic_pointer_cast<FunctionArgumentFragment>(argument))
 						{
-							string methodName = "$dispatch<" + signature + ">" + rootName;
-							auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(scope, module, assembly));
-							ast->composedName = methodName;
+							dispatchArguments.insert(make_pair(dispatch, offset++));
+						}
+						dispatch++;
+					}
+				}
 
-							auto ita = func->argumentTypes.find(func->function->name[*itd]);
-							if (ita == func->argumentTypes.end())
+				set<int> dispatches;
+				AstFunctionDeclaration::Ptr dispatchFailAst;
+				for (it = lower; it != upper; it++)
+				{
+					auto func = it->second;
+					for (auto ita = func->function->name.begin(); ita != func->function->name.end(); ita++)
+					{
+						if (func->argumentTypes.find(*ita) != func->argumentTypes.end())
+						{
+							dispatches.insert(ita - func->function->name.begin());
+						}
+					}
+				}
+				
+				FillMultipleDispatchStepAst(rootAst, "$dispatch<>" + rootAst->composedName, dispatchArguments.find(*dispatches.begin())->second);
+				{
+					auto ast = rootFunc->function->GenerateAst(scope, module, assembly);
+					ast->composedName = "$dispatch_fail<>" + rootAst->composedName;
+					assembly->declarations.push_back(ast);
+					dispatchFailAst = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
+				}
+
+				set<string> createdFunctions, objectFunctions;
+				for (it = lower; it != upper; it++)
+				{
+					auto func = it->second;
+					auto module = functionModules.find(func)->second;
+					string signature;
+					for (auto itd = dispatches.begin(); itd != dispatches.end(); itd++)
+					{
+						string methodName = "$dispatch<" + signature + ">" + rootAst->composedName;
+						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(scope, module, assembly));
+						ast->composedName = methodName;
+
+						auto ita = func->argumentTypes.find(func->function->name[*itd]);
+						if (ita == func->argumentTypes.end())
+						{
+							auto type = make_shared<AstPredefinedType>();
+							type->parent = ast;
+							type->typeName = AstPredefinedTypeName::Object;
+							ast->ownerType = type;
+							objectFunctions.insert(methodName);
+						}
+						else
+						{
+							ast->ownerType = scope->GetType(ita->second, ast);
+						}
+
+						if (itd != dispatches.begin())
+						{
+							signature += ", ";
+						}
+						{
+							stringstream o;
+							ast->ownerType->Print(o, 0);
+							signature += o.str();
+						}
+
+						string functionName = "$dispatch<" + signature + ">" + rootAst->composedName;
+						if (createdFunctions.insert(functionName).second)
+						{
+							assembly->declarations.push_back(ast);
+							auto itd2 = itd;
+							if (++itd2 == dispatches.end())
 							{
-								auto type = make_shared<AstPredefinedType>();
-								type->parent = ast;
-								type->typeName = AstPredefinedTypeName::Object;
-								ast->ownerType = type;
+								FillMultipleDispatchRedirectAst(ast, functionAsts.find(func)->second);
 							}
 							else
 							{
-								ast->ownerType = scope->GetType(ita->second, ast);
-							}
-
-							{
-								stringstream o;
-								ast->ownerType->Print(o, 0);
-								signature += o.str();
-							}
-							if (itd != dispatches.end())
-							{
-								signature += ", ";
-							}
-
-							string functionName = "$dispatch<" + signature + ">" + rootName;
-							if (createdFunctions.insert(functionName).second)
-							{
-								assembly->declarations.push_back(ast);
+								FillMultipleDispatchStepAst(ast, functionName, dispatchArguments.find(*itd)->second);
 							}
 						}
 					}
-
-					it = upper;
 				}
+
+				for (auto name : createdFunctions)
+				{
+					if (objectFunctions.find(name) == objectFunctions.end())
+					{
+						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(rootFunc->function->GenerateAst(scope, module, assembly));
+						ast->composedName = name;
+						{
+							auto type = make_shared<AstPredefinedType>();
+							type->parent = ast;
+							type->typeName = AstPredefinedTypeName::Object;
+							ast->ownerType = type;
+						}
+						assembly->declarations.push_back(ast);
+						FillMultipleDispatchRedirectAst(ast, dispatchFailAst);
+					}
+				}
+
+				functionAsts.find(rootFunc)->second = dispatchFailAst;
+				it = upper;
 			}
+		}
+
+		ast::AstAssembly::Ptr GenerateAst(SymbolAssembly::Ptr symbolAssembly)
+		{
+			auto assembly = make_shared<AstAssembly>();
+			auto scope = make_shared<SymbolAstScope>();
+
+			multimap<SymbolFunction::Ptr, SymbolFunction::Ptr> multipleDispatchChildren;
+			map<SymbolFunction::Ptr, SymbolModule::Ptr> functionModules;
+			map<SymbolFunction::Ptr, AstFunctionDeclaration::Ptr> functionAsts;
+			GenerateStaticAst(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
+			GenerateMultipleDispatchAsts(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
 
 			return assembly;
 		}

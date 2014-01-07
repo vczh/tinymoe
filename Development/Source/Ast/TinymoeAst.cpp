@@ -74,7 +74,7 @@ namespace tinymoe
 			if (statement)
 			{
 				o << ")" << endl;
-				statement->Print(o, indentation + 1);
+				statement->Print(o, indentation + (dynamic_pointer_cast<AstBlockStatement>(statement) ? 0 : 1));
 			}
 			else
 			{
@@ -280,7 +280,7 @@ namespace tinymoe
 				statement->Print(o, indentation + 1);
 				o << endl;
 			}
-			o << Indent(indentation - 1) << "}" << endl;
+			o << Indent(indentation - 1) << "}";
 		}
 
 		void AstExpressionStatement::Print(ostream& o, int indentation)

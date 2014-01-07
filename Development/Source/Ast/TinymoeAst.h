@@ -73,6 +73,8 @@ namespace tinymoe
 		class AstTypeDeclaration : public AstDeclaration
 		{
 		public:
+			typedef shared_ptr<AstTypeDeclaration>				Ptr;
+
 			AstType::WeakPtr				baseType;
 			AstSymbolDeclaration::List		fields;
 
@@ -82,6 +84,8 @@ namespace tinymoe
 		class AstFunctionDeclaration : public AstDeclaration
 		{
 		public:
+			typedef shared_ptr<AstFunctionDeclaration>			Ptr;
+
 			AstType::Ptr					ownerType;			// (optional) if ownerType is not null, this function is added to this type as a virtual function.
 			AstSymbolDeclaration::List		arguments;
 			AstStatement::Ptr				statement;
