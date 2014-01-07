@@ -88,6 +88,8 @@ namespace tinymoe
 
 			AstType::Ptr					ownerType;			// (optional) if ownerType is not null, this function is added to this type as a virtual function.
 			AstSymbolDeclaration::List		arguments;
+			map<int, int>					readArgumentAstMap;
+			map<int, int>					writeArgumentAstMap;
 			AstStatement::Ptr				statement;
 
 			AstSymbolDeclaration::Ptr		resultVariable;

@@ -241,10 +241,12 @@ namespace tinymoe
 				auto pair = (*it)->CreateAst(ast);
 				if (pair.first)
 				{
+					ast->readArgumentAstMap.insert(make_pair(it - name.begin(), ast->arguments.size()));
 					ast->arguments.push_back(pair.first);
 				}
 				if (pair.second)
 				{
+					ast->writeArgumentAstMap.insert(make_pair(it - name.begin(), ast->arguments.size()));
 					ast->arguments.push_back(pair.second);
 				}
 			}
@@ -415,33 +417,6 @@ namespace tinymoe
 				auto rootFunc = it->first;
 				auto rootAst = functionAsts.find(rootFunc)->second;
 
-				map<int, int> dispatchArguments;
-				{
-					int offset = 0;
-					auto ast = functionAsts.find(rootFunc)->second;
-					if (ast->cpsStateArgument) offset++;
-					if (ast->cpsContinuationArgument) offset++;
-					if (ast->categorySignalArgument) offset++;
-					if (ast->blockBodyArgument) offset++;
-
-					int dispatch = 0;
-					for (auto argument : rootFunc->function->name)
-					{
-						if (auto variable = dynamic_pointer_cast<VariableArgumentFragment>(argument))
-						{
-							if (variable->type != FunctionArgumentType::Argument)
-							{
-								dispatchArguments.insert(make_pair(dispatch, offset++));
-							}
-						}
-						else if (dynamic_pointer_cast<FunctionArgumentFragment>(argument))
-						{
-							dispatchArguments.insert(make_pair(dispatch, offset++));
-						}
-						dispatch++;
-					}
-				}
-
 				set<int> dispatches;
 				AstFunctionDeclaration::Ptr dispatchFailAst;
 				for (it = lower; it != upper; it++)
@@ -456,7 +431,7 @@ namespace tinymoe
 					}
 				}
 				
-				FillMultipleDispatchStepAst(rootAst, "$dispatch<>" + rootAst->composedName, dispatchArguments.find(*dispatches.begin())->second);
+				FillMultipleDispatchStepAst(rootAst, "$dispatch<>" + rootAst->composedName, rootAst->readArgumentAstMap.find(*dispatches.begin())->second);
 				{
 					auto ast = rootFunc->function->GenerateAst(scope, module, assembly);
 					ast->composedName = "$dispatch_fail<>" + rootAst->composedName;
@@ -464,7 +439,7 @@ namespace tinymoe
 					dispatchFailAst = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
 				}
 
-				set<string> createdFunctions, objectFunctions;
+				set<string> createdFunctions, typeFunctions, objectFunctions;
 				for (it = lower; it != upper; it++)
 				{
 					auto func = it->second;
@@ -488,6 +463,7 @@ namespace tinymoe
 						else
 						{
 							ast->ownerType = scope->GetType(ita->second, ast);
+							typeFunctions.insert(methodName);
 						}
 
 						if (itd != dispatches.begin())
@@ -511,13 +487,13 @@ namespace tinymoe
 							}
 							else
 							{
-								FillMultipleDispatchStepAst(ast, functionName, dispatchArguments.find(*itd)->second);
+								FillMultipleDispatchStepAst(ast, functionName, ast->readArgumentAstMap.find(*itd)->second);
 							}
 						}
 					}
 				}
 
-				for (auto name : createdFunctions)
+				for (auto name : typeFunctions)
 				{
 					if (objectFunctions.find(name) == objectFunctions.end())
 					{
