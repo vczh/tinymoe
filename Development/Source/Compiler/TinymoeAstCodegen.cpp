@@ -266,7 +266,9 @@ namespace tinymoe
 			auto scope = make_shared<SymbolAstScope>();
 
 			multimap<SymbolFunction::Ptr, SymbolFunction::Ptr> multipleDispatchChildren;
-			multimap<SymbolFunction::Ptr, SymbolModule::Ptr> functionModules;
+			map<SymbolFunction::Ptr, SymbolModule::Ptr> functionModules;
+			map<SymbolFunction::Ptr, AstFunctionDeclaration::Ptr> functionAsts;
+
 			for (auto module : symbolAssembly->symbolModules)
 			{
 				for (auto dfp : module->declarationFunctions)
@@ -284,15 +286,6 @@ namespace tinymoe
 				map<Declaration::Ptr, AstDeclaration::Ptr> decls;
 				for (auto sdp : module->symbolDeclarations)
 				{
-					auto itfunc = module->declarationFunctions.find(sdp.second);
-					if (itfunc != module->declarationFunctions.end())
-					{
-						if (multipleDispatchChildren.find(itfunc->second) != multipleDispatchChildren.end())
-						{
-							continue;
-						}
-					}
-
 					auto it = decls.find(sdp.second);
 					if (it == decls.end())
 					{
@@ -300,6 +293,12 @@ namespace tinymoe
 						assembly->declarations.push_back(ast);
 						decls.insert(make_pair(sdp.second, ast));
 						scope->readAsts.insert(make_pair(sdp.first, ast));
+
+						auto itfunc = module->declarationFunctions.find(sdp.second);
+						if (itfunc != module->declarationFunctions.end())
+						{
+							functionAsts.insert(make_pair(itfunc->second, ast));
+						}
 					}
 					else
 					{
@@ -329,12 +328,9 @@ namespace tinymoe
 				{
 					auto lower = multipleDispatchChildren.lower_bound(it->first);
 					auto upper = multipleDispatchChildren.lower_bound(it->second);
+					auto module = functionModules.find(it->first)->second;
+					auto rootFunc = it->first;
 					string rootName = it->first->function->GetComposedName();
-					{
-						auto module = functionModules.find(it->first)->second;
-						auto ast = it->first->function->GenerateAst(scope, module, assembly);
-						assembly->declarations.push_back(ast);
-					}
 
 					set<int> dispatches;
 					for (it = lower; it != upper; it++)
@@ -348,7 +344,12 @@ namespace tinymoe
 							}
 						}
 					}
-
+					
+					{
+						auto ast = rootFunc->function->GenerateAst(scope, module, assembly);
+						ast->composedName = "$dispatch_fail<>" + rootName;
+						assembly->declarations.push_back(ast);
+					}
 
 					set<string> createdFunctions;
 					for (it = lower; it != upper; it++)
