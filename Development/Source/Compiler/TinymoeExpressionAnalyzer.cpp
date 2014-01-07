@@ -144,6 +144,10 @@ namespace tinymoe
 				+ "new" + GrammarFragmentType::Type
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewTypeOfFields)
+				+ "new" + GrammarFragmentType::Type + "of" + GrammarFragmentType::List
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewArray)
 				+ "new" + "array" + "of" + GrammarFragmentType::Expression + "items"
 				);

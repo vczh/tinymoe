@@ -36,6 +36,10 @@ phrase square root of (number)
 	redirect to "sqrt"
 end
 
+sentence print (message)
+	redirect to "printf"
+end
+
 type rectangle
 	width
 	height
@@ -86,6 +90,14 @@ end
 
 phrase (a : circle) and (b : circle) is the same shape
 	set the result to true
+end
+
+phrase main
+	set shape one to new triangle of (2, 3, 4)
+	set shape two to new rectangle of (1, 2)
+	if shape one and shape two is the same shape
+		print "This world is mad!"
+	end
 end
 
 )tinymoe");

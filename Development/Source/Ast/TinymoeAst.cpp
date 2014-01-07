@@ -198,7 +198,16 @@ namespace tinymoe
 		{
 			o << "new ";
 			type->Print(o, indentation);
-			o << "()";
+			o << "(";
+			for (auto it = fields.begin(); it != fields.end(); it++)
+			{
+				(*it)->Print(o, indentation);
+				if (it + 1 != fields.end())
+				{
+					o << ", ";
+				}
+			}
+			o << ")";
 		}
 
 		void AstTestTypeExpression::Print(ostream& o, int indentation)

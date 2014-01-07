@@ -57,6 +57,7 @@ namespace tinymoe
 			TheResult,				// (primitive)	the result
 
 			NewType,				// (primitive)	new <type>
+			NewTypeOfFields,		// (primitive)	new <type> of <list>
 			NewArray,				// (primitive)	new array of <expression> items
 			GetArrayItem,			// (primitive)	item <expression> of array <primitive>
 			GetArrayLength,			// (primitive)	length of array <primitive>

@@ -210,6 +210,7 @@ namespace tinymoe
 		{
 		public:
 			AstType::Ptr					type;
+			AstExpression::List				fields;
 
 			void							Print(ostream& o, int indentation)override;
 		};
