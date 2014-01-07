@@ -4,7 +4,9 @@ tinymoe
 ###English-like programming language
 ######with dynamic typing and build-in continuation
 
-<Hello world>
+Here are two samples to introduce this language:
+
+*Hello world
 
 	module hello world
 	using standard library
@@ -24,7 +26,7 @@ tinymoe
 		print "1+ ... +100 = " & sum from 1 to 100
 	end
 
-<Geometry>
+*Geometry
 
 	module geometry
 	using standard library
