@@ -94,7 +94,7 @@ namespace tinymoe
 			{
 			}
 
-			bool RequireCps()
+			bool RequireCps()const
 			{
 				return statement && continuation;
 			}
@@ -104,55 +104,56 @@ namespace tinymoe
 				return SymbolAstResult(_value, statement, continuation);
 			}
 
-			static SymbolAstResult Merge(SymbolAstContext& context, vector<SymbolAstResult>& results)
+			SymbolAstResult ReplaceValue(shared_ptr<AstExpression> _value, shared_ptr<AstLambdaExpression> _continuation)
 			{
-				SymbolAstResult merged;
-				auto start = results.begin();
+				return SymbolAstResult(_value, statement, _continuation);
+			}
 
-				for (auto it = results.begin(); it != results.end(); it++)
+			void Merge(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr> exprs, int& exprStart, AstDeclaration::Ptr& state)
+			{
+				exprs.push_back(result.value);
+				if (result.RequireCps())
 				{
-					if (it->RequireCps())
+					auto block = make_shared<AstBlockStatement>();
+					for (int i = exprStart; (size_t)i < exprs.size(); i++)
 					{
-						auto block = make_shared<AstBlockStatement>();
-						for (auto it2 = start; it2 != it; it2++)
+						auto var = make_shared<AstDeclarationStatement>();
 						{
-							auto var = make_shared<AstDeclarationStatement>();
-							{
-								auto decl = make_shared<AstSymbolDeclaration>();
-								decl->parent = var;
-								decl->composedName = "$var" + context.GetUniquePostfix();
-								var->declaration = decl;
+							auto decl = make_shared<AstSymbolDeclaration>();
+							decl->parent = var;
+							decl->composedName = "$var" + context.GetUniquePostfix();
+							var->declaration = decl;
 
-								auto assign = make_shared<AstAssignmentStatement>();
-								assign->parent = block;
-								block->statements.push_back(assign);
+							auto assign = make_shared<AstAssignmentStatement>();
+							assign->parent = block;
+							block->statements.push_back(assign);
 
-								auto ref = make_shared<AstReferenceExpression>();
-								ref->parent = assign;
-								ref->reference = decl;
-								assign->target = ref;
-
-								it2->value->parent = assign;
-								assign->value = it2->value;
-							}
-					
 							auto ref = make_shared<AstReferenceExpression>();
-							ref->reference = var->declaration;
-							it2->value = ref;
-						}
+							ref->parent = assign;
+							ref->reference = decl;
+							assign->target = ref;
 
-						if (merged.continuation)
-						{
-							merged.continuation->statement = block;
+							exprs[i]->parent = assign;
+							assign->value = exprs[i];
 						}
-						else
-						{
-							merged.statement = block;
-						}
-						merged.continuation = it->continuation;
+					
+						auto ref = make_shared<AstReferenceExpression>();
+						ref->reference = var->declaration;
+						exprs[i] = ref;
 					}
+
+					if (continuation)
+					{
+						continuation->statement = block;
+					}
+					else
+					{
+						statement = block;
+					}
+					continuation = result.continuation;
+					exprStart = exprs.size();
+					state = continuation->arguments[0];
 				}
-				return merged;
 			}
 		};
 
@@ -360,7 +361,7 @@ namespace tinymoe
 		Expression::GenerateAst
 		*************************************************************/
 
-		SymbolAstResult LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			switch (token.type)
 			{
@@ -390,12 +391,12 @@ namespace tinymoe
 			return SymbolAstResult();
 		}
 
-		SymbolAstResult ArgumentExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult ArgumentExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			return SymbolAstResult();
 		}
 
-		SymbolAstResult ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			switch (symbol->target)
 			{
@@ -424,7 +425,7 @@ namespace tinymoe
 			return SymbolAstResult(ast);
 		}
 
-		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			Expression::Ptr func;
 			Expression::List args;
@@ -448,46 +449,68 @@ namespace tinymoe
 				args = arguments;
 			}
 
-			vector<SymbolAstResult> results;
-			results.push_back(func->GenerateAst(scope, context, module));
+			SymbolAstResult result;
+			vector<AstExpression::Ptr> exprs;
+			int exprStart = 0;
+
+			result.Merge(func->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			for (auto arg : args)
 			{
-				results.push_back(arg->GenerateAst(scope, context, module));
+				result.Merge(arg->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			}
-			auto result = SymbolAstResult::Merge(context, results);
 
 			auto ast = make_shared<AstInvokeExpression>();
-			ast->function = results[0].value;
-			for (auto it = results.begin() + 1; it != results.end(); it++)
+			auto it = exprs.begin();
+			ast->function = *it++;
 			{
-				ast->arguments.push_back(it->value);
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->parent = ast;
+				ref->reference = state;
+				ast->arguments.push_back(ref);
 			}
-			for (auto r : results)
+			while (it != exprs.end())
 			{
-				r.value->parent = ast;
+				ast->arguments.push_back(*it++);
 			}
-			return result.ReplaceValue(ast);
+
+			auto lambda = make_shared<AstLambdaExpression>();
+			lambda->parent = ast;
+			{
+				auto ref = make_shared<AstSymbolDeclaration>();
+				ref->parent = lambda;
+				ref->composedName = "$state" + context.GetUniquePostfix();
+				lambda->arguments.push_back(ref);
+			}
+			ast->arguments.push_back(lambda);
+
+			for (auto expr : exprs)
+			{
+				expr->parent = ast;
+			}
+			return result.ReplaceValue(ast, lambda);
 		}
 
-		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
-			vector<SymbolAstResult> results;
+			SymbolAstResult result;
+			vector<AstExpression::Ptr> exprs;
+			int exprStart = 0;
+
 			for (auto element : elements)
 			{
-				results.push_back(element->GenerateAst(scope, context, module));
+				result.Merge(element->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			}
-			auto result = SymbolAstResult::Merge(context, results);
 
 			auto ast = make_shared<AstNewArrayLiteralExpression>();
-			for (auto& element : results)
+			for (auto expr : exprs)
 			{
-				ast->elements.push_back(element.value);
-				element.value->parent = ast;
+				ast->elements.push_back(expr);
+				expr->parent = ast;
 			}
 			return result.ReplaceValue(ast);
 		}
 
-		SymbolAstResult UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			AstUnaryOperator astOp = AstUnaryOperator::Not;
 			switch (op)
@@ -503,7 +526,12 @@ namespace tinymoe
 				break;
 			}
 
-			auto result = operand->GenerateAst(scope, context, module);
+			SymbolAstResult result;
+			vector<AstExpression::Ptr> exprs;
+			int exprStart = 0;
+
+			result.Merge(operand->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+
 			auto ast = make_shared<AstUnaryExpression>();
 			ast->op = astOp;
 			ast->operand = result.value;
@@ -511,7 +539,7 @@ namespace tinymoe
 			return result.ReplaceValue(ast);
 		}
 
-		SymbolAstResult BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
+		SymbolAstResult BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			AstBinaryOperator astOp = AstBinaryOperator::Concat;
 			
@@ -557,18 +585,20 @@ namespace tinymoe
 				astOp = AstBinaryOperator::Or;
 				break;
 			}
+
+			SymbolAstResult result;
+			vector<AstExpression::Ptr> exprs;
+			int exprStart = 0;
 			
-			vector<SymbolAstResult> results;
-			results.push_back(first->GenerateAst(scope, context, module));
-			results.push_back(second->GenerateAst(scope, context, module));
-			auto result = SymbolAstResult::Merge(context, results);
+			result.Merge(first->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+			result.Merge(second->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 
 			auto ast = make_shared<AstBinaryExpression>();
 			ast->op = astOp;
-			ast->first = results[0].value;
-			results[0].value->parent = ast;
-			ast->second = results[1].value;
-			results[1].value->parent = ast;
+			ast->first = exprs[0];
+			ast->second = exprs[1];
+			exprs[0]->parent = ast;
+			exprs[1]->parent = ast;
 			return result.ReplaceValue(ast);
 		}
 

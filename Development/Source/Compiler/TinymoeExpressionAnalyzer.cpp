@@ -201,6 +201,10 @@ namespace tinymoe
 				+ "call" + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CallContinuation)
+				+ "call" + "continuation" + GrammarFragmentType::Expression + "with" + GrammarFragmentType::List
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::RedirectTo)
 				+ "redirect" + "to" + GrammarFragmentType::Expression
 				);
