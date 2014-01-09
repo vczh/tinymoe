@@ -5,8 +5,18 @@
 
 namespace tinymoe
 {
+	namespace ast
+	{
+		class AstNode;
+		class AstExpression;
+	}
+
 	namespace compiler
 	{
+		class SymbolModule;
+		class SymbolAstScope;
+		struct SymbolAstContext;
+
 		/*************************************************************
 		Symbol
 		*************************************************************/
@@ -18,11 +28,10 @@ namespace tinymoe
 			Primitive,				// for primitive expression,		e.g. sum from 1 to [10]
 			Expression,				// for all kinds of expressions,	e.g. repeat with the current number from [1] to [100]
 			List,					// for tuple (marshalled as array),	e.g. set names to collection of [("a", "b", "c")]
-			Assignable,				// for left value expression, create a new symbol in the containing block if the <assignable> does not exist
-			//									e.g. [field unique identifier of person]
-			//									e.g. [a variable]
+			Assignable,				// for variable, or create a new symbolif the <assignable> does not exist
+			//															e.g. [a variable]
 			Argument,				// always create a new symbol in the block body
-			//									e.g. repeat with [the current number] from 1 to sum from 1 to 10
+			//															e.g. repeat with [the current number] from 1 to sum from 1 to 10
 		};
 
 		class GrammarFragment
@@ -31,12 +40,12 @@ namespace tinymoe
 			typedef shared_ptr<GrammarFragment>			Ptr;
 			typedef vector<Ptr>							List;
 
-			GrammarFragmentType			type;
-			vector<string>				identifiers;
+			GrammarFragmentType							type;
+			vector<string>								identifiers;
 
 			GrammarFragment(GrammarFragmentType _type);
 
-			string						GetUniqueIdFragment();
+			string										GetUniqueIdFragment();
 		};
 
 		enum class GrammarSymbolTarget
@@ -94,20 +103,20 @@ namespace tinymoe
 			typedef vector<Ptr>							List;
 			typedef multimap<string, Ptr>				MultiMap;
 
-			GrammarFragment::List		fragments;		// grammar fragments for this symbol
+			GrammarFragment::List						fragments;		// grammar fragments for this symbol
 			// a statement cannot be an expression
 			// the top invoke expression's function of a statement should reference to a statement symbol
-			string						uniqueId;		// a string that identifies the grammar structure
-			GrammarSymbolTarget			target;
-			GrammarSymbolType			type;
+			string										uniqueId;		// a string that identifies the grammar structure
+			GrammarSymbolTarget							target;
+			GrammarSymbolType							type;
 
 			GrammarSymbol(GrammarSymbolType _type, GrammarSymbolTarget _target = GrammarSymbolTarget::Custom);
 
-			void						CalculateUniqueId();
+			void										CalculateUniqueId();
 		};
 
-		GrammarSymbol::Ptr				operator+(GrammarSymbol::Ptr symbol, const string& name);
-		GrammarSymbol::Ptr				operator+(GrammarSymbol::Ptr symbol, GrammarFragmentType type);
+		GrammarSymbol::Ptr								operator+(GrammarSymbol::Ptr symbol, const string& name);
+		GrammarSymbol::Ptr								operator+(GrammarSymbol::Ptr symbol, GrammarFragmentType type);
 
 		/*************************************************************
 		Expression
@@ -119,65 +128,71 @@ namespace tinymoe
 			typedef shared_ptr<Expression>				Ptr;
 			typedef vector<Ptr>							List;
 
-			virtual string				ToLog() = 0;
-			virtual string				ToCode() = 0;
-			virtual void				CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments) = 0;
+			virtual string								ToLog() = 0;
+			virtual string								ToCode() = 0;
+			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments) = 0;
+			virtual shared_ptr<ast::AstExpression>		GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda) = 0;
 		};
 
 		// for numbers and strings
 		class LiteralExpression : public Expression
 		{
 		public:
-			CodeToken					token;
+			CodeToken									token;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		// for new created symbols in <assignable> and <argument>
 		class ArgumentExpression : public Expression
 		{
 		public:
-			CodeToken::List				tokens;
+			CodeToken::List								tokens;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		// for symbol referencing
 		class ReferenceExpression : public Expression
 		{
 		public:
-			GrammarSymbol::Ptr			symbol;
+			GrammarSymbol::Ptr							symbol;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		// for function invoking
 		class InvokeExpression : public Expression
 		{
 		public:
-			Expression::Ptr				function;
-			Expression::List			arguments;
+			Expression::Ptr								function;
+			Expression::List							arguments;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		// for <list>
 		class ListExpression : public Expression
 		{
 		public:
-			Expression::List			elements;
+			Expression::List							elements;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		enum class UnaryOperator
@@ -191,12 +206,13 @@ namespace tinymoe
 		class UnaryExpression : public Expression
 		{
 		public:
-			Expression::Ptr				operand;
-			UnaryOperator				op;
+			Expression::Ptr								operand;
+			UnaryOperator								op;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		enum class BinaryOperator
@@ -220,13 +236,14 @@ namespace tinymoe
 		class BinaryExpression : public Expression
 		{
 		public:
-			Expression::Ptr				first;
-			Expression::Ptr				second;
-			BinaryOperator				op;
+			Expression::Ptr								first;
+			Expression::Ptr								second;
+			BinaryOperator								op;
 
-			string						ToLog()override;
-			string						ToCode()override;
-			void						CollectNewAssignable(Expression::List& assignables, Expression::List& arguments)override;
+			string										ToLog()override;
+			string										ToCode()override;
+			void										CollectNewAssignable(Expression::List& assignables, Expression::List& arguments)override;
+			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
 		};
 
 		/*************************************************************
@@ -239,62 +256,62 @@ namespace tinymoe
 			typedef shared_ptr<GrammarStackItem>		Ptr;
 			typedef vector<Ptr>							List;
 
-			GrammarSymbol::List			symbols;
+			GrammarSymbol::List							symbols;
 
-			void						FillPredefinedSymbols();
+			void										FillPredefinedSymbols();
 		};
 
 		class GrammarStack
 		{
 		public:
-			typedef shared_ptr<GrammarStack>					Ptr;
-			typedef CodeToken::List::iterator					Iterator;
-			typedef pair<Iterator, Expression::Ptr>				ResultItem;
-			typedef vector<ResultItem>							ResultList;
+			typedef shared_ptr<GrammarStack>			Ptr;
+			typedef CodeToken::List::iterator			Iterator;
+			typedef pair<Iterator, Expression::Ptr>		ResultItem;
+			typedef vector<ResultItem>					ResultList;
 			typedef CodeError(GrammarStack::* ParseFunctionType)(Iterator, Iterator, ResultList&);
 
-			GrammarStackItem::List		stackItems;				// available symbols organized in a scope based structure
-			GrammarSymbol::MultiMap		availableSymbols;		// available symbols grouped by the unique identifier
+			GrammarStackItem::List						stackItems;				// available symbols organized in a scope based structure
+			GrammarSymbol::MultiMap						availableSymbols;		// available symbols grouped by the unique identifier
 			// the last symbol overrides all other symbols in the same group
 
 			struct ExpressionLink
 			{
 				typedef shared_ptr<ExpressionLink>		Ptr;
 
-				Expression::Ptr			expression;
-				Ptr						previous;
+				Expression::Ptr							expression;
+				Ptr										previous;
 			};
 
-			void						Push(GrammarStackItem::Ptr stackItem);
-			GrammarStackItem::Ptr		Pop();
+			void										Push(GrammarStackItem::Ptr stackItem);
+			GrammarStackItem::Ptr						Pop();
 
-			CodeError					SuccessError();
-			CodeError					ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
-			CodeError					FoldError(CodeError error1, CodeError error2);
+			CodeError									SuccessError();
+			CodeError									ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
+			CodeError									FoldError(CodeError error1, CodeError error2);
 
-			CodeError					ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result);
-			CodeError					ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
-			CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, int beginFragment, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, ResultList& result);
-			CodeError					ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result);
+			CodeError									ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result);
+			CodeError									ParseGrammarSymbolStep(GrammarSymbol::Ptr symbol, int fragmentIndex, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, vector<pair<Iterator, ExpressionLink::Ptr>>& result);
+			CodeError									ParseGrammarSymbol(GrammarSymbol::Ptr symbol, int beginFragment, ExpressionLink::Ptr previousExpression, Iterator input, Iterator end, ResultList& result);
+			CodeError									ParseGrammarSymbol(GrammarSymbol::Ptr symbol, Iterator input, Iterator end, ResultList& result);
 
-			CodeError					ParseType(Iterator input, Iterator end, ResultList& result);			// <type>
-			CodeError					ParseShortPrimitive(Iterator input, Iterator end, ResultList& result);	// <literal>, op <primitive>, (<expression>), <phrase>
-			CodeError					ParsePrimitive(Iterator input, Iterator end, ResultList& result);		// left recursive <phrase>
-			CodeError					ParseList(Iterator input, Iterator end, ResultList& result);			// (<expression>, ...)
-			CodeError					ParseAssignable(Iterator input, Iterator end, ResultList& result);		// <symbol> or <argument>
-			CodeError					ParseArgument(Iterator input, Iterator end, ResultList& result);		// <argument>
+			CodeError									ParseType(Iterator input, Iterator end, ResultList& result);			// <type>
+			CodeError									ParseShortPrimitive(Iterator input, Iterator end, ResultList& result);	// <literal>, op <primitive>, (<expression>), <phrase>
+			CodeError									ParsePrimitive(Iterator input, Iterator end, ResultList& result);		// left recursive <phrase>
+			CodeError									ParseList(Iterator input, Iterator end, ResultList& result);			// (<expression>, ...)
+			CodeError									ParseAssignable(Iterator input, Iterator end, ResultList& result);		// <symbol> or <argument>
+			CodeError									ParseArgument(Iterator input, Iterator end, ResultList& result);		// <argument>
 
-			CodeError					ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result);
-			CodeError					ParseExp1(Iterator input, Iterator end, ResultList& result);			// * /
-			CodeError					ParseExp2(Iterator input, Iterator end, ResultList& result);			// + -
-			CodeError					ParseExp3(Iterator input, Iterator end, ResultList& result);			// &
-			CodeError					ParseExp4(Iterator input, Iterator end, ResultList& result);			// < > <= >= = <>
-			CodeError					ParseExp5(Iterator input, Iterator end, ResultList& result);			// and
-			CodeError					ParseExpression(Iterator input, Iterator end, ResultList& result);		// or, aka. <expression>
+			CodeError									ParseBinary(Iterator input, Iterator end, ParseFunctionType parser, CodeTokenType* tokenTypes, BinaryOperator* binaryOperators, int count, ResultList& result);
+			CodeError									ParseExp1(Iterator input, Iterator end, ResultList& result);			// * /
+			CodeError									ParseExp2(Iterator input, Iterator end, ResultList& result);			// + -
+			CodeError									ParseExp3(Iterator input, Iterator end, ResultList& result);			// &
+			CodeError									ParseExp4(Iterator input, Iterator end, ResultList& result);			// < > <= >= = <>
+			CodeError									ParseExp5(Iterator input, Iterator end, ResultList& result);			// and
+			CodeError									ParseExpression(Iterator input, Iterator end, ResultList& result);		// or, aka. <expression>
 
-			CodeError					ParseStatement(Iterator input, Iterator end, ResultList& result);
-			int							CountStatementAssignables(Expression::List& assignables);				// -1: illegal assignable (e.g. the assignable is a legal expression)
-			int							CountStatementAssignables(Expression::List& assignables, Expression::Ptr& illegalConvertedAssignable);
+			CodeError									ParseStatement(Iterator input, Iterator end, ResultList& result);
+			int											CountStatementAssignables(Expression::List& assignables);				// -1: illegal assignable (e.g. the assignable is a legal expression)
+			int											CountStatementAssignables(Expression::List& assignables, Expression::Ptr& illegalConvertedAssignable);
 		};
 	}
 }

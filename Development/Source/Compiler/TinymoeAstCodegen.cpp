@@ -60,6 +60,10 @@ namespace tinymoe
 			}
 		};
 
+		struct SymbolAstContext
+		{
+		};
+
 		/*************************************************************
 		FunctionFragment::GetComposedName
 		*************************************************************/
@@ -211,24 +215,15 @@ namespace tinymoe
 					argument->composedName = "$state";
 				}
 				ast->arguments.push_back(argument);
-				ast->cpsStateArgument = argument;
+				ast->stateArgument = argument;
 			}
-			if (cps && cps->continuationName)
-			{
-				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->parent = ast;
-				argument->composedName = cps->continuationName->GetComposedName();
-				ast->arguments.push_back(argument);
-				ast->cpsContinuationArgument = argument;
-			}
-
 			if (category && category->signalName)
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
 				argument->parent = ast;
 				argument->composedName = category->signalName->GetComposedName();
 				ast->arguments.push_back(argument);
-				ast->categorySignalArgument = argument;
+				ast->signalArgument = argument;
 			}
 			if (bodyName)
 			{
@@ -236,6 +231,7 @@ namespace tinymoe
 				ast->arguments.push_back(argument);
 				ast->blockBodyArgument = argument;
 			}
+
 			for (auto it = name.begin(); it != name.end(); it++)
 			{
 				auto pair = (*it)->CreateAst(ast);
@@ -250,14 +246,66 @@ namespace tinymoe
 					ast->arguments.push_back(pair.second);
 				}
 			}
+
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
 				argument->parent = ast;
-				argument->composedName = "$continuation";
+				if (cps && cps->continuationName)
+				{
+					argument->composedName = cps->continuationName->GetComposedName();
+				}
+				else
+				{
+					argument->composedName = "$continuation";
+				}
 				ast->arguments.push_back(argument);
+				ast->continuationArgument = argument;
 			}
 			return ast;
 		}
+
+		/*************************************************************
+		Expression::GenerateAst
+		*************************************************************/
+
+		shared_ptr<ast::AstExpression> LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> ArgumentExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		shared_ptr<ast::AstExpression> BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		{
+			return nullptr;
+		}
+
+		/*************************************************************
+		Statement::GenerateAst
+		*************************************************************/
 
 		/*************************************************************
 		GenerateAst
