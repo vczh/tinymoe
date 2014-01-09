@@ -397,7 +397,31 @@ namespace tinymoe
 
 		SymbolAstResult ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return SymbolAstResult();
+			switch (symbol->target)
+			{
+			case GrammarSymbolTarget::True:
+				{
+					auto ast = make_shared<AstLiteralExpression>();
+					ast->literalName = AstLiteralName::True;
+					return SymbolAstResult(ast);
+				}
+			case GrammarSymbolTarget::False:
+				{
+					auto ast = make_shared<AstLiteralExpression>();
+					ast->literalName = AstLiteralName::False;
+					return SymbolAstResult(ast);
+				}
+			case GrammarSymbolTarget::Null:
+				{
+					auto ast = make_shared<AstLiteralExpression>();
+					ast->literalName = AstLiteralName::Null;
+					return SymbolAstResult(ast);
+				}
+			}
+
+			auto ast = make_shared<AstReferenceExpression>();
+			ast->reference = scope->readAsts.find(symbol)->second;
+			return SymbolAstResult(ast);
 		}
 
 		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
