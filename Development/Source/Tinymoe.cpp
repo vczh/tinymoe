@@ -67,13 +67,13 @@ category
 	start REPEAT
 	closable
 block (body) repeat : repeat statement
-	call invoke body with (state)
+	call invoke body
 	select field flag of state
 		case breaking repeating
 			reset continuation state state to null
 		case continuing repeating
 			reset continuation state state to null
-			call invoke repeat statement with (state, body)
+			call invoke repeat statement with (body)
 	end
 end
 
