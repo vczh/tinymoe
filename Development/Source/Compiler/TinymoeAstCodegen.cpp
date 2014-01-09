@@ -104,50 +104,55 @@ namespace tinymoe
 				return SymbolAstResult(_value, statement, continuation);
 			}
 
-			void Merge(SymbolAstResult& result, SymbolAstContext& context)
+			static SymbolAstResult Merge(SymbolAstContext& context, vector<SymbolAstResult>& results)
 			{
-				if (result.RequireCps())
+				SymbolAstResult merged;
+				auto start = results.begin();
+
+				for (auto it = results.begin(); it != results.end(); it++)
 				{
-					if (RequireCps())
-					{
-						continuation->statement = result.statement;
-						result.statement->parent = continuation;
-						continuation = result.continuation;
-					}
-					else
+					if (it->RequireCps())
 					{
 						auto block = make_shared<AstBlockStatement>();
-						auto var = make_shared<AstDeclarationStatement>();
+						for (auto it2 = start; it2 != it; it2++)
 						{
-							auto decl = make_shared<AstSymbolDeclaration>();
-							decl->parent = var;
-							decl->composedName = "$var" + context.GetUniquePostfix();
-							var->declaration = decl;
+							auto var = make_shared<AstDeclarationStatement>();
+							{
+								auto decl = make_shared<AstSymbolDeclaration>();
+								decl->parent = var;
+								decl->composedName = "$var" + context.GetUniquePostfix();
+								var->declaration = decl;
 
-							auto assign = make_shared<AstAssignmentStatement>();
-							assign->parent = block;
-							block->statements.push_back(assign);
+								auto assign = make_shared<AstAssignmentStatement>();
+								assign->parent = block;
+								block->statements.push_back(assign);
 
+								auto ref = make_shared<AstReferenceExpression>();
+								ref->parent = assign;
+								ref->reference = decl;
+								assign->target = ref;
+
+								it2->value->parent = assign;
+								assign->value = it2->value;
+							}
+					
 							auto ref = make_shared<AstReferenceExpression>();
-							ref->parent = assign;
-							ref->reference = decl;
-							assign->target = ref;
-
-							value->parent = assign;
-							assign->value = value;
+							ref->reference = var->declaration;
+							it2->value = ref;
 						}
 
-						result.statement->parent = block;
-						block->statements.push_back(result.statement);
-					
-						auto ref = make_shared<AstReferenceExpression>();
-						ref->reference = var->declaration;
-
-						value = ref;
-						statement = block;
-						continuation = result.continuation;
+						if (merged.continuation)
+						{
+							merged.continuation->statement = block;
+						}
+						else
+						{
+							merged.statement = block;
+						}
+						merged.continuation = it->continuation;
 					}
 				}
+				return merged;
 			}
 		};
 
@@ -402,7 +407,20 @@ namespace tinymoe
 
 		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return SymbolAstResult();
+			vector<SymbolAstResult> results;
+			for (auto element : elements)
+			{
+				results.push_back(element->GenerateAst(scope, context, module));
+			}
+			auto result = SymbolAstResult::Merge(context, results);
+
+			auto ast = make_shared<AstNewArrayLiteralExpression>();
+			for (auto& element : results)
+			{
+				ast->elements.push_back(element.value);
+				element.value->parent = ast;
+			}
+			return result.ReplaceValue(ast);
 		}
 
 		SymbolAstResult UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
@@ -476,17 +494,18 @@ namespace tinymoe
 				break;
 			}
 			
-			auto firstResult = first->GenerateAst(scope, context, module);
-			auto secondResult = second->GenerateAst(scope, context, module);
-			firstResult.Merge(secondResult, context);
+			vector<SymbolAstResult> results;
+			results.push_back(first->GenerateAst(scope, context, module));
+			results.push_back(second->GenerateAst(scope, context, module));
+			auto result = SymbolAstResult::Merge(context, results);
 
 			auto ast = make_shared<AstBinaryExpression>();
 			ast->op = astOp;
-			ast->first = firstResult.value;
-			firstResult.value->parent = ast;
-			ast->second = secondResult.value;
-			secondResult.value->parent = ast;
-			return firstResult.ReplaceValue(ast);
+			ast->first = results[0].value;
+			results[0].value->parent = ast;
+			ast->second = results[1].value;
+			results[1].value->parent = ast;
+			return result.ReplaceValue(ast);
 		}
 
 		/*************************************************************
