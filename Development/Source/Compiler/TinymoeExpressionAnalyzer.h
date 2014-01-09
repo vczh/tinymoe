@@ -9,6 +9,7 @@ namespace tinymoe
 	{
 		class AstNode;
 		class AstExpression;
+		class AstLambdaExpression;
 	}
 
 	namespace compiler
@@ -16,6 +17,7 @@ namespace tinymoe
 		class SymbolModule;
 		class SymbolAstScope;
 		struct SymbolAstContext;
+		struct SymbolAstResult;
 
 		/*************************************************************
 		Symbol
@@ -131,7 +133,7 @@ namespace tinymoe
 			virtual string								ToLog() = 0;
 			virtual string								ToCode() = 0;
 			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments) = 0;
-			virtual shared_ptr<ast::AstExpression>		GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda) = 0;
+			virtual SymbolAstResult						GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module) = 0;
 		};
 
 		// for numbers and strings
@@ -143,7 +145,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		// for new created symbols in <assignable> and <argument>
@@ -155,7 +157,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		// for symbol referencing
@@ -167,7 +169,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		// for function invoking
@@ -180,7 +182,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		// for <list>
@@ -192,7 +194,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		enum class UnaryOperator
@@ -212,7 +214,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		enum class BinaryOperator
@@ -243,7 +245,7 @@ namespace tinymoe
 			string										ToLog()override;
 			string										ToCode()override;
 			void										CollectNewAssignable(Expression::List& assignables, Expression::List& arguments)override;
-			shared_ptr<ast::AstExpression>				GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)override;
+			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)override;
 		};
 
 		/*************************************************************

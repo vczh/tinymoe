@@ -12,8 +12,8 @@ namespace tinymoe
 			typedef shared_ptr<SymbolAstScope>							Ptr;
 			typedef map<GrammarSymbol::Ptr, AstDeclaration::Ptr>		SymbolAstDeclarationMap;
 
-			SymbolAstDeclarationMap			readAsts;
-			SymbolAstDeclarationMap			writeAsts;
+			SymbolAstDeclarationMap					readAsts;
+			SymbolAstDeclarationMap					writeAsts;
 
 			AstType::Ptr GetType(GrammarSymbol::Ptr symbol, AstNode::Ptr parent)
 			{
@@ -62,6 +62,93 @@ namespace tinymoe
 
 		struct SymbolAstContext
 		{
+			int										uniqueId = 0;
+
+			string GetUniquePostfix()
+			{
+				stringstream ss;
+				ss << "_" << uniqueId++;
+				return ss.str();
+			}
+		};
+
+		struct SymbolAstResult
+		{
+			shared_ptr<AstExpression>				value;
+			shared_ptr<AstStatement>				statement;
+			shared_ptr<AstLambdaExpression>			continuation;
+
+			SymbolAstResult()
+			{
+			}
+
+			SymbolAstResult(shared_ptr<AstExpression> _value)
+				:value(_value)
+			{
+			}
+
+			SymbolAstResult(shared_ptr<AstExpression> _value, shared_ptr<AstStatement> _statement, shared_ptr<AstLambdaExpression> _continuation)
+				:value(_value)
+				, statement(_statement)
+				, continuation(_continuation)
+			{
+			}
+
+			bool RequireCps()
+			{
+				return statement && continuation;
+			}
+
+			SymbolAstResult ReplaceValue(shared_ptr<AstExpression> _value)
+			{
+				return SymbolAstResult(_value, statement, continuation);
+			}
+
+			void Merge(SymbolAstResult& result, SymbolAstContext& context)
+			{
+				if (result.RequireCps())
+				{
+					if (RequireCps())
+					{
+						continuation->statement = result.statement;
+						result.statement->parent = continuation;
+						continuation = result.continuation;
+					}
+					else
+					{
+						auto block = make_shared<AstBlockStatement>();
+						auto var = make_shared<AstDeclarationStatement>();
+						{
+							auto decl = make_shared<AstSymbolDeclaration>();
+							decl->parent = var;
+							decl->composedName = "$var" + context.GetUniquePostfix();
+							var->declaration = decl;
+
+							auto assign = make_shared<AstAssignmentStatement>();
+							assign->parent = block;
+							block->statements.push_back(assign);
+
+							auto ref = make_shared<AstReferenceExpression>();
+							ref->parent = assign;
+							ref->reference = decl;
+							assign->target = ref;
+
+							value->parent = assign;
+							assign->value = value;
+						}
+
+						result.statement->parent = block;
+						block->statements.push_back(result.statement);
+					
+						auto ref = make_shared<AstReferenceExpression>();
+						ref->reference = var->declaration;
+
+						value = ref;
+						statement = block;
+						continuation = result.continuation;
+					}
+				}
+			}
 		};
 
 		/*************************************************************
@@ -268,39 +355,138 @@ namespace tinymoe
 		Expression::GenerateAst
 		*************************************************************/
 
-		shared_ptr<ast::AstExpression> LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			switch (token.type)
+			{
+			case CodeTokenType::Integer:
+				{
+					char* endptr = 0;
+					int result = strtol(token.value.c_str(), &endptr, 10);
+					auto ast = make_shared<AstIntegerExpression>();
+					ast->value = result;
+					return SymbolAstResult(ast);
+				}
+			case CodeTokenType::Float:
+				{
+					char* endptr = 0;
+					double result = strtod(token.value.c_str(), &endptr);
+					auto ast = make_shared<AstFloatExpression>();
+					ast->value = result;
+					return SymbolAstResult(ast);
+				}
+			case CodeTokenType::String:
+				{
+					auto ast = make_shared<AstStringExpression>();
+					ast->value = token.value;
+					return SymbolAstResult(ast);
+				}
+			}
+			return SymbolAstResult();
 		}
 
-		shared_ptr<ast::AstExpression> ArgumentExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult ArgumentExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			return SymbolAstResult();
 		}
 
-		shared_ptr<ast::AstExpression> ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult ReferenceExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			return SymbolAstResult();
 		}
 
-		shared_ptr<ast::AstExpression> InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			return SymbolAstResult();
 		}
 
-		shared_ptr<ast::AstExpression> ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			return SymbolAstResult();
 		}
 
-		shared_ptr<ast::AstExpression> UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			AstUnaryOperator astOp = AstUnaryOperator::Not;
+			switch (op)
+			{
+			case UnaryOperator::Not:
+				astOp = AstUnaryOperator::Not;
+				break;
+			case UnaryOperator::Positive:
+				astOp = AstUnaryOperator::Positive;
+				break;
+			case UnaryOperator::Negative:
+				astOp = AstUnaryOperator::Negative;
+				break;
+			}
+
+			auto result = operand->GenerateAst(scope, context, module);
+			auto ast = make_shared<AstUnaryExpression>();
+			ast->op = astOp;
+			ast->operand = result.value;
+			result.value->parent = ast;
+			return result.ReplaceValue(ast);
 		}
 
-		shared_ptr<ast::AstExpression> BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module, shared_ptr<ast::AstExpression>& continuationLambda)
+		SymbolAstResult BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return nullptr;
+			AstBinaryOperator astOp = AstBinaryOperator::Concat;
+			
+			switch (op)
+			{
+			case BinaryOperator::Concat:
+				astOp = AstBinaryOperator::Concat;
+				break;
+			case BinaryOperator::Add:
+				astOp = AstBinaryOperator::Add;
+				break;
+			case BinaryOperator::Sub:
+				astOp = AstBinaryOperator::Sub;
+				break;
+			case BinaryOperator::Mul:
+				astOp = AstBinaryOperator::Mul;
+				break;
+			case BinaryOperator::Div:
+				astOp = AstBinaryOperator::Div;
+				break;
+			case BinaryOperator::LT:
+				astOp = AstBinaryOperator::LT;
+				break;
+			case BinaryOperator::GT:
+				astOp = AstBinaryOperator::GT;
+				break;
+			case BinaryOperator::LE:
+				astOp = AstBinaryOperator::LE;
+				break;
+			case BinaryOperator::GE:
+				astOp = AstBinaryOperator::GE;
+				break;
+			case BinaryOperator::EQ:
+				astOp = AstBinaryOperator::EQ;
+				break;
+			case BinaryOperator::NE:
+				astOp = AstBinaryOperator::NE;
+				break;
+			case BinaryOperator::And:
+				astOp = AstBinaryOperator::And;
+				break;
+			case BinaryOperator::Or:
+				astOp = AstBinaryOperator::Or;
+				break;
+			}
+			
+			auto firstResult = first->GenerateAst(scope, context, module);
+			auto secondResult = second->GenerateAst(scope, context, module);
+			firstResult.Merge(secondResult, context);
+
+			auto ast = make_shared<AstBinaryExpression>();
+			ast->op = astOp;
+			ast->first = firstResult.value;
+			firstResult.value->parent = ast;
+			ast->second = secondResult.value;
+			secondResult.value->parent = ast;
+			return firstResult.ReplaceValue(ast);
 		}
 
 		/*************************************************************

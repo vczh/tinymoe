@@ -86,11 +86,6 @@ namespace tinymoe
 		AstExpression::Print
 		*************************************************************/
 
-		void AstThisExpression::Print(ostream& o, int indentation)
-		{
-			o << "$this";
-		}
-
 		void AstLiteralExpression::Print(ostream& o, int indentation)
 		{
 			switch (literalName)
@@ -224,6 +219,20 @@ namespace tinymoe
 			o << "new $Array(";
 			length->Print(o, indentation);
 			o << ")";
+		}
+
+		void AstNewArrayLiteralExpression::Print(ostream& o, int indentation)
+		{
+			o << "[";
+			for (auto it = elements.begin(); it != elements.end(); it++)
+			{
+				(*it)->Print(o, indentation);
+				if (it + 1 != elements.end())
+				{
+					o << ", ";
+				}
+			}
+			o << "]";
 		}
 
 		void AstArrayLengthExpression::Print(ostream& o, int indentation)

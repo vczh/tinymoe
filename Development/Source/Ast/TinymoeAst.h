@@ -137,13 +137,6 @@ namespace tinymoe
 			Or,
 		};
 
-		class AstThisExpression : public AstExpression
-		{
-		public:
-
-			void							Print(ostream& o, int indentation)override;
-		};
-
 		class AstLiteralExpression : public AstExpression
 		{
 		public:
@@ -227,6 +220,14 @@ namespace tinymoe
 		{
 		public:
 			AstExpression::Ptr				length;
+
+			void							Print(ostream& o, int indentation)override;
+		};
+
+		class AstNewArrayLiteralExpression : public AstExpression
+		{
+		public:
+			AstExpression::List				elements;
 
 			void							Print(ostream& o, int indentation)override;
 		};
