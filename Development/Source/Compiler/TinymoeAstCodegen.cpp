@@ -426,7 +426,47 @@ namespace tinymoe
 
 		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
 		{
-			return SymbolAstResult();
+			Expression::Ptr func;
+			Expression::List args;
+
+			if (auto ref = dynamic_pointer_cast<ReferenceExpression>(function))
+			{
+				switch (ref->symbol->target)
+				{
+				case GrammarSymbolTarget::Invoke:
+					func = arguments[0];
+					break;
+				case GrammarSymbolTarget::InvokeWith:
+					func = arguments[0];
+					args.assign(arguments.begin() + 1, arguments.end());
+					break;
+				}
+			}
+			if (!func)
+			{
+				func = function;
+				args = arguments;
+			}
+
+			vector<SymbolAstResult> results;
+			results.push_back(func->GenerateAst(scope, context, module));
+			for (auto arg : args)
+			{
+				results.push_back(arg->GenerateAst(scope, context, module));
+			}
+			auto result = SymbolAstResult::Merge(context, results);
+
+			auto ast = make_shared<AstInvokeExpression>();
+			ast->function = results[0].value;
+			for (auto it = results.begin() + 1; it != results.end(); it++)
+			{
+				ast->arguments.push_back(it->value);
+			}
+			for (auto r : results)
+			{
+				r.value->parent = ast;
+			}
+			return result.ReplaceValue(ast);
 		}
 
 		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<SymbolModule> module)
