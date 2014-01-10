@@ -439,7 +439,7 @@ namespace tinymoe
 					break;
 				case GrammarSymbolTarget::InvokeWith:
 					func = arguments[0];
-					args.assign(arguments.begin() + 1, arguments.end());
+					args = dynamic_pointer_cast<ListExpression>(arguments[1])->elements;
 					break;
 				}
 			}
@@ -559,6 +559,12 @@ namespace tinymoe
 				break;
 			case BinaryOperator::Div:
 				astOp = AstBinaryOperator::Div;
+				break;
+			case BinaryOperator::IntDiv:
+				astOp = AstBinaryOperator::IntDiv;
+				break;
+			case BinaryOperator::Mod:
+				astOp = AstBinaryOperator::Mod;
 				break;
 			case BinaryOperator::LT:
 				astOp = AstBinaryOperator::LT;

@@ -160,6 +160,12 @@ namespace tinymoe
 			case AstBinaryOperator::Div:
 				o << " / ";
 				break;
+			case AstBinaryOperator::IntDiv:
+				o << " \\ ";
+				break;
+			case AstBinaryOperator::Mod:
+				o << " % ";
+				break;
 			case AstBinaryOperator::LT:
 				o << " < ";
 				break;

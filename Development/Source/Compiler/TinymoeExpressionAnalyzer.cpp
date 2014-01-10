@@ -327,6 +327,12 @@ namespace tinymoe
 			case BinaryOperator::Div:
 				result += "/(";
 				break;
+			case BinaryOperator::IntDiv:
+				result += "\\(";
+				break;
+			case BinaryOperator::Mod:
+				result += "%(";
+				break;
 			case BinaryOperator::LT:
 				result += "<(";
 				break;
@@ -489,6 +495,12 @@ namespace tinymoe
 				break;
 			case BinaryOperator::Div:
 				result += "/";
+				break;
+			case BinaryOperator::IntDiv:
+				result += "\\";
+				break;
+			case BinaryOperator::Mod:
+				result += "%";
 				break;
 			case BinaryOperator::LT:
 				result += "<";
@@ -1141,8 +1153,8 @@ namespace tinymoe
 
 		CodeError GrammarStack::ParseExp1(Iterator input, Iterator end, ResultList& result)
 		{
-			CodeTokenType tokenTypes[] = { CodeTokenType::Mul, CodeTokenType::Div };
-			BinaryOperator binaryOperators[] = { BinaryOperator::Mul, BinaryOperator::Div };
+			CodeTokenType tokenTypes[] = { CodeTokenType::Mul, CodeTokenType::Div, CodeTokenType::IntDiv, CodeTokenType::Mod };
+			BinaryOperator binaryOperators[] = { BinaryOperator::Mul, BinaryOperator::Div, BinaryOperator::IntDiv, BinaryOperator::Mod };
 			int count = sizeof(tokenTypes) / sizeof(*tokenTypes);
 			return ParseBinary(input, end, &GrammarStack::ParsePrimitive, tokenTypes, binaryOperators, count, result);
 		}

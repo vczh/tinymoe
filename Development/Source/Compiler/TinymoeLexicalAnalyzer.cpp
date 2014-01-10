@@ -230,6 +230,12 @@ namespace tinymoe
 					case '/':
 						AddToken(1, CodeTokenType::Div);
 						break;
+					case '\\':
+						AddToken(1, CodeTokenType::IntDiv);
+						break;
+					case '%':
+						AddToken(1, CodeTokenType::Mod);
+						break;
 					case '<':
 						switch (reading[1])
 						{

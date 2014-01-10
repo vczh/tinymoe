@@ -226,6 +226,8 @@ namespace tinymoe
 			Sub,
 			Mul,
 			Div,
+			IntDiv,
+			Mod,
 			LT,
 			GT,
 			LE,
