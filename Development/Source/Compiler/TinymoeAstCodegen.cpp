@@ -961,17 +961,20 @@ namespace tinymoe
 			case GrammarSymbolTarget::Assign:
 				{
 					SymbolAstResult result = statementExpression->arguments[1]->GenerateAst(scope, context, state, module);
-					
-					auto ast = make_shared<AstAssignmentStatement>();
-					ast->value = result.value;
+					auto assignValue = result.value;
 
 					AstDeclaration::Ptr variable;
+					bool invoke = false;
 					if (auto ref = dynamic_pointer_cast<ReferenceExpression>(statementExpression->arguments[0]))
 					{
 						auto it = scope->writeAsts.find(ref->symbol);
 						if (it == scope->writeAsts.end())
 						{
 							it = scope->readAsts.find(ref->symbol);
+						}
+						else
+						{
+							invoke = true;
 						}
 						variable = it->second;
 					}
@@ -988,13 +991,39 @@ namespace tinymoe
 						context.createdVariables.push_back(symbol);
 						scope->readAsts.insert(make_pair(symbol, variable));
 					}
+					
+					if (invoke)
+					{
+						auto ast = make_shared<AstAssignmentStatement>();
+						ast->value = assignValue;
 
-					auto access = make_shared<AstReferenceExpression>();
-					access->reference = variable;
-					ast->target = access;
+						auto access = make_shared<AstReferenceExpression>();
+						access->reference = variable;
+						ast->target = access;
 
-					result.AppendStatement(ast);
-					return result;
+						result.AppendStatement(ast);
+						return result;
+					}
+					else
+					{
+						auto ast = make_shared<AstExpressionStatement>();
+
+						auto invoke = make_shared<AstInvokeExpression>();
+						ast->expression = invoke;
+
+						auto access = make_shared<AstReferenceExpression>();
+						access->reference = variable;
+						invoke->function = access;
+
+						invoke->arguments.push_back(assignValue);
+
+						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
+						invoke->arguments.push_back(lambda);
+
+						result.AppendStatement(ast);
+						result.continuation = lambda;
+						return result;
+					}
 				}
 			case GrammarSymbolTarget::SetArrayItem:
 				{
