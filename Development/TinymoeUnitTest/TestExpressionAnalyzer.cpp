@@ -155,15 +155,15 @@ TEST_CASE(TestParseArgumentExpression)
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->tokens.size() == 1);
-		TEST_ASSERT(expr->tokens[0].value == "true");
+		TEST_ASSERT(expr->name->identifiers.size() == 1);
+		TEST_ASSERT(expr->name->identifiers[0].value == "true");
 	}
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->tokens.size() == 2);
-		TEST_ASSERT(expr->tokens[0].value == "true");
-		TEST_ASSERT(expr->tokens[1].value == "end");
+		TEST_ASSERT(expr->name->identifiers.size() == 2);
+		TEST_ASSERT(expr->name->identifiers[0].value == "true");
+		TEST_ASSERT(expr->name->identifiers[1].value == "end");
 	}
 }
 
@@ -188,9 +188,9 @@ TEST_CASE(TestParseAssignableExpression)
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->tokens.size() == 2);
-		TEST_ASSERT(expr->tokens[0].value == "true");
-		TEST_ASSERT(expr->tokens[1].value == "end");
+		TEST_ASSERT(expr->name->identifiers.size() == 2);
+		TEST_ASSERT(expr->name->identifiers[0].value == "true");
+		TEST_ASSERT(expr->name->identifiers[1].value == "end");
 	}
 }
 

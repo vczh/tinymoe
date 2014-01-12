@@ -155,7 +155,7 @@ namespace tinymoe
 		class ArgumentExpression : public Expression
 		{
 		public:
-			CodeToken::List								tokens;
+			SymbolName::Ptr								name;
 
 			string										ToLog()override;
 			string										ToCode()override;

@@ -614,7 +614,7 @@ namespace tinymoe
 							auto argument = dynamic_pointer_cast<ArgumentExpression>(expr);
 							GrammarSymbol::Ptr symbol;
 							CodeToken token;
-							BuildNameSymbol(argument->tokens, symbol, token);
+							BuildNameSymbol(argument->name->identifiers, symbol, token);
 							newStatement->newVariables.insert(make_pair(symbol, expr));
 							symbolTokens.insert(make_pair(symbol, token));
 						}
@@ -623,7 +623,7 @@ namespace tinymoe
 							auto argument = dynamic_pointer_cast<ArgumentExpression>(expr);
 							GrammarSymbol::Ptr symbol;
 							CodeToken token;
-							BuildNameSymbol(argument->tokens, symbol, token);
+							BuildNameSymbol(argument->name->identifiers, symbol, token);
 							newStatement->blockArguments.insert(make_pair(symbol, expr));
 							symbolTokens.insert(make_pair(symbol, token));
 						}

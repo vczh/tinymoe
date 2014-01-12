@@ -403,5 +403,124 @@ namespace tinymoe
 		CodeFragment::~CodeFragment()
 		{
 		}
+		/*************************************************************
+		SymbolName
+		*************************************************************/
+
+		string SymbolName::GetName()
+		{
+			string result;
+			for (auto it = identifiers.begin(); it != identifiers.end(); it++)
+			{
+				result += it->value;
+				if (it + 1 != identifiers.end())
+				{
+					result += " ";
+				}
+			}
+			return result;
+		}
+
+		string SymbolName::GetComposedName()
+		{
+			string result;
+			for (auto it = identifiers.begin(); it != identifiers.end(); it++)
+			{
+				result += it->value;
+				if (it + 1 != identifiers.end())
+				{
+					result += "_";
+				}
+			}
+			return result;
+		}
+
+		bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors)
+		{
+			if (it == end)
+			{
+				CodeError error =
+				{
+					ownerToken,
+					"Incomplete code, \"" + content + "\" expected.",
+				};
+				errors.push_back(error);
+				return false;
+			}
+
+			if (it->type != tokenType)
+			{
+				CodeError error =
+				{
+					*it,
+					"\"" + content + "\" expected but \"" + it->value + "\" found.",
+				};
+				errors.push_back(error);
+				return false;
+			}
+
+			it++;
+			return true;
+		}
+
+		SymbolName::Ptr SymbolName::ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
+		{
+			auto symbolName = make_shared<SymbolName>();
+			while (it != end)
+			{
+				if (it->IsNameFragmentToken())
+				{
+					symbolName->identifiers.push_back(*it);
+				}
+				else
+				{
+					CodeError error =
+					{
+						*it,
+						"Token is not a legal name: \"" + it->value + "\".",
+					};
+					errors.push_back(error);
+				}
+				it++;
+			}
+
+			if (symbolName->identifiers.size() == 0)
+			{
+				CodeError error =
+				{
+					ownerToken,
+					ownerName + " name should not be empty.",
+				};
+				errors.push_back(error);
+			}
+			return symbolName;
+		}
+
+		SymbolName::Ptr SymbolName::ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
+		{
+			auto symbolName = make_shared<SymbolName>();
+			while (it != end)
+			{
+				if (it->IsNameFragmentToken())
+				{
+					symbolName->identifiers.push_back(*it++);
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			if (symbolName->identifiers.size() == 0)
+			{
+				CodeError error =
+				{
+					ownerToken,
+					ownerName + " name should not be empty.",
+				};
+				errors.push_back(error);
+			}
+			return symbolName;
+		}
 	}
 }

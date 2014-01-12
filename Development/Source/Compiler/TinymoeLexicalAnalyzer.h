@@ -103,6 +103,22 @@ namespace tinymoe
 			CodeFragment();
 			virtual ~CodeFragment();
 		};
+
+		class SymbolName : public CodeFragment
+		{
+		public:
+			typedef shared_ptr<SymbolName>						Ptr;
+			typedef vector<Ptr>									List;
+
+			vector<CodeToken>									identifiers;
+
+			string												GetName();
+			string												GetComposedName();
+
+			static bool											ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors);
+			static SymbolName::Ptr								ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
+			static SymbolName::Ptr								ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
+		};
 	}
 }
 

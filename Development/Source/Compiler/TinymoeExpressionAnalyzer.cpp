@@ -244,16 +244,7 @@ namespace tinymoe
 
 		string ArgumentExpression::ToLog()
 		{
-			string result = "(argument: ";
-			for (auto i = tokens.begin(); i != tokens.end(); i++)
-			{
-				result += i->value;
-				if (i + 1 != tokens.end())
-				{
-					result += " ";
-				}
-			}
-			result += ")";
+			string result = "(argument: " + name->GetName() + ")";
 			return result;
 		}
 
@@ -384,16 +375,7 @@ namespace tinymoe
 
 		string ArgumentExpression::ToCode()
 		{
-			string result = "(";
-			for (auto i = tokens.begin(); i != tokens.end(); i++)
-			{
-				result += i->value;
-				if (i + 1 != tokens.end())
-				{
-					result += " ";
-				}
-			}
-			result += ")";
+			string result = "(" + name->GetName() + ")";
 			return result;
 		}
 
@@ -1082,7 +1064,7 @@ namespace tinymoe
 			{
 				if (auto argument = dynamic_pointer_cast<ArgumentExpression>(result[i].second))
 				{
-					if (symbolSizes.find(argument->tokens.size()) != symbolSizes.end())
+					if (symbolSizes.find(argument->name->identifiers.size()) != symbolSizes.end())
 					{
 						result.erase(result.begin() + i);
 					}
@@ -1112,7 +1094,8 @@ namespace tinymoe
 				tokens.push_back(*input++);
 
 				auto argument = make_shared<ArgumentExpression>();
-				argument->tokens = tokens;
+				argument->name = make_shared<SymbolName>();
+				argument->name->identifiers = tokens;
 				result.push_back(make_pair(input, static_pointer_cast<Expression>(argument)));
 			}
 
@@ -1255,10 +1238,10 @@ namespace tinymoe
 				auto argument = dynamic_pointer_cast<ArgumentExpression>(assignable);
 
 				ResultList result;
-				ParseExpression(argument->tokens.begin(), argument->tokens.end(), result);
+				ParseExpression(argument->name->identifiers.begin(), argument->name->identifiers.end(), result);
 				for (auto r : result)
 				{
-					if (r.first == argument->tokens.end())
+					if (r.first == argument->name->identifiers.end())
 					{
 						illegalConvertedAssignable = r.second;
 						return -1;

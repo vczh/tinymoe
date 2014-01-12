@@ -441,6 +441,97 @@ namespace tinymoe
 					func = arguments[0];
 					args = dynamic_pointer_cast<ListExpression>(arguments[1])->elements;
 					break;
+				case GrammarSymbolTarget::NewType:
+					{
+						auto ast = make_shared<AstNewTypeExpression>();
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[0])->symbol, ast);
+						return SymbolAstResult(ast);
+					}
+				case GrammarSymbolTarget::NewTypeOfFields:
+					{
+						SymbolAstResult result;
+						vector<AstExpression::Ptr> exprs;
+						int exprStart = 0;
+						for (auto expr : dynamic_pointer_cast<ListExpression>(arguments[1])->elements)
+						{
+							result.Merge(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+						}
+
+						auto ast = make_shared<AstNewTypeExpression>();
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[0])->symbol, ast);
+						ast->fields = exprs;
+						for (auto expr : exprs)
+						{
+							expr->parent = ast;
+						}
+						return result.ReplaceValue(ast);
+					}
+				case GrammarSymbolTarget::NewArray:
+					{
+						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
+						auto ast = make_shared<AstNewArrayExpression>();
+						ast->length = result.value;
+						result.value->parent = ast;
+						return result.ReplaceValue(ast);
+					}
+				case GrammarSymbolTarget::GetArrayItem:
+					{
+						SymbolAstResult result;
+						vector<AstExpression::Ptr> exprs;
+						int exprStart = 0;
+						for (auto expr : arguments)
+						{
+							result.Merge(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+						}
+
+						auto ast = make_shared<AstArrayAccessExpression>();
+						ast->target = exprs[1];
+						ast->index = exprs[0];
+						for (auto expr : exprs)
+						{
+							expr->parent = ast;
+						}
+						return result.ReplaceValue(ast);
+					}
+				case GrammarSymbolTarget::GetArrayLength:
+					{
+						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
+						auto ast = make_shared<AstArrayLengthExpression>();
+						ast->target = result.value;
+						result.value->parent = ast;
+						return result.ReplaceValue(ast);
+					}
+				case GrammarSymbolTarget::IsType:
+					{
+						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
+						auto ast = make_shared<AstTestTypeExpression>();
+						ast->target = result.value;
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
+						result.value->parent = ast;
+						return result.ReplaceValue(ast);
+					}
+				case GrammarSymbolTarget::IsNotType:
+					{
+						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
+						auto ast = make_shared<AstTestTypeExpression>();
+						ast->target = result.value;
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
+						result.value->parent = ast;
+
+						auto unary = make_shared<AstUnaryExpression>();
+						unary->op = AstUnaryOperator::Not;
+						unary->operand = ast;
+						ast->parent = unary;
+						return result.ReplaceValue(unary);
+					}
+				case GrammarSymbolTarget::GetField:
+					{
+						SymbolAstResult result = arguments[1]->GenerateAst(scope, context, state, module);
+						auto ast = make_shared<AstFieldAccessExpression>();
+						ast->target = result.value;
+						ast->composedFieldName = dynamic_pointer_cast<ArgumentExpression>(arguments[0])->name->GetComposedName();
+						return result.ReplaceValue(ast);
+					}
 				}
 			}
 			if (!func)
