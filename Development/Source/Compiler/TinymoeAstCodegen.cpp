@@ -994,18 +994,6 @@ namespace tinymoe
 					
 					if (invoke)
 					{
-						auto ast = make_shared<AstAssignmentStatement>();
-						ast->value = assignValue;
-
-						auto access = make_shared<AstReferenceExpression>();
-						access->reference = variable;
-						ast->target = access;
-
-						result.AppendStatement(ast);
-						return result;
-					}
-					else
-					{
 						auto ast = make_shared<AstExpressionStatement>();
 
 						auto invoke = make_shared<AstInvokeExpression>();
@@ -1022,6 +1010,18 @@ namespace tinymoe
 
 						result.AppendStatement(ast);
 						result.continuation = lambda;
+						return result;
+					}
+					else
+					{
+						auto ast = make_shared<AstAssignmentStatement>();
+						ast->value = assignValue;
+
+						auto access = make_shared<AstReferenceExpression>();
+						access->reference = variable;
+						ast->target = access;
+
+						result.AppendStatement(ast);
 						return result;
 					}
 				}
