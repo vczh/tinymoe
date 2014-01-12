@@ -636,6 +636,12 @@ namespace tinymoe
 				ref->composedName = "$state" + context.GetUniquePostfix();
 				lambda->arguments.push_back(ref);
 			}
+			{
+				auto ref = make_shared<AstSymbolDeclaration>();
+				ref->parent = lambda;
+				ref->composedName = "$result" + context.GetUniquePostfix();
+				lambda->arguments.push_back(ref);
+			}
 			ast->arguments.push_back(lambda);
 
 			for (auto expr : exprs)
@@ -814,6 +820,135 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::Select:
 				{
+					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
+					auto selectedValue = result.value;
+
+					auto selectLambda = make_shared<AstLambdaExpression>();
+					{
+						auto ref = make_shared<AstSymbolDeclaration>();
+						ref->parent = selectLambda;
+						ref->composedName = "$state" + context.GetUniquePostfix();
+						selectLambda->arguments.push_back(ref);
+					}
+					{
+						auto ref = make_shared<AstSymbolDeclaration>();
+						ref->parent = selectLambda;
+						ref->composedName = "$result" + context.GetUniquePostfix();
+						selectLambda->arguments.push_back(ref);
+					}
+
+					auto selectContinuation = make_shared<AstSymbolDeclaration>();
+					selectContinuation->composedName = "$select_continuation" + context.GetUniquePostfix();
+
+					auto selectValue = make_shared<AstSymbolDeclaration>();
+					selectValue->composedName = "$select_value" + context.GetUniquePostfix();
+
+					{
+						auto stat = make_shared<AstDeclarationStatement>();
+						stat->declaration = selectContinuation;
+						selectContinuation->parent = stat;
+						result.AppendStatement(stat);
+					}
+					{
+						auto stat = make_shared<AstDeclarationStatement>();
+						stat->declaration = selectValue;
+						selectValue->parent = stat;
+						result.AppendStatement(stat);
+					}
+					{
+						auto stat = make_shared<AstAssignmentStatement>();
+						stat->value = selectLambda;
+						selectLambda->parent = stat;
+
+						auto access = make_shared<AstReferenceExpression>();
+						access->parent = stat;
+						access->reference = selectContinuation;
+						stat->target = access;
+
+						result.AppendStatement(stat);
+					}
+					{
+						auto stat = make_shared<AstAssignmentStatement>();
+						stat->value = selectedValue;
+						selectedValue->parent = stat;
+
+						auto access = make_shared<AstReferenceExpression>();
+						access->parent = stat;
+						access->reference = selectValue;
+						stat->target = access;
+
+						result.AppendStatement(stat);
+					}
+
+					if (result.continuation)
+					{
+						state = result.continuation->arguments[0];
+					}
+
+					shared_ptr<AstIfStatement> lastIfStat;
+					Statement::Ptr caseElse;
+					for (auto childCase : statements)
+					{
+						if (childCase->statementSymbol->target == GrammarSymbolTarget::CaseElse)
+						{
+							caseElse = childCase;
+							continue;
+						}
+						SymbolAstResult caseResult = childCase->statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
+						if (caseResult.continuation)
+						{
+							state = caseResult.continuation->arguments[0];
+						}
+
+						auto ifstat = make_shared<AstIfStatement>();
+						{
+							auto binary = make_shared<AstBinaryExpression>();
+							binary->parent = ifstat;
+							binary->op = AstBinaryOperator::EQ;
+							
+							auto value = make_shared<AstReferenceExpression>();
+							value->parent = binary;
+							value->reference = selectValue;
+							binary->first = value;
+
+							binary->second = caseResult.value;
+							caseResult.value->parent = binary;
+
+							ifstat->condition = binary;
+						}
+						caseResult.AppendStatement(ifstat);
+
+						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, module, selectContinuation);
+						ifstat->trueBranch = bodyResult.statement;
+
+						if (lastIfStat)
+						{
+							lastIfStat->falseBranch = ifstat;
+							result.continuation = caseResult.continuation;
+						}
+						else
+						{
+							result.AppendStatement(ifstat);
+						}
+						lastIfStat = ifstat;
+					}
+
+					if (caseElse)
+					{
+						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, module, selectContinuation);
+
+						if (lastIfStat)
+						{
+							lastIfStat->falseBranch = bodyResult.statement;
+						}
+						else
+						{
+							result.AppendStatement(bodyResult.statement);
+						}
+					}
+
+					result.continuation = selectLambda;
+					return result;
 				}
 			case GrammarSymbolTarget::Call:
 				{
@@ -987,7 +1122,7 @@ namespace tinymoe
 			return SymbolAstResult();
 		}
 
-		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, bool appendExit)
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, shared_ptr<ast::AstDeclaration> continuation)
 		{
 			SymbolAstResult result;
 			for (auto stat : statements)
@@ -1000,7 +1135,52 @@ namespace tinymoe
 				result.MergeForStatement(stat->GenerateAst(scope, context, state, signal, module), state);
 			}
 
-			if (appendExit)
+			if (continuation)
+			{
+				auto stat = make_shared<AstExpressionStatement>();
+
+				auto invoke = make_shared<AstInvokeExpression>();
+				invoke->parent = stat;
+				stat->expression = invoke;
+
+				auto cont = make_shared<AstReferenceExpression>();
+				cont->parent = invoke;
+				cont->reference = continuation;
+				invoke->function = cont;
+
+				if (result.continuation)
+				{
+					{
+						auto arg = make_shared<AstReferenceExpression>();
+						arg->parent = invoke;
+						arg->reference = result.continuation->arguments[0];
+						invoke->arguments.push_back(arg);
+					}
+					{
+						auto arg = make_shared<AstReferenceExpression>();
+						arg->parent = invoke;
+						arg->reference = result.continuation->arguments[1];
+						invoke->arguments.push_back(arg);
+					}
+				}
+				else
+				{
+					{
+						auto arg = make_shared<AstReferenceExpression>();
+						arg->parent = invoke;
+						arg->reference = state;
+						invoke->arguments.push_back(arg);
+					}
+					{
+						auto arg = make_shared<AstLiteralExpression>();
+						arg->parent = invoke;
+						arg->literalName = AstLiteralName::Null;
+						invoke->arguments.push_back(arg);
+					}
+				}
+				result.AppendStatement(stat);
+			}
+			else
 			{
 				result.MergeForStatement(GenerateExitAst(scope, context, state, module), state);
 			}
