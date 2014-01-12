@@ -11,7 +11,7 @@ namespace tinymoe
 		Common
 		*************************************************************/
 
-		class AstNode
+		class AstNode : protected enable_shared_from_this<AstNode>
 		{
 		public:
 			typedef shared_ptr<AstNode>				Ptr;
@@ -23,7 +23,9 @@ namespace tinymoe
 			virtual ~AstNode();
 
 			string							Indent(int indentation);
-			virtual void					Print(ostream& o, int indentation) = 0;
+			void							Print(ostream& o, int indentation, AstNode::WeakPtr parent = AstNode::WeakPtr());
+		protected:
+			virtual void					PrintInternal(ostream& o, int indentation) = 0;
 		};
 
 		class AstType : public AstNode
@@ -66,8 +68,9 @@ namespace tinymoe
 		public:
 			typedef shared_ptr<AstSymbolDeclaration>			Ptr;
 			typedef vector<Ptr>									List;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstTypeDeclaration : public AstDeclaration
@@ -77,8 +80,9 @@ namespace tinymoe
 
 			AstType::WeakPtr				baseType;
 			AstSymbolDeclaration::List		fields;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstFunctionDeclaration : public AstDeclaration
@@ -98,8 +102,9 @@ namespace tinymoe
 			AstSymbolDeclaration::Ptr		signalArgument;				// (optional) for block
 			AstSymbolDeclaration::Ptr		blockBodyArgument;			// (optional) for block
 			AstSymbolDeclaration::Ptr		continuationArgument;		// for function
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		/*************************************************************
@@ -143,32 +148,36 @@ namespace tinymoe
 		{
 		public:
 			AstLiteralName					literalName;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstIntegerExpression : public AstExpression
 		{
 		public:
 			int64_t							value;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstFloatExpression : public AstExpression
 		{
 		public:
 			double							value;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstStringExpression : public AstExpression
 		{
 		public:
 			string							value;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstReferenceExpression : public AstExpression
@@ -177,8 +186,9 @@ namespace tinymoe
 			AstDeclaration::WeakPtr			reference;			// could be
 																//     AstSymbolDeclaration
 																//     AstFunctionDeclaration
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstUnaryExpression : public AstExpression
@@ -186,8 +196,9 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				operand;
 			AstUnaryOperator				op;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstBinaryExpression : public AstExpression
@@ -196,8 +207,9 @@ namespace tinymoe
 			AstExpression::Ptr				first;
 			AstExpression::Ptr				second;
 			AstBinaryOperator				op;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstNewTypeExpression : public AstExpression
@@ -205,8 +217,9 @@ namespace tinymoe
 		public:
 			AstType::Ptr					type;
 			AstExpression::List				fields;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstTestTypeExpression : public AstExpression
@@ -214,32 +227,36 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				target;
 			AstType::Ptr					type;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstNewArrayExpression : public AstExpression
 		{
 		public:
 			AstExpression::Ptr				length;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstNewArrayLiteralExpression : public AstExpression
 		{
 		public:
 			AstExpression::List				elements;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstArrayLengthExpression : public AstExpression
 		{
 		public:
 			AstExpression::Ptr				target;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstArrayAccessExpression : public AstExpression
@@ -247,8 +264,9 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				target;
 			AstExpression::Ptr				index;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstFieldAccessExpression : public AstExpression
@@ -256,8 +274,9 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				target;
 			string							composedFieldName;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -265,8 +284,9 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				function;
 			AstExpression::List				arguments;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstLambdaExpression : public AstExpression
@@ -274,8 +294,9 @@ namespace tinymoe
 		public:
 			AstSymbolDeclaration::List		arguments;
 			AstStatement::Ptr				statement;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		/*************************************************************
@@ -286,24 +307,27 @@ namespace tinymoe
 		{
 		public:
 			AstStatement::List				statements;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstExpressionStatement : public AstStatement
 		{
 		public:
 			AstExpression::Ptr				expression;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstDeclarationStatement : public AstStatement
 		{
 		public:
 			AstDeclaration::Ptr				declaration;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstAssignmentStatement : public AstStatement
@@ -314,8 +338,9 @@ namespace tinymoe
 																//     AstFieldAccessExpression
 																//     AstArrayAccessExpression
 			AstExpression::Ptr				value;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		
@@ -325,8 +350,9 @@ namespace tinymoe
 			AstExpression::Ptr				condition;
 			AstStatement::Ptr				trueBranch;
 			AstStatement::Ptr				falseBranch;		// (optional)
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		/*************************************************************
@@ -348,16 +374,18 @@ namespace tinymoe
 		{
 		public:
 			AstPredefinedTypeName			typeName;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		class AstReferenceType : public AstType
 		{
 		public:
 			weak_ptr<AstTypeDeclaration>	typeDeclaration;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
 		/*************************************************************
@@ -370,8 +398,9 @@ namespace tinymoe
 			typedef shared_ptr<AstAssembly>			Ptr;
 
 			AstDeclaration::List			declarations;
-
-			void							Print(ostream& o, int indentation)override;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
 		};
 	}
 }

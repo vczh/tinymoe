@@ -26,39 +26,45 @@ namespace tinymoe
 			return s;
 		}
 
+		void AstNode::Print(ostream& o, int indentation, AstNode::WeakPtr parent)
+		{
+			ASSERT(parent.expired() || this->parent.lock() == parent.lock());
+			PrintInternal(o, indentation);
+		}
+
 		/*************************************************************
 		AstDeclaration::Print
 		*************************************************************/
 
-		void AstSymbolDeclaration::Print(ostream& o, int indentation)
+		void AstSymbolDeclaration::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation) << "symbol " << composedName << ";";
 		}
 
-		void AstTypeDeclaration::Print(ostream& o, int indentation)
+		void AstTypeDeclaration::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation) << "type " << composedName;
 			if (!baseType.expired())
 			{
 				o << " : ";
-				baseType.lock()->Print(o, indentation);
+				baseType.lock()->Print(o, indentation, shared_from_this());
 			}
 			o << endl << Indent(indentation) << "{" << endl;
 			for (auto field : fields)
 			{
-				field->Print(o, indentation + 1);
+				field->Print(o, indentation + 1, shared_from_this());
 				o << endl;
 			}
 			o << Indent(indentation) << "}";
 		}
 
-		void AstFunctionDeclaration::Print(ostream& o, int indentation)
+		void AstFunctionDeclaration::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation) << "function ";
 			if (ownerType)
 			{
 				o << "(";
-				ownerType->Print(o, indentation);
+				ownerType->Print(o, indentation, shared_from_this());
 				o << ").";
 			}
 			o << composedName << "(";
@@ -74,7 +80,7 @@ namespace tinymoe
 			if (statement)
 			{
 				o << ")" << endl;
-				statement->Print(o, indentation + (dynamic_pointer_cast<AstBlockStatement>(statement) ? 0 : 1));
+				statement->Print(o, indentation + (dynamic_pointer_cast<AstBlockStatement>(statement) ? 0 : 1), shared_from_this());
 			}
 			else
 			{
@@ -86,7 +92,7 @@ namespace tinymoe
 		AstExpression::Print
 		*************************************************************/
 
-		void AstLiteralExpression::Print(ostream& o, int indentation)
+		void AstLiteralExpression::PrintInternal(ostream& o, int indentation)
 		{
 			switch (literalName)
 			{
@@ -102,27 +108,27 @@ namespace tinymoe
 			}
 		}
 
-		void AstIntegerExpression::Print(ostream& o, int indentation)
+		void AstIntegerExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << value;
 		}
 
-		void AstFloatExpression::Print(ostream& o, int indentation)
+		void AstFloatExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << value;
 		}
 
-		void AstStringExpression::Print(ostream& o, int indentation)
+		void AstStringExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "\"" << value << "\"";
 		}
 
-		void AstReferenceExpression::Print(ostream& o, int indentation)
+		void AstReferenceExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << reference.lock()->composedName;
 		}
 
-		void AstUnaryExpression::Print(ostream& o, int indentation)
+		void AstUnaryExpression::PrintInternal(ostream& o, int indentation)
 		{
 			switch (op)
 			{
@@ -136,13 +142,13 @@ namespace tinymoe
 				o << "-";
 				break;
 			}
-			operand->Print(o, indentation);
+			operand->Print(o, indentation, shared_from_this());
 		}
 
-		void AstBinaryExpression::Print(ostream& o, int indentation)
+		void AstBinaryExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "(";
-			first->Print(o, indentation);
+			first->Print(o, indentation, shared_from_this());
 			switch (op)
 			{
 			case AstBinaryOperator::Concat:
@@ -191,18 +197,18 @@ namespace tinymoe
 				o << " || ";
 				break;
 			}
-			second->Print(o, indentation);
+			second->Print(o, indentation, shared_from_this());
 			o << ")";
 		}
 
-		void AstNewTypeExpression::Print(ostream& o, int indentation)
+		void AstNewTypeExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "new ";
-			type->Print(o, indentation);
+			type->Print(o, indentation, shared_from_this());
 			o << "(";
 			for (auto it = fields.begin(); it != fields.end(); it++)
 			{
-				(*it)->Print(o, indentation);
+				(*it)->Print(o, indentation, shared_from_this());
 				if (it + 1 != fields.end())
 				{
 					o << ", ";
@@ -211,28 +217,28 @@ namespace tinymoe
 			o << ")";
 		}
 
-		void AstTestTypeExpression::Print(ostream& o, int indentation)
+		void AstTestTypeExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "(";
-			target->Print(o, indentation);
+			target->Print(o, indentation, shared_from_this());
 			o << " is ";
-			type->Print(o, indentation);
+			type->Print(o, indentation, shared_from_this());
 			o << ")";
 		}
 
-		void AstNewArrayExpression::Print(ostream& o, int indentation)
+		void AstNewArrayExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "new $Array(";
-			length->Print(o, indentation);
+			length->Print(o, indentation, shared_from_this());
 			o << ")";
 		}
 
-		void AstNewArrayLiteralExpression::Print(ostream& o, int indentation)
+		void AstNewArrayLiteralExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "[";
 			for (auto it = elements.begin(); it != elements.end(); it++)
 			{
-				(*it)->Print(o, indentation);
+				(*it)->Print(o, indentation, shared_from_this());
 				if (it + 1 != elements.end())
 				{
 					o << ", ";
@@ -241,34 +247,34 @@ namespace tinymoe
 			o << "]";
 		}
 
-		void AstArrayLengthExpression::Print(ostream& o, int indentation)
+		void AstArrayLengthExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "$ArrayLength(";
-			target->Print(o, indentation);
+			target->Print(o, indentation, shared_from_this());
 			o << ")";
 		}
 
-		void AstArrayAccessExpression::Print(ostream& o, int indentation)
+		void AstArrayAccessExpression::PrintInternal(ostream& o, int indentation)
 		{
-			target->Print(o, indentation);
+			target->Print(o, indentation, shared_from_this());
 			o << "[";
-			index->Print(o, indentation);
+			index->Print(o, indentation, shared_from_this());
 			o << "]";
 		}
 
-		void AstFieldAccessExpression::Print(ostream& o, int indentation)
+		void AstFieldAccessExpression::PrintInternal(ostream& o, int indentation)
 		{
-			target->Print(o, indentation);
+			target->Print(o, indentation, shared_from_this());
 			o << "." << composedFieldName;
 		}
 
-		void AstInvokeExpression::Print(ostream& o, int indentation)
+		void AstInvokeExpression::PrintInternal(ostream& o, int indentation)
 		{
-			function->Print(o, indentation);
+			function->Print(o, indentation, shared_from_this());
 			o << "(";
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
-				(*it)->Print(o, indentation);
+				(*it)->Print(o, indentation, shared_from_this());
 				if (it + 1 != arguments.end())
 				{
 					o << ", ";
@@ -277,7 +283,7 @@ namespace tinymoe
 			o << ")";
 		}
 
-		void AstLambdaExpression::Print(ostream& o, int indentation)
+		void AstLambdaExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "function (";
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
@@ -289,55 +295,55 @@ namespace tinymoe
 				}
 			}
 			o << ")" << endl;
-			statement->Print(o, indentation + 1);
+			statement->Print(o, indentation + 1, shared_from_this());
 		}
 
 		/*************************************************************
 		AstStatement::Print
 		*************************************************************/
 
-		void AstBlockStatement::Print(ostream& o, int indentation)
+		void AstBlockStatement::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation - 1) << "{" << endl;
 			for (auto statement : statements)
 			{
-				statement->Print(o, indentation + 1);
+				statement->Print(o, indentation + 1, shared_from_this());
 				o << endl;
 			}
 			o << Indent(indentation - 1) << "}";
 		}
 
-		void AstExpressionStatement::Print(ostream& o, int indentation)
+		void AstExpressionStatement::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation);
-			expression->Print(o, indentation);
+			expression->Print(o, indentation, shared_from_this());
 			o << ";";
 		}
 
-		void AstDeclarationStatement::Print(ostream& o, int indentation)
+		void AstDeclarationStatement::PrintInternal(ostream& o, int indentation)
 		{
-			declaration->Print(o, indentation);
+			declaration->Print(o, indentation, shared_from_this());
 		}
 
-		void AstAssignmentStatement::Print(ostream& o, int indentation)
+		void AstAssignmentStatement::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation);
-			target->Print(o, indentation);
+			target->Print(o, indentation, shared_from_this());
 			o << " = ";
-			value->Print(o, indentation);
+			value->Print(o, indentation, shared_from_this());
 			o << ";";
 		}
 
-		void AstIfStatement::Print(ostream& o, int indentation)
+		void AstIfStatement::PrintInternal(ostream& o, int indentation)
 		{
 			o << Indent(indentation) << "if (";
-			condition->Print(o, indentation);
+			condition->Print(o, indentation, shared_from_this());
 			o << endl;
-			trueBranch->Print(o, indentation + 1);
+			trueBranch->Print(o, indentation + 1, shared_from_this());
 			if (falseBranch)
 			{
 				o << endl;
-				falseBranch->Print(o, indentation + 1);
+				falseBranch->Print(o, indentation + 1, shared_from_this());
 			}
 		}
 
@@ -345,7 +351,7 @@ namespace tinymoe
 		AstType::Print
 		*************************************************************/
 
-		void AstPredefinedType::Print(ostream& o, int indentation)
+		void AstPredefinedType::PrintInternal(ostream& o, int indentation)
 		{
 			switch (typeName)
 			{
@@ -373,7 +379,7 @@ namespace tinymoe
 			}
 		}
 
-		void AstReferenceType::Print(ostream& o, int indentation)
+		void AstReferenceType::PrintInternal(ostream& o, int indentation)
 		{
 			o << typeDeclaration.lock()->composedName;
 		}
@@ -382,11 +388,11 @@ namespace tinymoe
 		AstAssembly::Print
 		*************************************************************/
 
-		void AstAssembly::Print(ostream& o, int indentation)
+		void AstAssembly::PrintInternal(ostream& o, int indentation)
 		{
 			for (auto decl : declarations)
 			{
-				decl->Print(o, indentation);
+				decl->Print(o, indentation, shared_from_this());
 				o << endl << endl;
 			}
 		}

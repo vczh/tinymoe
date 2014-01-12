@@ -14,4 +14,11 @@
 
 using namespace std;
 
+namespace tinymoe
+{
+	struct AssertFailedException{};
+}
+
+#define ASSERT(CONDITION) do{if(!(CONDITION)) throw AssertFailedException();}while(0)
+
 #endif
