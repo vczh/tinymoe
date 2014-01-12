@@ -38,12 +38,12 @@ namespace tinymoe
 
 		void AstSymbolDeclaration::PrintInternal(ostream& o, int indentation)
 		{
-			o << Indent(indentation) << "symbol " << composedName << ";";
+			o << Indent(indentation) << "$symbol " << composedName << ";";
 		}
 
 		void AstTypeDeclaration::PrintInternal(ostream& o, int indentation)
 		{
-			o << Indent(indentation) << "type " << composedName;
+			o << Indent(indentation) << "$type " << composedName;
 			if (!baseType.expired())
 			{
 				o << " : ";
@@ -60,7 +60,7 @@ namespace tinymoe
 
 		void AstFunctionDeclaration::PrintInternal(ostream& o, int indentation)
 		{
-			o << Indent(indentation) << "function ";
+			o << Indent(indentation) << "$procedure ";
 			if (ownerType)
 			{
 				o << "(";
@@ -121,6 +121,13 @@ namespace tinymoe
 		void AstStringExpression::PrintInternal(ostream& o, int indentation)
 		{
 			o << "\"" << value << "\"";
+		}
+
+		void AstExternalSymbolExpression::PrintInternal(ostream& o, int indentation)
+		{
+			o << "$external (";
+			name->Print(o, indentation);
+			o << ")";
 		}
 
 		void AstReferenceExpression::PrintInternal(ostream& o, int indentation)
@@ -345,6 +352,11 @@ namespace tinymoe
 				o << endl;
 				falseBranch->Print(o, indentation + 1, shared_from_this());
 			}
+		}
+
+		void AstReturnStatement::PrintInternal(ostream& o, int indentation)
+		{
+			o << Indent(indentation) << "return;";
 		}
 
 		/*************************************************************

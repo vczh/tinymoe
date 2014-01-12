@@ -180,6 +180,15 @@ namespace tinymoe
 			void							PrintInternal(ostream& o, int indentation)override;
 		};
 
+		class AstExternalSymbolExpression : public AstExpression
+		{
+		public:
+			AstExpression::Ptr				name;
+			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
+		};
+
 		class AstReferenceExpression : public AstExpression
 		{
 		public:
@@ -351,6 +360,12 @@ namespace tinymoe
 			AstStatement::Ptr				trueBranch;
 			AstStatement::Ptr				falseBranch;		// (optional)
 			
+		protected:
+			void							PrintInternal(ostream& o, int indentation)override;
+		};
+
+		class AstReturnStatement : public AstStatement
+		{
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 		};

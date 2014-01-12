@@ -63,6 +63,7 @@ namespace tinymoe
 		struct SymbolAstContext
 		{
 			int										uniqueId = 0;
+			AstFunctionDeclaration::Ptr				function;
 
 			string GetUniquePostfix()
 			{
@@ -87,6 +88,11 @@ namespace tinymoe
 			{
 			}
 
+			SymbolAstResult(shared_ptr<AstStatement> _statement)
+				:statement(_statement)
+			{
+			}
+
 			SymbolAstResult(shared_ptr<AstExpression> _value, shared_ptr<AstStatement> _statement, shared_ptr<AstLambdaExpression> _continuation)
 				:value(_value)
 				, statement(_statement)
@@ -107,6 +113,16 @@ namespace tinymoe
 			SymbolAstResult ReplaceValue(shared_ptr<AstExpression> _value, shared_ptr<AstLambdaExpression> _continuation)
 			{
 				return SymbolAstResult(_value, statement, _continuation);
+			}
+
+			SymbolAstResult ReplaceStatement(shared_ptr<AstStatement> _statement)
+			{
+				return SymbolAstResult(value, _statement, continuation);
+			}
+
+			SymbolAstResult ReplaceStatement(shared_ptr<AstStatement> _statement, shared_ptr<AstLambdaExpression> _continuation)
+			{
+				return SymbolAstResult(value, _statement, _continuation);
 			}
 
 			void MergeForExpression(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr> exprs, int& exprStart, AstDeclaration::Ptr& state)
@@ -179,7 +195,7 @@ namespace tinymoe
 				}
 			}
 
-			void MergeForStatement(const SymbolAstResult& result)
+			void MergeForStatement(const SymbolAstResult& result, AstDeclaration::Ptr& state)
 			{
 				if (RequireCps())
 				{
@@ -192,6 +208,11 @@ namespace tinymoe
 				{
 					AppendStatement(statement, result.statement);
 					continuation = result.continuation;
+				}
+
+				if (continuation)
+				{
+					state = continuation->arguments[0];
 				}
 			}
 		};
@@ -742,8 +763,74 @@ namespace tinymoe
 		Statement::GenerateAst
 		*************************************************************/
 
+		SymbolAstResult Statement::GenerateExitAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		{
+			auto block = make_shared<AstBlockStatement>();
+			{
+				auto stat = make_shared<AstExpressionStatement>();
+				stat->parent = block;
+				block->statements.push_back(stat);
+
+				auto invoke = make_shared<AstInvokeExpression>();
+				invoke->parent = stat;
+				stat->expression = invoke;
+
+				auto cont = make_shared<AstReferenceExpression>();
+				cont->parent = invoke;
+				cont->reference = context.function->continuationArgument;
+				invoke->function = cont;
+				{
+					auto arg = make_shared<AstReferenceExpression>();
+					arg->parent = invoke;
+					arg->reference = state;
+					invoke->arguments.push_back(arg);
+				}
+				{
+					auto arg = make_shared<AstReferenceExpression>();
+					arg->parent = invoke;
+					arg->reference = context.function->resultVariable;
+					invoke->arguments.push_back(arg);
+				}
+			}
+			{
+				auto stat = make_shared<AstReturnStatement>();
+				stat->parent = block;
+				block->statements.push_back(stat);
+			}
+			return SymbolAstResult(block);
+		}
+
 		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
+			switch (statementSymbol->target)
+			{
+			case GrammarSymbolTarget::Exit:
+				{
+					return GenerateExitAst(scope, context, state, module);
+				}
+			case GrammarSymbolTarget::Select:
+				{
+				}
+			case GrammarSymbolTarget::Call:
+				{
+				}
+			case GrammarSymbolTarget::CallContinuation:
+				{
+				}
+			case GrammarSymbolTarget::RedirectTo:
+				{
+				}
+			case GrammarSymbolTarget::Assign:
+				{
+				}
+			case GrammarSymbolTarget::SetArrayItem:
+				{
+				}
+			case GrammarSymbolTarget::SetField:
+				{
+				}
+			}
+
 			return SymbolAstResult();
 		}
 
