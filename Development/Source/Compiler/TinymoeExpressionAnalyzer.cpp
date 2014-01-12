@@ -539,19 +539,19 @@ namespace tinymoe
 		Expression::CollectNewAssignables
 		*************************************************************/
 
-		void LiteralExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void LiteralExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
 		}
 
-		void ArgumentExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void ArgumentExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
 		}
 
-		void ReferenceExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void ReferenceExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
 		}
 
-		void InvokeExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void InvokeExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
 			if (auto reference = dynamic_pointer_cast<ReferenceExpression>(function))
 			{
@@ -563,6 +563,10 @@ namespace tinymoe
 						if (auto argument = dynamic_pointer_cast<ArgumentExpression>(*it))
 						{
 							newAssignables.push_back(*it);
+						}
+						else if (auto ref = dynamic_pointer_cast<ReferenceExpression>(*it))
+						{
+							modifiedAssignables.push_back(*it);
 						}
 					}
 					else if (fragment->type == GrammarFragmentType::Argument)
@@ -580,31 +584,31 @@ namespace tinymoe
 			}
 			else
 			{
-				function->CollectNewAssignable(newAssignables, newArguments);
+				function->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
 				for (auto argument : arguments)
 				{
-					argument->CollectNewAssignable(newAssignables, newArguments);
+					argument->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
 				}
 			}
 		}
 
-		void ListExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void ListExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
 			for (auto element : elements)
 			{
-				element->CollectNewAssignable(newAssignables, newArguments);
+				element->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
 			}
 		}
 
-		void UnaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void UnaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
-			operand->CollectNewAssignable(newAssignables, newArguments);
+			operand->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
 		}
 
-		void BinaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)
+		void BinaryExpression::CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)
 		{
-			first->CollectNewAssignable(newAssignables, newArguments);
-			second->CollectNewAssignable(newAssignables, newArguments);
+			first->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
+			second->CollectNewAssignable(newAssignables, newArguments, modifiedAssignables);
 		}
 
 		/*************************************************************

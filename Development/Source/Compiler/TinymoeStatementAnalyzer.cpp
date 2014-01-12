@@ -372,27 +372,11 @@ namespace tinymoe
 		{
 			if (symbol && symbol->type == acceptableType)
 			{
+				if (auto decl = FindDeclaration(symbol))
 				{
-					auto itblock = symbolDeclarations.find(symbol);
-					if (itblock != symbolDeclarations.end())
+					if (auto func = dynamic_pointer_cast<FunctionDeclaration>(decl))
 					{
-						if (auto block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second))
-						{
-							return block;
-						}
-					}
-				}
-
-				for (auto weakRef : usingSymbolModules)
-				{
-					auto ref = weakRef.lock();
-					auto itblock = ref->symbolDeclarations.find(symbol);
-					if (itblock != ref->symbolDeclarations.end())
-					{
-						if (auto block = dynamic_pointer_cast<FunctionDeclaration>(itblock->second))
-						{
-							return block;
-						}
+						return func;
 					}
 				}
 			}
@@ -437,8 +421,8 @@ namespace tinymoe
 					multimap<int, Expression::Ptr> statementScores;
 					for (auto r : result)
 					{
-						Expression::List assignables, arguments;
-						r.second->CollectNewAssignable(assignables, arguments);
+						Expression::List assignables, arguments, modifiedAssignables;
+						r.second->CollectNewAssignable(assignables, arguments, modifiedAssignables);
 
 						Expression::Ptr illegalConvertedAssignable;
 						int score = stack->CountStatementAssignables(assignables, illegalConvertedAssignable);
@@ -621,8 +605,8 @@ namespace tinymoe
 						newStatement->statementSymbol = symbol;
 						newStatement->statementExpression = invoke;
 					
-						Expression::List assignables, arguments;
-						invoke->CollectNewAssignable(assignables, arguments);
+						Expression::List assignables, arguments, modifiedAssignables;
+						invoke->CollectNewAssignable(assignables, arguments, modifiedAssignables);
 
 						map<GrammarSymbol::Ptr, CodeToken> symbolTokens;
 						for (auto expr : assignables)
@@ -642,6 +626,19 @@ namespace tinymoe
 							BuildNameSymbol(argument->tokens, symbol, token);
 							newStatement->blockArguments.insert(make_pair(symbol, expr));
 							symbolTokens.insert(make_pair(symbol, token));
+						}
+						for (auto expr : modifiedAssignables)
+						{
+							auto ref = dynamic_pointer_cast<ReferenceExpression>(expr);
+							if ((ref->symbol->target != GrammarSymbolTarget::Custom && ref->symbol->target!=GrammarSymbolTarget::TheResult) || FindDeclaration(ref->symbol))
+							{
+								CodeError error =
+								{
+									newStatement->keywordToken,
+									"Symbol \"" + ref->symbol->uniqueId + "\" cannot be assigned to.",
+								};
+								errors.push_back(error);
+							}
 						}
 
 						if (parent && block && parent->category && parent->category->categoryName && block->category)

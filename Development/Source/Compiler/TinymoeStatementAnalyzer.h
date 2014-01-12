@@ -6,8 +6,19 @@
 
 namespace tinymoe
 {
+	namespace ast
+	{
+		class AstNode;
+		class AstStatement;
+	}
+
 	namespace compiler
 	{
+		class SymbolModule;
+		class SymbolAstScope;
+		struct SymbolAstContext;
+		struct SymbolAstResult;
+
 		/*************************************************************
 		Statement
 		*************************************************************/
@@ -28,6 +39,9 @@ namespace tinymoe
 			SymbolExpressionMap				blockArguments;
 			Statement::List					statements;
 			bool							connectToPreviousBlock = false;
+
+			SymbolAstResult					GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module);
+			SymbolAstResult					GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module);
 		};
 
 		/*************************************************************

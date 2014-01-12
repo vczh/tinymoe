@@ -612,6 +612,16 @@ namespace tinymoe
 		Statement::GenerateAst
 		*************************************************************/
 
+		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		{
+			return SymbolAstResult();
+		}
+
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		{
+			return SymbolAstResult();
+		}
+
 		/*************************************************************
 		GenerateAst
 		*************************************************************/

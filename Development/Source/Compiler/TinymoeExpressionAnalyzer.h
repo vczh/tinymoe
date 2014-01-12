@@ -135,7 +135,7 @@ namespace tinymoe
 
 			virtual string								ToLog() = 0;
 			virtual string								ToCode() = 0;
-			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments) = 0;
+			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables) = 0;
 			virtual SymbolAstResult						GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module) = 0;
 		};
 
@@ -147,7 +147,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -159,7 +159,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -171,7 +171,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -184,7 +184,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -196,7 +196,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -216,7 +216,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments)override;
+			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
@@ -249,7 +249,7 @@ namespace tinymoe
 
 			string										ToLog()override;
 			string										ToCode()override;
-			void										CollectNewAssignable(Expression::List& assignables, Expression::List& arguments)override;
+			void										CollectNewAssignable(Expression::List& assignables, Expression::List& arguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)override;
 		};
 
