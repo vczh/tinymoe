@@ -20,6 +20,7 @@ namespace tinymoe
 			typedef vector<Ptr>											List;
 			typedef map<GrammarSymbol::Ptr, Expression::Ptr>			SymbolExpressionMap;
 
+			CodeToken						keywordToken;
 			Statement::WeakPtr				parentStatement;
 			GrammarSymbol::Ptr				statementSymbol;
 			InvokeExpression::Ptr			statementExpression;

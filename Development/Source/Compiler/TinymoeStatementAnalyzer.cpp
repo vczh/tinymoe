@@ -555,21 +555,56 @@ namespace tinymoe
 						switch (symbol->target)
 						{
 						case GrammarSymbolTarget::End:
-							if (statement->statementSymbol && statement->statementSymbol->target != GrammarSymbolTarget::Select)
+							if (statement->statementSymbol)
 							{
-								if (!parent || (parent->category && !parent->category->closable))
+								if (statement->statementSymbol->target != GrammarSymbolTarget::Select)
 								{
-									CodeError error =
+									if (!parent || (parent->category && !parent->category->closable))
 									{
-										line->tokens[0],
-										"A non-closable block cannot be closed using \"end\".",
-									};
-									errors.push_back(error);
+										CodeError error =
+										{
+											line->tokens[0],
+											"A non-closable block cannot be closed using \"end\".",
+										};
+										errors.push_back(error);
+									}
+								}
+								else
+								{
+									Statement::Ptr lastCaseStatement;
+									for (int i = 0; (size_t)i < statement->statements.size(); i++)
+									{
+										auto childStat = statement->statements[i];
+										switch (childStat->statementSymbol->target)
+										{
+										case GrammarSymbolTarget::Case:
+										case GrammarSymbolTarget::CaseElse:
+											lastCaseStatement = childStat;
+											break;
+										default:
+											if (lastCaseStatement)
+											{
+												statement->statements.erase(statement->statements.begin() + i);
+												lastCaseStatement->statements.push_back(childStat);
+												i--;
+											}
+											else
+											{
+												CodeError error =
+												{
+													childStat->keywordToken,
+													"Select sentence can only contain case or case else sentence.",
+												};
+												errors.push_back(error);
+											}
+										}
+									}
 								}
 							}
 							POP_STACK;
 							return nullptr;
 						case GrammarSymbolTarget::Case:
+						case GrammarSymbolTarget::CaseElse:
 							if (!statement->statementSymbol || statement->statementSymbol->target != GrammarSymbolTarget::Select)
 							{
 								CodeError error =
@@ -582,6 +617,7 @@ namespace tinymoe
 						}
 
 						auto newStatement = make_shared<Statement>();
+						newStatement->keywordToken = line->tokens[0];
 						newStatement->statementSymbol = symbol;
 						newStatement->statementExpression = invoke;
 					

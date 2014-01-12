@@ -197,6 +197,10 @@ namespace tinymoe
 				+ "case" + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CaseElse)
+				+ "case" + "else"
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
 				+ "call" + GrammarFragmentType::Expression
 				);

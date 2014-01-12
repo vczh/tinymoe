@@ -83,6 +83,7 @@ namespace tinymoe
 			Exit,					// (sentence)	exit
 			Select,					// (block)		select <expression>
 			Case,					// (sentence)	case <expression>
+			CaseElse,				// (sentence)	case else
 			Call,					// (sentence)	call <expression>
 			CallContinuation,		// (sentence)	call continuation <expression> with <list>
 			RedirectTo,				// (sentence)	redirect to <expression>
