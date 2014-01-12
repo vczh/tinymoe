@@ -64,6 +64,7 @@ namespace tinymoe
 		{
 			int										uniqueId = 0;
 			AstFunctionDeclaration::Ptr				function;
+			GrammarSymbol::List						createdVariables;
 
 			string GetUniquePostfix()
 			{
@@ -207,7 +208,7 @@ namespace tinymoe
 			void MergeForStatement(const SymbolAstResult& result, AstDeclaration::Ptr& state)
 			{
 				AppendStatement(result.statement);
-				if (!RequireCps())
+				if (result.RequireCps())
 				{
 					continuation = result.continuation;
 				}
@@ -894,6 +895,44 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::Assign:
 				{
+					SymbolAstResult result = statementExpression->arguments[1]->GenerateAst(scope, context, state, module);
+					
+					auto ast = make_shared<AstAssignmentStatement>();
+					ast->value = result.value;
+					result.value->parent = ast;
+
+					AstDeclaration::Ptr variable;
+					if (auto ref = dynamic_pointer_cast<ReferenceExpression>(statementExpression->arguments[0]))
+					{
+						auto it = scope->writeAsts.find(ref->symbol);
+						if (it == scope->writeAsts.end())
+						{
+							it = scope->readAsts.find(ref->symbol);
+						}
+						variable = it->second;
+					}
+					else if (auto arg = dynamic_pointer_cast<ArgumentExpression>(statementExpression->arguments[0]))
+					{
+						variable = make_shared<AstSymbolDeclaration>();
+						variable->composedName = arg->name->GetComposedName();
+
+						auto varStat = make_shared<AstDeclarationStatement>();
+						varStat->declaration = variable;
+						variable->parent = varStat;
+						result.AppendStatement(varStat);
+
+						auto symbol = newVariables.begin()->first;
+						context.createdVariables.push_back(symbol);
+						scope->readAsts.insert(make_pair(symbol, variable));
+					}
+
+					auto access = make_shared<AstReferenceExpression>();
+					access->parent = ast;
+					access->reference = variable;
+					ast->target = access;
+
+					result.AppendStatement(ast);
+					return result;
 				}
 			case GrammarSymbolTarget::SetArrayItem:
 				{
