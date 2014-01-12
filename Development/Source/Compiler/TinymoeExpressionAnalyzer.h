@@ -179,6 +179,8 @@ namespace tinymoe
 		class InvokeExpression : public Expression
 		{
 		public:
+			typedef shared_ptr<InvokeExpression>		Ptr;
+
 			Expression::Ptr								function;
 			Expression::List							arguments;
 

@@ -591,6 +591,7 @@ namespace tinymoe
 						SymbolAstResult result = arguments[1]->GenerateAst(scope, context, state, module);
 						auto ast = make_shared<AstFieldAccessExpression>();
 						ast->target = result.value;
+						result.value->parent = ast;
 						ast->composedFieldName = dynamic_pointer_cast<ArgumentExpression>(arguments[0])->name->GetComposedName();
 						return result.ReplaceValue(ast);
 					}
@@ -802,7 +803,7 @@ namespace tinymoe
 			return SymbolAstResult(block);
 		}
 
-		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module)
 		{
 			switch (statementSymbol->target)
 			{
@@ -826,13 +827,8 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::CallContinuation:
 				{
-					Expression::Ptr func;
-					Expression::List args;
-					{
-						auto invoke = dynamic_pointer_cast<InvokeExpression>(statementExpression);
-						func = invoke->arguments[0];
-						args = dynamic_pointer_cast<ListExpression>(invoke->arguments[1])->elements;
-					}
+					auto func = statementExpression->arguments[0];
+					auto& args = dynamic_pointer_cast<ListExpression>(statementExpression->arguments[1])->elements;
 
 					SymbolAstResult result;
 					vector<AstExpression::Ptr> exprs;
@@ -871,24 +867,105 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
+					auto block = make_shared<AstBlockStatement>();
+					{
+						auto stat = make_shared<AstExpressionStatement>();
+						stat->parent = block;
+						block->statements.push_back(stat);
+
+						auto invoke = make_shared<AstInvokeExpression>();
+						invoke->parent = stat;
+						stat->expression = invoke;
+
+						for (auto decl : context.function->arguments)
+						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->parent = invoke;
+							arg->reference = (decl == context.function->stateArgument ? state : decl);
+							invoke->arguments.push_back(arg);
+						}
+					}
+					{
+						auto stat = make_shared<AstReturnStatement>();
+						stat->parent = block;
+						block->statements.push_back(stat);
+					}
+					return SymbolAstResult(block);
 				}
 			case GrammarSymbolTarget::Assign:
 				{
 				}
 			case GrammarSymbolTarget::SetArrayItem:
 				{
+					SymbolAstResult result;
+					AstExpression::List exprs;
+					int exprStart = 0;
+					result.MergeForExpression(statementExpression->arguments[0]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+
+					auto ast = make_shared<AstAssignmentStatement>();
+
+					auto access = make_shared<AstArrayAccessExpression>();
+					access->parent = ast;
+					ast->target = access;
+					access->target = exprs[1];
+					exprs[1]->parent = access;
+					access->index = exprs[0];
+					exprs[0]->parent = access;
+
+					ast->value = exprs[2];
+					exprs[2]->parent = ast;
+
+					result.AppendStatement(ast);
+					return result;
 				}
 			case GrammarSymbolTarget::SetField:
 				{
+					SymbolAstResult result;
+					AstExpression::List exprs;
+					int exprStart = 0;
+					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+
+					auto ast = make_shared<AstAssignmentStatement>();
+
+					auto access = make_shared<AstFieldAccessExpression>();
+					access->parent = ast;
+					ast->target = access;
+					access->target = exprs[0];
+					exprs[0]->parent = access;
+					access->composedFieldName = dynamic_pointer_cast<ArgumentExpression>(statementExpression->arguments[0])->name->GetComposedName();
+
+					ast->value = exprs[1];
+					exprs[1]->parent = ast;
+
+					result.AppendStatement(ast);
+					return result;
 				}
 			}
 
 			return SymbolAstResult();
 		}
 
-		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, bool appendExit)
 		{
-			return SymbolAstResult();
+			SymbolAstResult result;
+			for (auto stat : statements)
+			{
+				AstDeclaration::Ptr signal;
+				if (stat->connectToPreviousBlock)
+				{
+					signal = result.continuation->arguments[1];
+				}
+				result.MergeForStatement(stat->GenerateAst(scope, context, state, signal, module), state);
+			}
+
+			if (appendExit)
+			{
+				result.MergeForStatement(GenerateExitAst(scope, context, state, module), state);
+			}
+			return result;
 		}
 
 		/*************************************************************
