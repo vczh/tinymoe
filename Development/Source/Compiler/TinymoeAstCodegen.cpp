@@ -396,6 +396,22 @@ namespace tinymoe
 		Expression::GenerateAst
 		*************************************************************/
 
+		shared_ptr<ast::AstLambdaExpression> Expression::GenerateContinuationLambdaAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		{
+			auto lambda = make_shared<AstLambdaExpression>();
+			{
+				auto ref = make_shared<AstSymbolDeclaration>();
+				ref->composedName = "$state" + context.GetUniquePostfix();
+				lambda->arguments.push_back(ref);
+			}
+			{
+				auto ref = make_shared<AstSymbolDeclaration>();
+				ref->composedName = "$result" + context.GetUniquePostfix();
+				lambda->arguments.push_back(ref);
+			}
+			return lambda;
+		}
+
 		SymbolAstResult LiteralExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
 		{
 			switch (token.type)
@@ -455,9 +471,25 @@ namespace tinymoe
 				}
 			}
 
-			auto ast = make_shared<AstReferenceExpression>();
-			ast->reference = scope->readAsts.find(symbol)->second;
-			return SymbolAstResult(ast);
+			if (scope->writeAsts.find(symbol) != scope->writeAsts.end())
+			{
+				auto ast = make_shared<AstInvokeExpression>();
+				
+				auto function = make_shared<AstReferenceExpression>();
+				function->reference = scope->readAsts.find(symbol)->second;
+				ast->function = function;
+
+				auto lambda = GenerateContinuationLambdaAst(scope, context, state, module);
+				ast->arguments.push_back(lambda);
+
+				return SymbolAstResult(ast, nullptr, lambda);
+			}
+			else
+			{
+				auto ast = make_shared<AstReferenceExpression>();
+				ast->reference = scope->readAsts.find(symbol)->second;
+				return SymbolAstResult(ast);
+			}
 		}
 
 		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
@@ -585,17 +617,7 @@ namespace tinymoe
 				ast->arguments.push_back(*it++);
 			}
 
-			auto lambda = make_shared<AstLambdaExpression>();
-			{
-				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->composedName = "$state" + context.GetUniquePostfix();
-				lambda->arguments.push_back(ref);
-			}
-			{
-				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->composedName = "$result" + context.GetUniquePostfix();
-				lambda->arguments.push_back(ref);
-			}
+			auto lambda = GenerateContinuationLambdaAst(scope, context, state, module);
 			ast->arguments.push_back(lambda);
 
 			return result.ReplaceValue(ast, lambda);
@@ -763,17 +785,7 @@ namespace tinymoe
 					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
 					auto selectedValue = result.value;
 
-					auto selectLambda = make_shared<AstLambdaExpression>();
-					{
-						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$state" + context.GetUniquePostfix();
-						selectLambda->arguments.push_back(ref);
-					}
-					{
-						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$result" + context.GetUniquePostfix();
-						selectLambda->arguments.push_back(ref);
-					}
+					auto selectLambda = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
 
 					auto selectContinuation = make_shared<AstSymbolDeclaration>();
 					selectContinuation->composedName = "$select_continuation" + context.GetUniquePostfix();

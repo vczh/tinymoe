@@ -137,6 +137,7 @@ namespace tinymoe
 			virtual string								ToCode() = 0;
 			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables) = 0;
 			virtual SymbolAstResult						GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module) = 0;
+			static shared_ptr<ast::AstLambdaExpression>	GenerateContinuationLambdaAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module);
 		};
 
 		// for numbers and strings
