@@ -109,7 +109,7 @@ namespace tinymoe
 				return SymbolAstResult(_value, statement, _continuation);
 			}
 
-			void Merge(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr> exprs, int& exprStart, AstDeclaration::Ptr& state)
+			void MergeForExpression(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr> exprs, int& exprStart, AstDeclaration::Ptr& state)
 			{
 				exprs.push_back(result.value);
 				if (result.RequireCps())
@@ -153,6 +153,45 @@ namespace tinymoe
 					continuation = result.continuation;
 					exprStart = exprs.size();
 					state = continuation->arguments[0];
+				}
+			}
+
+			bool AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
+			{
+				if (!target)
+				{
+					target = statement;
+					return true;
+				}
+				else if (auto block = dynamic_pointer_cast<AstBlockStatement>(target))
+				{
+					block->statements.push_back(statement);
+					statement->parent = block;
+					return false;
+				}
+				else
+				{
+					block = make_shared<AstBlockStatement>();
+					block->parent = target->parent;
+					block->statements.push_back(target);
+					block->statements.push_back(statement);
+					target = block;
+				}
+			}
+
+			void MergeForStatement(const SymbolAstResult& result)
+			{
+				if (RequireCps())
+				{
+					if (AppendStatement(continuation->statement, result.statement))
+					{
+						result.statement->parent = continuation;
+					}
+				}
+				else
+				{
+					AppendStatement(statement, result.statement);
+					continuation = result.continuation;
 				}
 			}
 		};
@@ -454,7 +493,7 @@ namespace tinymoe
 						int exprStart = 0;
 						for (auto expr : dynamic_pointer_cast<ListExpression>(arguments[1])->elements)
 						{
-							result.Merge(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+							result.MergeForExpression(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 						}
 
 						auto ast = make_shared<AstNewTypeExpression>();
@@ -481,7 +520,7 @@ namespace tinymoe
 						int exprStart = 0;
 						for (auto expr : arguments)
 						{
-							result.Merge(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+							result.MergeForExpression(expr->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 						}
 
 						auto ast = make_shared<AstArrayAccessExpression>();
@@ -544,10 +583,10 @@ namespace tinymoe
 			vector<AstExpression::Ptr> exprs;
 			int exprStart = 0;
 
-			result.Merge(func->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+			result.MergeForExpression(func->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			for (auto arg : args)
 			{
-				result.Merge(arg->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+				result.MergeForExpression(arg->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			}
 
 			auto ast = make_shared<AstInvokeExpression>();
@@ -589,7 +628,7 @@ namespace tinymoe
 
 			for (auto element : elements)
 			{
-				result.Merge(element->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+				result.MergeForExpression(element->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 			}
 
 			auto ast = make_shared<AstNewArrayLiteralExpression>();
@@ -621,7 +660,7 @@ namespace tinymoe
 			vector<AstExpression::Ptr> exprs;
 			int exprStart = 0;
 
-			result.Merge(operand->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+			result.MergeForExpression(operand->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 
 			auto ast = make_shared<AstUnaryExpression>();
 			ast->op = astOp;
@@ -687,8 +726,8 @@ namespace tinymoe
 			vector<AstExpression::Ptr> exprs;
 			int exprStart = 0;
 			
-			result.Merge(first->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
-			result.Merge(second->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+			result.MergeForExpression(first->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+			result.MergeForExpression(second->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
 
 			auto ast = make_shared<AstBinaryExpression>();
 			ast->op = astOp;
