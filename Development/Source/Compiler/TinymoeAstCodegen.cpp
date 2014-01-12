@@ -20,7 +20,6 @@ namespace tinymoe
 				if (symbol->target == GrammarSymbolTarget::Custom)
 				{
 					auto type = make_shared<AstReferenceType>();
-					type->parent = parent;
 					type->typeDeclaration = dynamic_pointer_cast<AstTypeDeclaration>(readAsts.find(symbol)->second);
 					return type;
 				}
@@ -53,7 +52,6 @@ namespace tinymoe
 					}
 
 					auto type = make_shared<AstPredefinedType>();
-					type->parent = parent;
 					type->typeName = typeName;
 					return type;
 				}
@@ -127,20 +125,16 @@ namespace tinymoe
 						auto var = make_shared<AstDeclarationStatement>();
 						{
 							auto decl = make_shared<AstSymbolDeclaration>();
-							decl->parent = var;
 							decl->composedName = "$var" + context.GetUniquePostfix();
 							var->declaration = decl;
 
 							auto assign = make_shared<AstAssignmentStatement>();
-							assign->parent = block;
 							block->statements.push_back(assign);
 
 							auto ref = make_shared<AstReferenceExpression>();
-							ref->parent = assign;
 							ref->reference = decl;
 							assign->target = ref;
 
-							exprs[i]->parent = assign;
 							assign->value = exprs[i];
 						}
 					
@@ -163,29 +157,22 @@ namespace tinymoe
 				}
 			}
 
-			static bool AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
+			static void AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
 			{
 				if (!target)
 				{
 					target = statement;
-					return true;
 				}
 				else if (auto block = dynamic_pointer_cast<AstBlockStatement>(target))
 				{
 					block->statements.push_back(statement);
-					statement->parent = block;
-					return false;
 				}
 				else
 				{
 					block = make_shared<AstBlockStatement>();
-					block->parent = target->parent;
 					block->statements.push_back(target);
 					block->statements.push_back(statement);
-					target->parent = block;
-					statement->parent = block;
 					target = block;
-					return false;
 				}
 			}
 
@@ -194,10 +181,7 @@ namespace tinymoe
 				value = nullptr;
 				if (RequireCps())
 				{
-					if (AppendStatement(continuation->statement, statement))
-					{
-						statement->parent = continuation;
-					}
+					AppendStatement(continuation->statement, statement);
 				}
 				else
 				{
@@ -281,18 +265,15 @@ namespace tinymoe
 			else if (type == FunctionArgumentType::Assignable)
 			{
 				auto read = make_shared<AstSymbolDeclaration>();
-				read->parent = parent;
 				read->composedName = "$read_" + name->GetComposedName();
 
 				auto write = make_shared<AstSymbolDeclaration>();
-				write->parent = parent;
 				write->composedName = "$write_" + name->GetComposedName();
 				return AstPair(read, write);
 			}
 			else
 			{
 				auto ast = make_shared<AstSymbolDeclaration>();
-				ast->parent = parent;
 				ast->composedName = name->GetComposedName();
 				return AstPair(ast, nullptr);
 			}
@@ -301,7 +282,6 @@ namespace tinymoe
 		FunctionFragment::AstPair FunctionArgumentFragment::CreateAst(weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
-			ast->parent = parent;
 			ast->composedName = declaration->GetComposedName();
 			return AstPair(ast, nullptr);
 		}
@@ -313,7 +293,6 @@ namespace tinymoe
 		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
-			ast->parent = parent;
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
 			return ast;
 		}
@@ -321,12 +300,10 @@ namespace tinymoe
 		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstTypeDeclaration>();
-			ast->parent = parent;
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
 			for (auto field : fields)
 			{
 				auto astField = make_shared<AstSymbolDeclaration>();
-				astField->parent = ast;
 				astField->composedName = field->GetComposedName();
 				ast->fields.push_back(astField);
 			}
@@ -350,18 +327,15 @@ namespace tinymoe
 		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
 		{
 			auto ast = make_shared<AstFunctionDeclaration>();
-			ast->parent = parent;
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + GetComposedName();
 			
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->parent = ast;
 				argument->composedName = "$the_result";
 				ast->resultVariable = argument;
 			}
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->parent = ast;
 				if (cps && cps->stateName)
 				{
 					argument->composedName = cps->stateName->GetComposedName();
@@ -376,7 +350,6 @@ namespace tinymoe
 			if (category && category->signalName)
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->parent = ast;
 				argument->composedName = category->signalName->GetComposedName();
 				ast->arguments.push_back(argument);
 				ast->signalArgument = argument;
@@ -405,7 +378,6 @@ namespace tinymoe
 
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->parent = ast;
 				if (cps && cps->continuationName)
 				{
 					argument->composedName = cps->continuationName->GetComposedName();
@@ -523,10 +495,6 @@ namespace tinymoe
 						auto ast = make_shared<AstNewTypeExpression>();
 						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[0])->symbol, ast);
 						ast->fields = exprs;
-						for (auto expr : exprs)
-						{
-							expr->parent = ast;
-						}
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::NewArray:
@@ -534,7 +502,6 @@ namespace tinymoe
 						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
 						auto ast = make_shared<AstNewArrayExpression>();
 						ast->length = result.value;
-						result.value->parent = ast;
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::GetArrayItem:
@@ -550,10 +517,6 @@ namespace tinymoe
 						auto ast = make_shared<AstArrayAccessExpression>();
 						ast->target = exprs[1];
 						ast->index = exprs[0];
-						for (auto expr : exprs)
-						{
-							expr->parent = ast;
-						}
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::GetArrayLength:
@@ -561,7 +524,6 @@ namespace tinymoe
 						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state, module);
 						auto ast = make_shared<AstArrayLengthExpression>();
 						ast->target = result.value;
-						result.value->parent = ast;
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::IsType:
@@ -570,7 +532,6 @@ namespace tinymoe
 						auto ast = make_shared<AstTestTypeExpression>();
 						ast->target = result.value;
 						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
-						result.value->parent = ast;
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::IsNotType:
@@ -579,12 +540,10 @@ namespace tinymoe
 						auto ast = make_shared<AstTestTypeExpression>();
 						ast->target = result.value;
 						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
-						result.value->parent = ast;
 
 						auto unary = make_shared<AstUnaryExpression>();
 						unary->op = AstUnaryOperator::Not;
 						unary->operand = ast;
-						ast->parent = unary;
 						return result.ReplaceValue(unary);
 					}
 				case GrammarSymbolTarget::GetField:
@@ -592,7 +551,6 @@ namespace tinymoe
 						SymbolAstResult result = arguments[1]->GenerateAst(scope, context, state, module);
 						auto ast = make_shared<AstFieldAccessExpression>();
 						ast->target = result.value;
-						result.value->parent = ast;
 						ast->composedFieldName = dynamic_pointer_cast<ArgumentExpression>(arguments[0])->name->GetComposedName();
 						return result.ReplaceValue(ast);
 					}
@@ -619,7 +577,6 @@ namespace tinymoe
 			ast->function = *it++;
 			{
 				auto ref = make_shared<AstReferenceExpression>();
-				ref->parent = ast;
 				ref->reference = state;
 				ast->arguments.push_back(ref);
 			}
@@ -629,25 +586,18 @@ namespace tinymoe
 			}
 
 			auto lambda = make_shared<AstLambdaExpression>();
-			lambda->parent = ast;
 			{
 				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->parent = lambda;
 				ref->composedName = "$state" + context.GetUniquePostfix();
 				lambda->arguments.push_back(ref);
 			}
 			{
 				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->parent = lambda;
 				ref->composedName = "$result" + context.GetUniquePostfix();
 				lambda->arguments.push_back(ref);
 			}
 			ast->arguments.push_back(lambda);
 
-			for (auto expr : exprs)
-			{
-				expr->parent = ast;
-			}
 			return result.ReplaceValue(ast, lambda);
 		}
 
@@ -666,7 +616,6 @@ namespace tinymoe
 			for (auto expr : exprs)
 			{
 				ast->elements.push_back(expr);
-				expr->parent = ast;
 			}
 			return result.ReplaceValue(ast);
 		}
@@ -696,7 +645,6 @@ namespace tinymoe
 			auto ast = make_shared<AstUnaryExpression>();
 			ast->op = astOp;
 			ast->operand = result.value;
-			result.value->parent = ast;
 			return result.ReplaceValue(ast);
 		}
 
@@ -764,8 +712,6 @@ namespace tinymoe
 			ast->op = astOp;
 			ast->first = exprs[0];
 			ast->second = exprs[1];
-			exprs[0]->parent = ast;
-			exprs[1]->parent = ast;
 			return result.ReplaceValue(ast);
 		}
 
@@ -778,33 +724,27 @@ namespace tinymoe
 			auto block = make_shared<AstBlockStatement>();
 			{
 				auto stat = make_shared<AstExpressionStatement>();
-				stat->parent = block;
 				block->statements.push_back(stat);
 
 				auto invoke = make_shared<AstInvokeExpression>();
-				invoke->parent = stat;
 				stat->expression = invoke;
 
 				auto cont = make_shared<AstReferenceExpression>();
-				cont->parent = invoke;
 				cont->reference = context.function->continuationArgument;
 				invoke->function = cont;
 				{
 					auto arg = make_shared<AstReferenceExpression>();
-					arg->parent = invoke;
 					arg->reference = state;
 					invoke->arguments.push_back(arg);
 				}
 				{
 					auto arg = make_shared<AstReferenceExpression>();
-					arg->parent = invoke;
 					arg->reference = context.function->resultVariable;
 					invoke->arguments.push_back(arg);
 				}
 			}
 			{
 				auto stat = make_shared<AstReturnStatement>();
-				stat->parent = block;
 				block->statements.push_back(stat);
 			}
 			return SymbolAstResult(block);
@@ -826,13 +766,11 @@ namespace tinymoe
 					auto selectLambda = make_shared<AstLambdaExpression>();
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->parent = selectLambda;
 						ref->composedName = "$state" + context.GetUniquePostfix();
 						selectLambda->arguments.push_back(ref);
 					}
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->parent = selectLambda;
 						ref->composedName = "$result" + context.GetUniquePostfix();
 						selectLambda->arguments.push_back(ref);
 					}
@@ -846,22 +784,18 @@ namespace tinymoe
 					{
 						auto stat = make_shared<AstDeclarationStatement>();
 						stat->declaration = selectContinuation;
-						selectContinuation->parent = stat;
 						result.AppendStatement(stat);
 					}
 					{
 						auto stat = make_shared<AstDeclarationStatement>();
 						stat->declaration = selectValue;
-						selectValue->parent = stat;
 						result.AppendStatement(stat);
 					}
 					{
 						auto stat = make_shared<AstAssignmentStatement>();
 						stat->value = selectLambda;
-						selectLambda->parent = stat;
 
 						auto access = make_shared<AstReferenceExpression>();
-						access->parent = stat;
 						access->reference = selectContinuation;
 						stat->target = access;
 
@@ -870,10 +804,8 @@ namespace tinymoe
 					{
 						auto stat = make_shared<AstAssignmentStatement>();
 						stat->value = selectedValue;
-						selectedValue->parent = stat;
 
 						auto access = make_shared<AstReferenceExpression>();
-						access->parent = stat;
 						access->reference = selectValue;
 						stat->target = access;
 
@@ -903,16 +835,13 @@ namespace tinymoe
 						auto ifstat = make_shared<AstIfStatement>();
 						{
 							auto binary = make_shared<AstBinaryExpression>();
-							binary->parent = ifstat;
 							binary->op = AstBinaryOperator::EQ;
 							
 							auto value = make_shared<AstReferenceExpression>();
-							value->parent = binary;
 							value->reference = selectValue;
 							binary->first = value;
 
 							binary->second = caseResult.value;
-							caseResult.value->parent = binary;
 
 							ifstat->condition = binary;
 						}
@@ -955,8 +884,7 @@ namespace tinymoe
 					SymbolAstResult result = statementExpression->GenerateAst(scope, context, state, module);
 
 					auto ast = make_shared<AstExpressionStatement>();
-					ast->parent = result.value;
-					result.value->parent = ast;
+					ast->expression = result.value;
 
 					result.AppendStatement(ast);
 					return result;
@@ -981,7 +909,6 @@ namespace tinymoe
 					invoke->function = *it++;
 					{
 						auto ref = make_shared<AstReferenceExpression>();
-						ref->parent = invoke;
 						ref->reference = state;
 						invoke->arguments.push_back(ref);
 					}
@@ -990,14 +917,9 @@ namespace tinymoe
 						invoke->arguments.push_back(*it++);
 					}
 
-					for (auto expr : exprs)
-					{
-						expr->parent = invoke;
-					}
-
 					auto ast = make_shared<AstExpressionStatement>();
-					ast->parent = invoke;
-					invoke->parent = ast;
+					ast->expression = invoke;
+
 					result.AppendStatement(ast);
 					return result;
 				}
@@ -1006,24 +928,20 @@ namespace tinymoe
 					auto block = make_shared<AstBlockStatement>();
 					{
 						auto stat = make_shared<AstExpressionStatement>();
-						stat->parent = block;
 						block->statements.push_back(stat);
 
 						auto invoke = make_shared<AstInvokeExpression>();
-						invoke->parent = stat;
 						stat->expression = invoke;
 
 						for (auto decl : context.function->arguments)
 						{
 							auto arg = make_shared<AstReferenceExpression>();
-							arg->parent = invoke;
 							arg->reference = (decl == context.function->stateArgument ? state : decl);
 							invoke->arguments.push_back(arg);
 						}
 					}
 					{
 						auto stat = make_shared<AstReturnStatement>();
-						stat->parent = block;
 						block->statements.push_back(stat);
 					}
 					return SymbolAstResult(block);
@@ -1034,7 +952,6 @@ namespace tinymoe
 					
 					auto ast = make_shared<AstAssignmentStatement>();
 					ast->value = result.value;
-					result.value->parent = ast;
 
 					AstDeclaration::Ptr variable;
 					if (auto ref = dynamic_pointer_cast<ReferenceExpression>(statementExpression->arguments[0]))
@@ -1053,7 +970,6 @@ namespace tinymoe
 
 						auto varStat = make_shared<AstDeclarationStatement>();
 						varStat->declaration = variable;
-						variable->parent = varStat;
 						result.AppendStatement(varStat);
 
 						auto symbol = newVariables.begin()->first;
@@ -1062,7 +978,6 @@ namespace tinymoe
 					}
 
 					auto access = make_shared<AstReferenceExpression>();
-					access->parent = ast;
 					access->reference = variable;
 					ast->target = access;
 
@@ -1081,15 +996,11 @@ namespace tinymoe
 					auto ast = make_shared<AstAssignmentStatement>();
 
 					auto access = make_shared<AstArrayAccessExpression>();
-					access->parent = ast;
 					ast->target = access;
 					access->target = exprs[1];
-					exprs[1]->parent = access;
 					access->index = exprs[0];
-					exprs[0]->parent = access;
 
 					ast->value = exprs[2];
-					exprs[2]->parent = ast;
 
 					result.AppendStatement(ast);
 					return result;
@@ -1105,14 +1016,11 @@ namespace tinymoe
 					auto ast = make_shared<AstAssignmentStatement>();
 
 					auto access = make_shared<AstFieldAccessExpression>();
-					access->parent = ast;
 					ast->target = access;
 					access->target = exprs[0];
-					exprs[0]->parent = access;
 					access->composedFieldName = dynamic_pointer_cast<ArgumentExpression>(statementExpression->arguments[0])->name->GetComposedName();
 
 					ast->value = exprs[1];
-					exprs[1]->parent = ast;
 
 					result.AppendStatement(ast);
 					return result;
@@ -1140,11 +1048,9 @@ namespace tinymoe
 				auto stat = make_shared<AstExpressionStatement>();
 
 				auto invoke = make_shared<AstInvokeExpression>();
-				invoke->parent = stat;
 				stat->expression = invoke;
 
 				auto cont = make_shared<AstReferenceExpression>();
-				cont->parent = invoke;
 				cont->reference = continuation;
 				invoke->function = cont;
 
@@ -1152,13 +1058,11 @@ namespace tinymoe
 				{
 					{
 						auto arg = make_shared<AstReferenceExpression>();
-						arg->parent = invoke;
 						arg->reference = result.continuation->arguments[0];
 						invoke->arguments.push_back(arg);
 					}
 					{
 						auto arg = make_shared<AstReferenceExpression>();
-						arg->parent = invoke;
 						arg->reference = result.continuation->arguments[1];
 						invoke->arguments.push_back(arg);
 					}
@@ -1167,13 +1071,11 @@ namespace tinymoe
 				{
 					{
 						auto arg = make_shared<AstReferenceExpression>();
-						arg->parent = invoke;
 						arg->reference = state;
 						invoke->arguments.push_back(arg);
 					}
 					{
 						auto arg = make_shared<AstLiteralExpression>();
-						arg->parent = invoke;
 						arg->literalName = AstLiteralName::Null;
 						invoke->arguments.push_back(arg);
 					}
@@ -1252,7 +1154,6 @@ namespace tinymoe
 						{
 							auto type = scope->readAsts.find(sdp.first)->second;
 							auto baseType = scope->GetType(module->baseTypes.find(typeDecl)->second, type);
-							type->parent = baseType;
 						}
 					}
 				}
@@ -1265,26 +1166,21 @@ namespace tinymoe
 			)
 		{
 			auto astBlock = make_shared<AstBlockStatement>();
-			astBlock->parent = ast;
 			ast->statement = astBlock;
 
 			auto astExprStat = make_shared<AstExpressionStatement>();
-			astExprStat->parent = astBlock;
 			astBlock->statements.push_back(astExprStat);
 
 			auto astInvoke = make_shared<AstInvokeExpression>();
-			astInvoke->parent = astExprStat;
 			astExprStat->expression = astInvoke;
 
 			auto astFunction = make_shared<AstReferenceExpression>();
-			astFunction->parent = astInvoke;
 			astFunction->reference = function;
 			astInvoke->function = astFunction;
 
 			for (auto argument : ast->arguments)
 			{
 				auto astArgument = make_shared<AstReferenceExpression>();
-				astArgument->parent = astInvoke;
 				astArgument->reference = argument;
 				astInvoke->arguments.push_back(astArgument);
 			}
@@ -1297,31 +1193,25 @@ namespace tinymoe
 			)
 		{
 			auto astBlock = make_shared<AstBlockStatement>();
-			astBlock->parent = ast;
 			ast->statement = astBlock;
 
 			auto astExprStat = make_shared<AstExpressionStatement>();
-			astExprStat->parent = astBlock;
 			astBlock->statements.push_back(astExprStat);
 
 			auto astInvoke = make_shared<AstInvokeExpression>();
-			astInvoke->parent = astExprStat;
 			astExprStat->expression = astInvoke;
 
 			auto astFieldAccess = make_shared<AstFieldAccessExpression>();
-			astFieldAccess->parent = astInvoke;
 			astFieldAccess->composedFieldName = functionName;
 			astInvoke->function = astFieldAccess;
 
 			auto astTargetObject = make_shared<AstReferenceExpression>();
-			astTargetObject->parent = astFieldAccess;
 			astTargetObject->reference = ast->arguments[dispatch];
 			astFieldAccess->target = astTargetObject;
 
 			for (auto argument : ast->arguments)
 			{
 				auto astArgument = make_shared<AstReferenceExpression>();
-				astArgument->parent = astInvoke;
 				astArgument->reference = argument;
 				astInvoke->arguments.push_back(astArgument);
 			}
@@ -1383,7 +1273,6 @@ namespace tinymoe
 						if (ita == func->argumentTypes.end())
 						{
 							auto type = make_shared<AstPredefinedType>();
-							type->parent = ast;
 							type->typeName = AstPredefinedTypeName::Object;
 							ast->ownerType = type;
 							objectFunctions.insert(methodName);
@@ -1429,7 +1318,6 @@ namespace tinymoe
 						ast->composedName = name;
 						{
 							auto type = make_shared<AstPredefinedType>();
-							type->parent = ast;
 							type->typeName = AstPredefinedTypeName::Object;
 							ast->ownerType = type;
 						}
@@ -1454,6 +1342,7 @@ namespace tinymoe
 			GenerateStaticAst(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
 			GenerateMultipleDispatchAsts(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
 
+			assembly->SetParent();
 			return assembly;
 		}
 	}

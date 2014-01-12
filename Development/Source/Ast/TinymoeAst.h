@@ -23,9 +23,11 @@ namespace tinymoe
 			virtual ~AstNode();
 
 			string							Indent(int indentation);
-			void							Print(ostream& o, int indentation, AstNode::WeakPtr parent = AstNode::WeakPtr());
+			void							Print(ostream& o, int indentation, AstNode::WeakPtr _parent = AstNode::WeakPtr());
+			void							SetParent(AstNode::WeakPtr _parent = AstNode::WeakPtr());
 		protected:
 			virtual void					PrintInternal(ostream& o, int indentation) = 0;
+			virtual void					SetParentInternal() = 0;
 		};
 
 		class AstType : public AstNode
@@ -71,6 +73,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstTypeDeclaration : public AstDeclaration
@@ -83,6 +86,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstFunctionDeclaration : public AstDeclaration
@@ -105,6 +109,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		/*************************************************************
@@ -151,6 +156,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstIntegerExpression : public AstExpression
@@ -160,6 +166,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstFloatExpression : public AstExpression
@@ -169,6 +176,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstStringExpression : public AstExpression
@@ -178,6 +186,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstExternalSymbolExpression : public AstExpression
@@ -187,6 +196,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstReferenceExpression : public AstExpression
@@ -198,6 +208,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstUnaryExpression : public AstExpression
@@ -208,6 +219,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstBinaryExpression : public AstExpression
@@ -219,6 +231,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstNewTypeExpression : public AstExpression
@@ -229,6 +242,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstTestTypeExpression : public AstExpression
@@ -239,6 +253,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstNewArrayExpression : public AstExpression
@@ -248,6 +263,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstNewArrayLiteralExpression : public AstExpression
@@ -257,6 +273,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstArrayLengthExpression : public AstExpression
@@ -266,6 +283,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstArrayAccessExpression : public AstExpression
@@ -276,6 +294,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstFieldAccessExpression : public AstExpression
@@ -286,6 +305,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -296,6 +316,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstLambdaExpression : public AstExpression
@@ -306,6 +327,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		/*************************************************************
@@ -319,6 +341,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstExpressionStatement : public AstStatement
@@ -328,6 +351,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstDeclarationStatement : public AstStatement
@@ -337,6 +361,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstAssignmentStatement : public AstStatement
@@ -350,6 +375,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		
@@ -362,12 +388,14 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstReturnStatement : public AstStatement
 		{
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		/*************************************************************
@@ -392,6 +420,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		class AstReferenceType : public AstType
@@ -401,6 +430,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 
 		/*************************************************************
@@ -416,6 +446,7 @@ namespace tinymoe
 			
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
+			void							SetParentInternal()override;
 		};
 	}
 }
