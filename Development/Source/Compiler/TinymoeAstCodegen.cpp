@@ -115,16 +115,6 @@ namespace tinymoe
 				return SymbolAstResult(_value, statement, _continuation);
 			}
 
-			SymbolAstResult ReplaceStatement(shared_ptr<AstStatement> _statement)
-			{
-				return SymbolAstResult(value, _statement, continuation);
-			}
-
-			SymbolAstResult ReplaceStatement(shared_ptr<AstStatement> _statement, shared_ptr<AstLambdaExpression> _continuation)
-			{
-				return SymbolAstResult(value, _statement, _continuation);
-			}
-
 			void MergeForExpression(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr> exprs, int& exprStart, AstDeclaration::Ptr& state)
 			{
 				exprs.push_back(result.value);
@@ -172,7 +162,7 @@ namespace tinymoe
 				}
 			}
 
-			bool AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
+			static bool AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
 			{
 				if (!target)
 				{
@@ -191,22 +181,34 @@ namespace tinymoe
 					block->parent = target->parent;
 					block->statements.push_back(target);
 					block->statements.push_back(statement);
+					target->parent = block;
+					statement->parent = block;
 					target = block;
+					return false;
+				}
+			}
+
+			void AppendStatement(AstStatement::Ptr statement)
+			{
+				value = nullptr;
+				if (RequireCps())
+				{
+					if (AppendStatement(continuation->statement, statement))
+					{
+						statement->parent = continuation;
+					}
+				}
+				else
+				{
+					AppendStatement(statement, statement);
 				}
 			}
 
 			void MergeForStatement(const SymbolAstResult& result, AstDeclaration::Ptr& state)
 			{
-				if (RequireCps())
+				AppendStatement(result.statement);
+				if (!RequireCps())
 				{
-					if (AppendStatement(continuation->statement, result.statement))
-					{
-						result.statement->parent = continuation;
-					}
-				}
-				else
-				{
-					AppendStatement(statement, result.statement);
 					continuation = result.continuation;
 				}
 
@@ -813,9 +815,59 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::Call:
 				{
+					SymbolAstResult result = statementExpression->GenerateAst(scope, context, state, module);
+
+					auto ast = make_shared<AstExpressionStatement>();
+					ast->parent = result.value;
+					result.value->parent = ast;
+
+					result.AppendStatement(ast);
+					return result;
 				}
 			case GrammarSymbolTarget::CallContinuation:
 				{
+					Expression::Ptr func;
+					Expression::List args;
+					{
+						auto invoke = dynamic_pointer_cast<InvokeExpression>(statementExpression);
+						func = invoke->arguments[0];
+						args = dynamic_pointer_cast<ListExpression>(invoke->arguments[1])->elements;
+					}
+
+					SymbolAstResult result;
+					vector<AstExpression::Ptr> exprs;
+					int exprStart = 0;
+
+					result.MergeForExpression(func->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					for (auto arg : args)
+					{
+						result.MergeForExpression(arg->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					}
+
+					auto invoke = make_shared<AstInvokeExpression>();
+					auto it = exprs.begin();
+					invoke->function = *it++;
+					{
+						auto ref = make_shared<AstReferenceExpression>();
+						ref->parent = invoke;
+						ref->reference = state;
+						invoke->arguments.push_back(ref);
+					}
+					while (it != exprs.end())
+					{
+						invoke->arguments.push_back(*it++);
+					}
+
+					for (auto expr : exprs)
+					{
+						expr->parent = invoke;
+					}
+
+					auto ast = make_shared<AstExpressionStatement>();
+					ast->parent = invoke;
+					invoke->parent = ast;
+					result.AppendStatement(ast);
+					return result;
 				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
