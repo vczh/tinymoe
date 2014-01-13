@@ -19,6 +19,7 @@ namespace tinymoe
 		class SymbolAstScope;
 		struct SymbolAstContext;
 		struct SymbolAstResult;
+		class FunctionFragment;
 
 		/*************************************************************
 		Symbol
@@ -45,6 +46,7 @@ namespace tinymoe
 
 			GrammarFragmentType							type;
 			vector<string>								identifiers;
+			shared_ptr<FunctionFragment>				functionFragment;
 
 			GrammarFragment(GrammarFragmentType _type);
 

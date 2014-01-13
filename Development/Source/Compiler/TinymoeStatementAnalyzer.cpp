@@ -69,6 +69,13 @@ namespace tinymoe
 				{
 					(*i)->AppendFunctionSymbol(symbol, (type == FunctionDeclarationType::Phrase && (i == name.begin() || i + 1 == name.end())));
 				}
+
+				auto itname = name.begin();
+				auto itfragment = symbol->fragments.begin();
+				while (itname != name.end())
+				{
+					(*itfragment++)->functionFragment = *itname++;
+				}
 				return symbol;
 			}
 		}

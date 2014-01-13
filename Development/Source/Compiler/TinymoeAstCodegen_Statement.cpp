@@ -55,6 +55,10 @@ namespace tinymoe
 				{
 					declRead = itread->second;
 					declWrite = itwrite->second;
+					if (!declWrite)
+					{
+						declWrite = declRead;
+					}
 					invoke = true;
 				}
 				else
@@ -425,6 +429,10 @@ namespace tinymoe
 						else
 						{
 							invoke = true;
+							if (!it->second)
+							{
+								it = scope->readAsts.find(ref->symbol);
+							}
 						}
 						variable = it->second;
 					}
@@ -541,18 +549,59 @@ namespace tinymoe
 			auto itarg = statementExpression->arguments.begin();
 			for (auto name : statementSymbol->fragments)
 			{
-				if (name->type == GrammarFragmentType::Argument)
+				if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(name->functionFragment))
 				{
-					itarg++;
+					switch (var->type)
+					{
+					case FunctionArgumentType::Argument:
+						itarg++;
+						break;
+					case FunctionArgumentType::Assignable:
+						{
+							AstExpression::Ptr reader, writer;
+							GenerateAssignableArgumentPairAst(scope, context, state, signal, *itarg++, itvar, reader, writer);
+							exprs.push_back(reader);
+							exprs.push_back(writer);
+						}
+						break;
+					case FunctionArgumentType::Expression:
+						{
+							auto lambda = make_shared<AstLambdaExpression>();
+							{
+								auto decl = make_shared<AstSymbolDeclaration>();
+								decl->composedName = "$state" + context.GetUniquePostfix();
+								lambda->arguments.push_back(decl);
+							}
+							{
+								auto decl = make_shared<AstSymbolDeclaration>();
+								decl->composedName = "$continuation" + context.GetUniquePostfix();
+								lambda->arguments.push_back(decl);
+							}
+							SymbolAstResult result = (*itarg)->GenerateAst(scope, context, lambda->arguments[0]);
+
+							auto stat = make_shared<AstExpressionStatement>();
+
+							auto invoke = make_shared<AstInvokeExpression>();
+							stat->expression = invoke;
+							{
+								auto ref = make_shared<AstReferenceExpression>();
+								ref->reference = lambda->arguments[1];
+								invoke->function = ref;
+							}
+							invoke->arguments.push_back(result.value);
+							result.AppendStatement(stat);
+							lambda->statement = result.statement;
+
+							exprs.push_back(lambda);
+							itarg++;
+						}
+						break;
+					default:
+						exprResult.MergeForExpression((*itarg)->GenerateAst(scope, context, state), context, exprs, exprStart, state);
+						itarg++;
+					}
 				}
-				else if (name->type == GrammarFragmentType::Assignable)
-				{
-					AstExpression::Ptr reader, writer;
-					GenerateAssignableArgumentPairAst(scope, context, state, signal, *itarg, itvar, reader, writer);
-					exprs.push_back(reader);
-					exprs.push_back(reader);
-				}
-				else if (name->type != GrammarFragmentType::Name)
+				else if (auto func = dynamic_pointer_cast<FunctionArgumentFragment>(name->functionFragment))
 				{
 					exprResult.MergeForExpression((*itarg)->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 					itarg++;

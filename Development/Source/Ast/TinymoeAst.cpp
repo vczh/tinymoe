@@ -311,7 +311,7 @@ namespace tinymoe
 				}
 			}
 			o << ")" << endl;
-			statement->Print(o, indentation, shared_from_this());
+			statement->Print(o, indentation + 1, shared_from_this());
 		}
 
 		/*************************************************************

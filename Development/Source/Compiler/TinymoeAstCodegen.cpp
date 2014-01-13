@@ -585,6 +585,13 @@ namespace tinymoe
 							scope->writeAsts.insert(make_pair(arg.first, *itdecl++));
 							continue;
 						}
+						else if (var->type == FunctionArgumentType::Expression)
+						{
+							context.createdVariables.push_back(arg.first);
+							scope->readAsts.insert(make_pair(arg.first, *itdecl++));
+							scope->writeAsts.insert(make_pair(arg.first, nullptr));
+							continue;
+						}
 					}
 					context.createdVariables.push_back(arg.first);
 					scope->readAsts.insert(make_pair(arg.first, *itdecl++));
