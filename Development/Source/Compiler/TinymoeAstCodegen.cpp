@@ -859,7 +859,7 @@ namespace tinymoe
 						}
 						caseResult.AppendStatement(ifstat);
 
-						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, module, selectContinuation);
+						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, module, selectContinuation, false);
 						ifstat->trueBranch = bodyResult.statement;
 
 						if (lastIfStat)
@@ -876,7 +876,7 @@ namespace tinymoe
 
 					if (caseElse)
 					{
-						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, module, selectContinuation);
+						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, module, selectContinuation, false);
 
 						if (lastIfStat)
 						{
@@ -1068,10 +1068,256 @@ namespace tinymoe
 				}
 			}
 
-			return SymbolAstResult();
+			auto itarg = statementExpression->arguments.begin();
+			auto itname = statementSymbol->fragments.begin();
+			SymbolAstResult statResult, exprResult;
+			AstExpression::List exprs;
+			int exprStart = 0;
+
+			AstSymbolDeclaration::List newVariableDecls, blockArgumentDecls;
+			for (auto symbol : newVariables)
+			{
+				auto decl = make_shared<AstSymbolDeclaration>();
+				auto& ids = symbol.first->fragments[0]->identifiers;
+				for (auto it = ids.begin(); it != ids.end(); it++)
+				{
+					decl->composedName += *it;
+					if (it + 1 != ids.end())
+					{
+						decl->composedName += "_";
+					}
+				}
+				newVariableDecls.push_back(decl);
+
+				auto stat = make_shared<AstDeclarationStatement>();
+				stat->declaration = decl;
+				statResult.AppendStatement(stat);
+			}
+			for (auto symbol : blockArguments)
+			{
+				auto decl = make_shared<AstSymbolDeclaration>();
+				auto& ids = symbol.first->fragments[0]->identifiers;
+				for (auto it = ids.begin(); it != ids.end(); it++)
+				{
+					decl->composedName += *it;
+					if (it + 1 != ids.end())
+					{
+						decl->composedName += "_";
+					}
+				}
+				blockArgumentDecls.push_back(decl);
+			}
+
+			auto itvar = newVariableDecls.begin();
+			while (itname != statementSymbol->fragments.end())
+			{
+				switch ((*itname)->type)
+				{
+				case GrammarFragmentType::Argument:
+					itarg++;
+					break;
+				case GrammarFragmentType::Assignable:
+					{
+						AstDeclaration::Ptr declRead, declWrite;
+						bool invoke = false;
+						if (auto ref = dynamic_pointer_cast<ReferenceExpression>(*itarg))
+						{
+							auto itwrite = scope->writeAsts.find(ref->symbol);
+							auto itread = scope->readAsts.find(ref->symbol);
+
+							if (itwrite != scope->writeAsts.end())
+							{
+								declRead = itread->second;
+								declWrite = itwrite->second;
+								invoke = true;
+							}
+							else
+							{
+								declRead = declWrite = itread->second;
+							}
+						}
+						else if (auto arg = dynamic_pointer_cast<ArgumentExpression>(*itarg))
+						{
+							declRead = declWrite = *itvar++;
+						}
+
+						if (invoke)
+						{
+							{
+								auto expr = make_shared<AstReferenceExpression>();
+								expr->reference = declRead;
+								exprs.push_back(expr);
+							}
+							{
+								auto expr = make_shared<AstReferenceExpression>();
+								expr->reference = declWrite;
+								exprs.push_back(expr);
+							}
+						}
+						else
+						{
+							{
+								auto lambda = make_shared<AstLambdaExpression>();
+								{
+									auto ref = make_shared<AstSymbolDeclaration>();
+									ref->composedName = "$state" + context.GetUniquePostfix();
+									lambda->arguments.push_back(ref);
+								}
+								{
+									auto ref = make_shared<AstSymbolDeclaration>();
+									ref->composedName = "$continuation" + context.GetUniquePostfix();
+									lambda->arguments.push_back(ref);
+								}
+								exprs.push_back(lambda);
+								
+								auto stat = make_shared<AstExpressionStatement>();
+								lambda->statement = stat;
+
+								auto invoke = make_shared<AstInvokeExpression>();
+								stat->expression = invoke;
+
+								auto cont = make_shared<AstReferenceExpression>();
+								cont->reference = lambda->arguments[1];
+								invoke->function = cont;
+								{
+									auto arg = make_shared<AstReferenceExpression>();
+									arg->reference = lambda->arguments[0];
+									invoke->arguments.push_back(arg);
+								}
+								{
+									auto arg = make_shared<AstReferenceExpression>();
+									arg->reference = declRead;
+									invoke->arguments.push_back(arg);
+								}
+							}
+							{
+								auto lambda = make_shared<AstLambdaExpression>();
+								{
+									auto ref = make_shared<AstSymbolDeclaration>();
+									ref->composedName = "$state" + context.GetUniquePostfix();
+									lambda->arguments.push_back(ref);
+								}
+								{
+									auto ref = make_shared<AstSymbolDeclaration>();
+									ref->composedName = "$input" + context.GetUniquePostfix();
+									lambda->arguments.push_back(ref);
+								}
+								{
+									auto ref = make_shared<AstSymbolDeclaration>();
+									ref->composedName = "$continuation" + context.GetUniquePostfix();
+									lambda->arguments.push_back(ref);
+								}
+								exprs.push_back(lambda);
+								
+								auto block = make_shared<AstBlockStatement>();
+								lambda->statement = block;
+								{
+									auto stat = make_shared<AstAssignmentStatement>();
+									block->statements.push_back(stat);
+									{
+										auto arg = make_shared<AstReferenceExpression>();
+										arg->reference = declWrite;
+										stat->target = arg;
+									}
+									{
+										auto arg = make_shared<AstReferenceExpression>();
+										arg->reference = lambda->arguments[1];
+										stat->value = arg;
+									}
+								}
+								{
+									auto stat = make_shared<AstExpressionStatement>();
+									block->statements.push_back(stat);
+
+									auto invoke = make_shared<AstInvokeExpression>();
+									stat->expression = invoke;
+
+									auto cont = make_shared<AstReferenceExpression>();
+									cont->reference = lambda->arguments[2];
+									invoke->function = cont;
+									{
+										auto arg = make_shared<AstReferenceExpression>();
+										arg->reference = lambda->arguments[0];
+										invoke->arguments.push_back(arg);
+									}
+									{
+										auto arg = make_shared<AstLiteralExpression>();
+										arg->literalName = AstLiteralName::Null;
+										invoke->arguments.push_back(arg);
+									}
+								}
+							}
+						}
+					}
+					itarg++;
+					break;
+				default:
+					if ((*itname)->type != GrammarFragmentType::Name)
+					{
+						exprResult.MergeForExpression((*itarg)->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+						itarg++;
+					}
+				}
+				itname++;
+			}
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			{
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = scope->readAsts.find(statementSymbol)->second;
+				invoke->arguments.push_back(arg);
+			}
+			auto targetFunction = dynamic_pointer_cast<AstFunctionDeclaration>(scope->readAsts.find(statementSymbol)->second);
+			if (targetFunction->stateArgument)
+			{
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = state;
+				invoke->arguments.push_back(arg);
+			}
+			if (targetFunction->signalArgument)
+			{
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = signal;
+				invoke->arguments.push_back(arg);
+			}
+			if (targetFunction->blockBodyArgument)
+			{
+				auto lambda = make_shared<AstLambdaExpression>();
+				{
+					auto ref = make_shared<AstSymbolDeclaration>();
+					ref->composedName = "$state" + context.GetUniquePostfix();
+					lambda->arguments.push_back(ref);
+				}
+				for (auto decl : blockArgumentDecls)
+				{
+					lambda->arguments.push_back(decl);
+				}
+				{
+					auto ref = make_shared<AstSymbolDeclaration>();
+					ref->composedName = "$continuation" + context.GetUniquePostfix();
+					lambda->arguments.push_back(ref);
+				}
+				lambda->statement = GenerateBodyAst(scope, context, state, module, *(lambda->arguments.end() - 1), false).statement;
+				invoke->arguments.push_back(lambda);
+			}
+			invoke->arguments.insert(invoke->arguments.end(), exprs.begin(), exprs.end());
+
+			shared_ptr<AstLambdaExpression> statementContinuation;
+			if (targetFunction->continuationArgument)
+			{
+				statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
+				invoke->arguments.push_back(statementContinuation);
+			}
+
+			auto stat = make_shared<AstExpressionStatement>();
+			stat->expression = invoke;
+			exprResult.AppendStatement(stat);
+			statResult.MergeForStatement(exprResult, state);
+			statResult.continuation = statementContinuation;
+			return statResult;
 		}
 
-		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, shared_ptr<ast::AstDeclaration> continuation)
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, shared_ptr<ast::AstDeclaration> continuation, bool callExit)
 		{
 			SymbolAstResult result;
 			for (auto stat : statements)
@@ -1123,7 +1369,7 @@ namespace tinymoe
 				}
 				result.AppendStatement(stat);
 			}
-			else
+			else if (callExit)
 			{
 				result.MergeForStatement(GenerateExitAst(scope, context, state, module), state);
 			}
