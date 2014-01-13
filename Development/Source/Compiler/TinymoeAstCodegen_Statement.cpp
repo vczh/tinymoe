@@ -588,6 +588,11 @@ namespace tinymoe
 								ref->reference = lambda->arguments[1];
 								invoke->function = ref;
 							}
+							{
+								auto ref = make_shared<AstReferenceExpression>();
+								ref->reference = lambda->arguments[0];
+								invoke->arguments.push_back(ref);
+							}
 							invoke->arguments.push_back(result.value);
 							result.AppendStatement(stat);
 							lambda->statement = result.statement;
