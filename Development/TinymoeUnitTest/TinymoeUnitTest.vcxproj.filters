@@ -66,6 +66,15 @@
     <ClCompile Include="TestAstCodegen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Declaration.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Statement.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Expression.cpp">
+      <Filter>Tinymoe\Compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
