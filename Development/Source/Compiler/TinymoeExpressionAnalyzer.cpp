@@ -608,6 +608,10 @@ namespace tinymoe
 			for (auto symbol : stackItem->symbols)
 			{
 				availableSymbols.insert(make_pair(symbol->uniqueId, symbol));
+				if (symbol->target == GrammarSymbolTarget::TheResult)
+				{
+					resultSymbol = symbol;
+				}
 			}
 		}
 

@@ -70,6 +70,7 @@ namespace tinymoe
 			SymbolFragmentMap				arguments;					// all arguments
 			FragmentSymbolMap				argumentTypes;				// map an argument to its receiving type
 
+			GrammarSymbol::Ptr				resultVariable;
 			GrammarSymbol::Ptr				cpsStateVariable;
 			GrammarSymbol::Ptr				cpsContinuationVariable;
 			GrammarSymbol::Ptr				categorySignalVariable;

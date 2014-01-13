@@ -545,16 +545,21 @@ namespace tinymoe
 					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->stateArgument));
 					itdecl++;
 				}
-				if (func->cpsContinuationVariable)
-				{
-					context.createdVariables.push_back(func->cpsContinuationVariable);
-					scope->readAsts.insert(make_pair(func->cpsContinuationVariable, ast->continuationArgument));
-				}
 				if (func->categorySignalVariable)
 				{
 					context.createdVariables.push_back(func->categorySignalVariable);
 					scope->readAsts.insert(make_pair(func->categorySignalVariable, ast->signalArgument));
 					itdecl++;
+				}
+				if (func->cpsContinuationVariable)
+				{
+					context.createdVariables.push_back(func->cpsContinuationVariable);
+					scope->readAsts.insert(make_pair(func->cpsContinuationVariable, ast->continuationArgument));
+				}
+				if (func->resultVariable)
+				{
+					context.createdVariables.push_back(func->resultVariable);
+					scope->readAsts.insert(make_pair(func->resultVariable, ast->resultVariable));
 				}
 
 				for (auto arg : func->arguments)

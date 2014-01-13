@@ -282,6 +282,7 @@ namespace tinymoe
 
 			GrammarStackItem::List						stackItems;				// available symbols organized in a scope based structure
 			GrammarSymbol::MultiMap						availableSymbols;		// available symbols grouped by the unique identifier
+			GrammarSymbol::Ptr							resultSymbol;
 			// the last symbol overrides all other symbols in the same group
 
 			struct ExpressionLink

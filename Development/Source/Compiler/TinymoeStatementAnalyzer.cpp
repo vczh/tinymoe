@@ -123,6 +123,10 @@ namespace tinymoe
 
 		shared_ptr<GrammarSymbol> VariableArgumentFragment::CreateSymbol()
 		{
+			if (type == FunctionArgumentType::Argument)
+			{
+				return nullptr;
+			}
 			auto symbol = make_shared<GrammarSymbol>(GrammarSymbolType::Symbol);
 			for (auto token : name->identifiers)
 			{
@@ -878,6 +882,7 @@ namespace tinymoe
 			{
 				auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(dfp.first);
 				auto func = dfp.second;
+				func->resultVariable = stack->resultSymbol;
 				for (auto sfp : func->arguments)
 				{
 					if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(sfp.second))
