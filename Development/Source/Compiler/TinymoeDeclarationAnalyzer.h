@@ -92,7 +92,7 @@ namespace tinymoe
 			CodeToken											keywordToken;
 
 			virtual shared_ptr<GrammarSymbol>					CreateSymbol(bool secondary) = 0;
-			virtual shared_ptr<ast::AstDeclaration>				GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent) = 0;
+			virtual shared_ptr<ast::AstDeclaration>				GenerateAst(shared_ptr<SymbolModule> symbolModule) = 0;
 		};
 
 		class SymbolDeclaration : public Declaration
@@ -105,7 +105,7 @@ namespace tinymoe
 			static SymbolDeclaration::Ptr						Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolModule> symbolModule)override;
 		};
 
 		class TypeDeclaration : public Declaration
@@ -120,7 +120,7 @@ namespace tinymoe
 			static TypeDeclaration::Ptr							Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 		
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolModule> symbolModule)override;
 		};
 
 		class FunctionDeclaration : public Declaration
@@ -143,7 +143,7 @@ namespace tinymoe
 		
 			string												GetComposedName();
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
-			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)override;
+			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolModule> symbolModule)override;
 		};
 
 		/*************************************************************

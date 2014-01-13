@@ -11,7 +11,7 @@ namespace tinymoe
 		Statement::GenerateAst
 		*************************************************************/
 
-		SymbolAstResult Statement::GenerateExitAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module)
+		SymbolAstResult Statement::GenerateExitAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)
 		{
 			auto block = make_shared<AstBlockStatement>();
 			{
@@ -42,7 +42,7 @@ namespace tinymoe
 			return SymbolAstResult(block);
 		}
 
-		void Statement::GenerateAssignableArgumentPairAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module, shared_ptr<Expression> assignable, vector<shared_ptr<ast::AstSymbolDeclaration>>::iterator& itvar, shared_ptr<ast::AstExpression>& reader, shared_ptr<ast::AstExpression>& writer)
+		void Statement::GenerateAssignableArgumentPairAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<Expression> assignable, vector<shared_ptr<ast::AstSymbolDeclaration>>::iterator& itvar, shared_ptr<ast::AstExpression>& reader, shared_ptr<ast::AstExpression>& writer)
 		{
 			AstDeclaration::Ptr declRead, declWrite;
 			bool invoke = false;
@@ -176,7 +176,7 @@ namespace tinymoe
 			}
 		}
 
-		void Statement::CreateNewVariableDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module, vector<shared_ptr<ast::AstSymbolDeclaration>>& newVariableDecls, SymbolAstResult& statResult)
+		void Statement::CreateNewVariableDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, vector<shared_ptr<ast::AstSymbolDeclaration>>& newVariableDecls, SymbolAstResult& statResult)
 		{
 			for (auto symbol : newVariables)
 			{
@@ -201,7 +201,7 @@ namespace tinymoe
 			}
 		}
 
-		void Statement::CreateBlockArgumentDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module, vector<shared_ptr<ast::AstSymbolDeclaration>>& blockArgumentDecls)
+		void Statement::CreateBlockArgumentDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, vector<shared_ptr<ast::AstSymbolDeclaration>>& blockArgumentDecls)
 		{
 			for (auto symbol : blockArguments)
 			{
@@ -222,20 +222,20 @@ namespace tinymoe
 			}
 		}
 
-		SymbolAstResult Statement::GeneratePredefinedAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module)
+		SymbolAstResult Statement::GeneratePredefinedAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal)
 		{
 			switch (statementSymbol->target)
 			{
 			case GrammarSymbolTarget::Exit:
 				{
-					return GenerateExitAst(scope, context, state, module);
+					return GenerateExitAst(scope, context, state);
 				}
 			case GrammarSymbolTarget::Select:
 				{
-					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
+					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
 					auto selectedValue = result.value;
 
-					auto selectLambda = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
+					auto selectLambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 
 					auto selectContinuation = make_shared<AstSymbolDeclaration>();
 					selectContinuation->composedName = "$select_continuation" + context.GetUniquePostfix();
@@ -288,7 +288,7 @@ namespace tinymoe
 							caseElse = childCase;
 							continue;
 						}
-						SymbolAstResult caseResult = childCase->statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
+						SymbolAstResult caseResult = childCase->statementExpression->arguments[0]->GenerateAst(scope, context, state);
 						if (caseResult.continuation)
 						{
 							state = caseResult.continuation->arguments[0];
@@ -309,7 +309,7 @@ namespace tinymoe
 						}
 						caseResult.AppendStatement(ifstat);
 
-						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, module, selectContinuation, false);
+						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, selectContinuation, false);
 						ifstat->trueBranch = bodyResult.statement;
 
 						if (lastIfStat)
@@ -326,7 +326,7 @@ namespace tinymoe
 
 					if (caseElse)
 					{
-						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, module, selectContinuation, false);
+						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, selectContinuation, false);
 
 						if (lastIfStat)
 						{
@@ -343,7 +343,7 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::Call:
 				{
-					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state, module);
+					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
 
 					auto ast = make_shared<AstExpressionStatement>();
 					ast->expression = result.value;
@@ -360,10 +360,10 @@ namespace tinymoe
 					vector<AstExpression::Ptr> exprs;
 					int exprStart = 0;
 
-					result.MergeForExpression(func->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(func->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 					for (auto arg : args)
 					{
-						result.MergeForExpression(arg->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+						result.MergeForExpression(arg->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 					}
 
 					auto invoke = make_shared<AstInvokeExpression>();
@@ -410,7 +410,7 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::Assign:
 				{
-					SymbolAstResult result = statementExpression->arguments[1]->GenerateAst(scope, context, state, module);
+					SymbolAstResult result = statementExpression->arguments[1]->GenerateAst(scope, context, state);
 					auto assignValue = result.value;
 
 					AstDeclaration::Ptr variable;
@@ -455,7 +455,7 @@ namespace tinymoe
 
 						invoke->arguments.push_back(assignValue);
 
-						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
+						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 						invoke->arguments.push_back(lambda);
 
 						result.AppendStatement(ast);
@@ -480,9 +480,9 @@ namespace tinymoe
 					SymbolAstResult result;
 					AstExpression::List exprs;
 					int exprStart = 0;
-					result.MergeForExpression(statementExpression->arguments[0]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
-					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
-					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[0]->GenerateAst(scope, context, state), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 
 					auto ast = make_shared<AstAssignmentStatement>();
 
@@ -501,8 +501,8 @@ namespace tinymoe
 					SymbolAstResult result;
 					AstExpression::List exprs;
 					int exprStart = 0;
-					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
-					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[1]->GenerateAst(scope, context, state), context, exprs, exprStart, state);
+					result.MergeForExpression(statementExpression->arguments[2]->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 
 					auto ast = make_shared<AstAssignmentStatement>();
 
@@ -521,9 +521,9 @@ namespace tinymoe
 			return SymbolAstResult();
 		}
 
-		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<SymbolModule> module)
+		SymbolAstResult Statement::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal)
 		{
-			SymbolAstResult statResult = GeneratePredefinedAst(scope, context, state, signal, module);
+			SymbolAstResult statResult = GeneratePredefinedAst(scope, context, state, signal);
 			if (statResult.statement)
 			{
 				return statResult;
@@ -533,9 +533,9 @@ namespace tinymoe
 			int exprStart = 0;
 
 			AstSymbolDeclaration::List newVariableDecls, blockArgumentDecls;
-			CreateNewVariableDeclarations(scope, context, state, signal, module, newVariableDecls, statResult);
+			CreateNewVariableDeclarations(scope, context, state, signal, newVariableDecls, statResult);
 			int contextVariableCount = context.createdVariables.size();
-			CreateBlockArgumentDeclarations(scope, context, state, signal, module, blockArgumentDecls);
+			CreateBlockArgumentDeclarations(scope, context, state, signal, blockArgumentDecls);
 
 			auto itvar = newVariableDecls.begin();
 			auto itarg = statementExpression->arguments.begin();
@@ -548,13 +548,13 @@ namespace tinymoe
 				else if (name->type == GrammarFragmentType::Assignable)
 				{
 					AstExpression::Ptr reader, writer;
-					GenerateAssignableArgumentPairAst(scope, context, state, signal, module, *itarg, itvar, reader, writer);
+					GenerateAssignableArgumentPairAst(scope, context, state, signal, *itarg, itvar, reader, writer);
 					exprs.push_back(reader);
 					exprs.push_back(reader);
 				}
 				else if (name->type != GrammarFragmentType::Name)
 				{
-					exprResult.MergeForExpression((*itarg)->GenerateAst(scope, context, state, module), context, exprs, exprStart, state);
+					exprResult.MergeForExpression((*itarg)->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 					itarg++;
 				}
 			}
@@ -595,7 +595,7 @@ namespace tinymoe
 					ref->composedName = "$continuation" + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
-				lambda->statement = GenerateBodyAst(scope, context, state, module, *(lambda->arguments.end() - 1), false).statement;
+				lambda->statement = GenerateBodyAst(scope, context, state, *(lambda->arguments.end() - 1), false).statement;
 				invoke->arguments.push_back(lambda);
 
 				for (int i = context.createdVariables.size() - 1; i >= contextVariableCount; i--)
@@ -609,7 +609,7 @@ namespace tinymoe
 			shared_ptr<AstLambdaExpression> statementContinuation;
 			if (targetFunction->continuationArgument)
 			{
-				statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state, module);
+				statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state);
 				invoke->arguments.push_back(statementContinuation);
 			}
 
@@ -621,7 +621,7 @@ namespace tinymoe
 			return statResult;
 		}
 
-		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<SymbolModule> module, shared_ptr<ast::AstDeclaration> continuation, bool callExit)
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> continuation, bool callExit)
 		{
 			SymbolAstResult result;
 			for (auto stat : statements)
@@ -631,7 +631,7 @@ namespace tinymoe
 				{
 					signal = result.continuation->arguments[1];
 				}
-				result.MergeForStatement(stat->GenerateAst(scope, context, state, signal, module), state);
+				result.MergeForStatement(stat->GenerateAst(scope, context, state, signal), state);
 			}
 
 			if (continuation)
@@ -675,7 +675,7 @@ namespace tinymoe
 			}
 			else if (callExit)
 			{
-				result.MergeForStatement(GenerateExitAst(scope, context, state, module), state);
+				result.MergeForStatement(GenerateExitAst(scope, context, state), state);
 			}
 			return result;
 		}

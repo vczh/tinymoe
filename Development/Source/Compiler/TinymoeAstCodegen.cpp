@@ -312,7 +312,7 @@ namespace tinymoe
 					auto it = decls.find(sdp.second);
 					if (it == decls.end())
 					{
-						auto ast = sdp.second->GenerateAst(scope, module, AstNode::WeakPtr(assembly));
+						auto ast = sdp.second->GenerateAst(module);
 						assembly->declarations.push_back(ast);
 						decls.insert(make_pair(sdp.second, ast));
 						scope->readAsts.insert(make_pair(sdp.first, ast));
@@ -320,7 +320,9 @@ namespace tinymoe
 						auto itfunc = module->declarationFunctions.find(sdp.second);
 						if (itfunc != module->declarationFunctions.end())
 						{
-							functionAsts.insert(make_pair(itfunc->second, dynamic_pointer_cast<AstFunctionDeclaration>(ast)));
+							auto func = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
+							functionAsts.insert(make_pair(itfunc->second, func));
+							scope->functionPrototypes.insert(make_pair(sdp.first, func));
 						}
 					}
 					else
@@ -437,7 +439,7 @@ namespace tinymoe
 				
 				FillMultipleDispatchStepAst(rootAst, "$dispatch<>" + rootAst->composedName, rootAst->readArgumentAstMap.find(*dispatches.begin())->second);
 				{
-					auto ast = rootFunc->function->GenerateAst(scope, module, assembly);
+					auto ast = rootFunc->function->GenerateAst(module);
 					ast->composedName = "$dispatch_fail<>" + rootAst->composedName;
 					assembly->declarations.push_back(ast);
 					dispatchFailAst = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
@@ -452,7 +454,7 @@ namespace tinymoe
 					for (auto itd = dispatches.begin(); itd != dispatches.end(); itd++)
 					{
 						string methodName = "$dispatch<" + signature + ">" + rootAst->composedName;
-						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(scope, module, assembly));
+						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(module));
 						ast->composedName = methodName;
 
 						auto ita = func->argumentTypes.find(func->function->name[*itd]);
@@ -500,7 +502,7 @@ namespace tinymoe
 				{
 					if (objectFunctions.find(name) == objectFunctions.end())
 					{
-						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(rootFunc->function->GenerateAst(scope, module, assembly));
+						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(rootFunc->function->GenerateAst(module));
 						ast->composedName = name;
 						{
 							auto type = make_shared<AstPredefinedType>();
@@ -573,14 +575,21 @@ namespace tinymoe
 					}
 					context.createdVariables.push_back(arg.first);
 					scope->readAsts.insert(make_pair(arg.first, *itdecl++));
+
+					if (auto func = dynamic_pointer_cast<FunctionArgumentFragment>(arg.second))
+					{
+						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->declaration->GenerateAst(module));
+						scope->functionPrototypes.insert(make_pair(arg.first, ast));
+					}
 				}
 
-				ast->statement = func->statement->GenerateBodyAst(scope, context, ast->stateArgument, module, nullptr, true).statement;
+				ast->statement = func->statement->GenerateBodyAst(scope, context, ast->stateArgument, nullptr, true).statement;
 
 				for (auto var : context.createdVariables)
 				{
 					scope->readAsts.erase(var);
 					scope->writeAsts.erase(var);
+					scope->functionPrototypes.erase(var);
 				}
 			}
 

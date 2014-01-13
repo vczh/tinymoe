@@ -11,14 +11,14 @@ namespace tinymoe
 		Declaration::GenerateAst
 		*************************************************************/
 
-		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
 			return ast;
 		}
 
-		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstTypeDeclaration>();
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
@@ -45,7 +45,7 @@ namespace tinymoe
 			return result;
 		}
 
-		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolAstScope> scope, shared_ptr<SymbolModule> symbolModule, weak_ptr<ast::AstNode> parent)
+		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstFunctionDeclaration>();
 			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + GetComposedName();
