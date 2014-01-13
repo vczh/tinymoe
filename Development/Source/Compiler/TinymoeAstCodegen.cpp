@@ -610,6 +610,22 @@ namespace tinymoe
 					result.MergeForStatement(Statement::GenerateExitAst(scope, context, state), state);
 					ast->statement = result.statement;
 				}
+				{
+					auto stat = make_shared<AstDeclarationStatement>();
+					stat->declaration = ast->resultVariable;
+
+					if (auto block = dynamic_pointer_cast<AstBlockStatement>(ast->statement))
+					{
+						block->statements.insert(block->statements.begin(), stat);
+					}
+					else
+					{
+						block = make_shared<AstBlockStatement>();
+						block->statements.push_back(stat);
+						block->statements.push_back(ast->statement);
+						ast->statement = block;
+					}
+				}
 				if (!dynamic_pointer_cast<AstBlockStatement>(ast->statement))
 				{
 					auto block = make_shared<AstBlockStatement>();
