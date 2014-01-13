@@ -301,7 +301,7 @@ namespace tinymoe
 
 		void AstLambdaExpression::PrintInternal(ostream& o, int indentation)
 		{
-			o << "function (";
+			o << "$lambda (";
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
 				o << (*it)->composedName;

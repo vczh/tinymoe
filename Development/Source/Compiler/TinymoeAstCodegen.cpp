@@ -135,6 +135,7 @@ namespace tinymoe
 					ref->reference = var->declaration;
 					exprs[i] = ref;
 				}
+				block->statements.push_back(result.statement);
 
 				if (continuation)
 				{
