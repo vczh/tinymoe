@@ -285,16 +285,18 @@ namespace tinymoe
 		void AstInvokeExpression::PrintInternal(ostream& o, int indentation)
 		{
 			function->Print(o, indentation, shared_from_this());
-			o << "(";
+			o << "(" << endl;
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
-				(*it)->Print(o, indentation, shared_from_this());
+				o << Indent(indentation + 1);
+				(*it)->Print(o, indentation + 1, shared_from_this());
 				if (it + 1 != arguments.end())
 				{
 					o << ", ";
 				}
+				o << endl;
 			}
-			o << ")";
+			o << Indent(indentation + 1) << ")";
 		}
 
 		void AstLambdaExpression::PrintInternal(ostream& o, int indentation)
@@ -309,7 +311,7 @@ namespace tinymoe
 				}
 			}
 			o << ")" << endl;
-			statement->Print(o, indentation + 1, shared_from_this());
+			statement->Print(o, indentation, shared_from_this());
 		}
 
 		/*************************************************************
@@ -356,7 +358,7 @@ namespace tinymoe
 			trueBranch->Print(o, indentation + 1, shared_from_this());
 			if (falseBranch)
 			{
-				o << endl;
+				o << endl << Indent(indentation) << "else" << endl;
 				falseBranch->Print(o, indentation + 1, shared_from_this());
 			}
 		}

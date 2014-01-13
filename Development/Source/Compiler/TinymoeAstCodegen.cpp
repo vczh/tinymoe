@@ -175,6 +175,10 @@ namespace tinymoe
 			value = nullptr;
 			if (RequireCps())
 			{
+				if (!continuation->statement)
+				{
+					continuation->statement = make_shared<AstBlockStatement>();
+				}
 				AppendStatement(continuation->statement, _statement);
 			}
 			else

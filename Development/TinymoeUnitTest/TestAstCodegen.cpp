@@ -102,5 +102,5 @@ end
 
 )tinymoe");
 
-	CodeGen(codes, "MultipleDispatchAst");
+	//CodeGen(codes, "MultipleDispatchAst");
 }
