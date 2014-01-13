@@ -88,16 +88,22 @@ namespace tinymoe
 
 			if (scope->writeAsts.find(symbol) != scope->writeAsts.end())
 			{
-				auto ast = make_shared<AstInvokeExpression>();
+				auto stat = make_shared<AstExpressionStatement>();
+
+				auto invoke = make_shared<AstInvokeExpression>();
+				stat->expression = invoke;
 				
 				auto function = make_shared<AstReferenceExpression>();
 				function->reference = scope->readAsts.find(symbol)->second;
-				ast->function = function;
+				invoke->function = function;
 
 				auto lambda = GenerateContinuationLambdaAst(scope, context, state);
-				ast->arguments.push_back(lambda);
+				invoke->arguments.push_back(lambda);
 
-				return SymbolAstResult(ast, nullptr, lambda);
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->reference = lambda->arguments[1];
+
+				return SymbolAstResult(ref, stat, lambda);
 			}
 			else
 			{
@@ -281,7 +287,7 @@ namespace tinymoe
 
 			auto ast = make_shared<AstUnaryExpression>();
 			ast->op = astOp;
-			ast->operand = result.value;
+			ast->operand = exprs[0];
 			return result.ReplaceValue(ast);
 		}
 

@@ -106,7 +106,6 @@ namespace tinymoe
 
 		void SymbolAstResult::MergeForExpression(const SymbolAstResult& result, SymbolAstContext& context, vector<AstExpression::Ptr>& exprs, int& exprStart, AstDeclaration::Ptr& state)
 		{
-			exprs.push_back(result.value);
 			if (result.RequireCps())
 			{
 				auto block = make_shared<AstBlockStatement>();
@@ -117,6 +116,10 @@ namespace tinymoe
 						auto decl = make_shared<AstSymbolDeclaration>();
 						decl->composedName = "$var" + context.GetUniquePostfix();
 						var->declaration = decl;
+
+						auto declstat = make_shared<AstDeclarationStatement>();
+						declstat->declaration = decl;
+						block->statements.push_back(declstat);
 
 						auto assign = make_shared<AstAssignmentStatement>();
 						block->statements.push_back(assign);
@@ -145,6 +148,7 @@ namespace tinymoe
 				exprStart = exprs.size();
 				state = continuation->arguments[0];
 			}
+			exprs.push_back(result.value);
 		}
 
 		void SymbolAstResult::AppendStatement(AstStatement::Ptr& target, AstStatement::Ptr statement)
@@ -543,8 +547,8 @@ namespace tinymoe
 				{
 					context.createdVariables.push_back(func->cpsStateVariable);
 					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->stateArgument));
-					itdecl++;
 				}
+				itdecl++;
 				if (func->categorySignalVariable)
 				{
 					context.createdVariables.push_back(func->categorySignalVariable);
@@ -589,6 +593,12 @@ namespace tinymoe
 				}
 
 				ast->statement = func->statement->GenerateBodyAst(scope, context, ast->stateArgument, nullptr, true).statement;
+				if (!dynamic_pointer_cast<AstBlockStatement>(ast->statement))
+				{
+					auto block = make_shared<AstBlockStatement>();
+					block->statements.push_back(ast->statement);
+					ast->statement = block;
+				}
 
 				for (auto var : context.createdVariables)
 				{

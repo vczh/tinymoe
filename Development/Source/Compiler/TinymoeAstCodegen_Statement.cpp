@@ -563,7 +563,7 @@ namespace tinymoe
 			{
 				auto arg = make_shared<AstReferenceExpression>();
 				arg->reference = scope->readAsts.find(statementSymbol)->second;
-				invoke->arguments.push_back(arg);
+				invoke->function = arg;
 			}
 			auto targetFunction = scope->functionPrototypes.find(statementSymbol)->second;
 			if (targetFunction->stateArgument)

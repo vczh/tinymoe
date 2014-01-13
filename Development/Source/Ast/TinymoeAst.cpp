@@ -87,7 +87,7 @@ namespace tinymoe
 			if (statement)
 			{
 				o << ")" << endl;
-				statement->Print(o, indentation + (dynamic_pointer_cast<AstBlockStatement>(statement) ? 0 : 1), shared_from_this());
+				statement->Print(o, indentation, shared_from_this());
 			}
 			else
 			{
@@ -318,13 +318,13 @@ namespace tinymoe
 
 		void AstBlockStatement::PrintInternal(ostream& o, int indentation)
 		{
-			o << Indent(indentation - 1) << "{" << endl;
+			o << Indent(indentation) << "{" << endl;
 			for (auto statement : statements)
 			{
 				statement->Print(o, indentation + 1, shared_from_this());
 				o << endl;
 			}
-			o << Indent(indentation - 1) << "}";
+			o << Indent(indentation) << "}";
 		}
 
 		void AstExpressionStatement::PrintInternal(ostream& o, int indentation)
