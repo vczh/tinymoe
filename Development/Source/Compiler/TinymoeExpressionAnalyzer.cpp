@@ -1089,7 +1089,7 @@ namespace tinymoe
 			}
 
 			CodeToken::List tokens;
-			while (input != end)
+			while (input != end && input->IsNameFragmentToken())
 			{
 				tokens.push_back(*input++);
 
