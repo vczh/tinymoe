@@ -547,13 +547,20 @@ namespace tinymoe
 
 				SymbolAstContext context;
 				context.function = ast;
+				context.continuation = ast->continuationArgument;
 				auto itdecl = ast->arguments.begin();
 				if (func->cpsStateVariable)
 				{
 					context.createdVariables.push_back(func->cpsStateVariable);
-					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->stateArgument));
+					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->cpsStateArgument));
 				}
 				itdecl++;
+				if (func->cpsContinuationVariable)
+				{
+					context.createdVariables.push_back(func->cpsStateVariable);
+					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->cpsContinuationArgument));
+					itdecl++;
+				}
 				if (func->categorySignalVariable)
 				{
 					context.createdVariables.push_back(func->categorySignalVariable);
@@ -605,7 +612,7 @@ namespace tinymoe
 				}
 
 				{
-					AstDeclaration::Ptr state = ast->stateArgument;
+					AstDeclaration::Ptr state = ast->arguments[0];
 					SymbolAstResult result = func->statement->GenerateBodyAst(scope, context, state, nullptr);
 					result.MergeForStatement(Statement::GenerateExitAst(scope, context, state), state);
 					ast->statement = result.statement;

@@ -389,7 +389,7 @@ namespace tinymoe
 						if (decl != context.function->continuationArgument)
 						{
 							auto arg = make_shared<AstReferenceExpression>();
-							arg->reference = (decl == context.function->stateArgument ? state : decl);
+							arg->reference = (decl == context.function->cpsStateArgument ? state : decl);
 							invoke->arguments.push_back(arg);
 						}
 					}
@@ -606,11 +606,17 @@ namespace tinymoe
 				invoke->function = arg;
 			}
 			auto targetFunction = scope->functionPrototypes.find(statementSymbol)->second;
-			if (targetFunction->stateArgument)
+			auto statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state);;
+
+			if (targetFunction->cpsStateArgument)
 			{
 				auto arg = make_shared<AstReferenceExpression>();
 				arg->reference = state;
 				invoke->arguments.push_back(arg);
+			}
+			if (targetFunction->cpsContinuationArgument)
+			{
+				invoke->arguments.push_back(statementContinuation);
 			}
 			if (targetFunction->signalArgument)
 			{
@@ -635,7 +641,11 @@ namespace tinymoe
 					ref->composedName = "$continuation" + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
+
+				auto oldContinuation = context.continuation;
+				context.continuation = *(lambda->arguments.end() - 1);
 				lambda->statement = GenerateBodyAst(scope, context, lambda->arguments[0], *(lambda->arguments.end() - 1)).statement;
+				context.continuation = oldContinuation;
 				invoke->arguments.push_back(lambda);
 
 				for (int i = context.createdVariables.size() - 1; i >= contextVariableCount; i--)
@@ -646,11 +656,18 @@ namespace tinymoe
 			}
 			invoke->arguments.insert(invoke->arguments.end(), exprs.begin(), exprs.end());
 
-			shared_ptr<AstLambdaExpression> statementContinuation;
 			if (targetFunction->continuationArgument)
 			{
-				statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state);
-				invoke->arguments.push_back(statementContinuation);
+				if (targetFunction->cpsContinuationArgument)
+				{
+					auto ref = make_shared<AstReferenceExpression>();
+					ref->reference = context.continuation;
+					invoke->arguments.push_back(ref);
+				}
+				else
+				{
+					invoke->arguments.push_back(statementContinuation);
+				}
 			}
 
 			auto stat = make_shared<AstExpressionStatement>();

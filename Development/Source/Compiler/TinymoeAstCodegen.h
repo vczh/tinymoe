@@ -26,6 +26,7 @@ namespace tinymoe
 		{
 			int										uniqueId = 0;
 			ast::AstFunctionDeclaration::Ptr		function;
+			ast::AstSymbolDeclaration::Ptr			continuation;
 			GrammarSymbol::List						createdVariables;
 
 			string									GetUniquePostfix();
