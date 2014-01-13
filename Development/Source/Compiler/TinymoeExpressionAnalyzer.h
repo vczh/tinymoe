@@ -82,7 +82,6 @@ namespace tinymoe
 			GetField,				// (primitive)	field <argument> of <primitive>
 
 			End,					// (sentence)	end
-			Exit,					// (sentence)	exit
 			Select,					// (block)		select <expression>
 			Case,					// (sentence)	case <expression>
 			CaseElse,				// (sentence)	case else

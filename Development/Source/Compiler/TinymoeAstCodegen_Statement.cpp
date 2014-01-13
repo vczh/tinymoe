@@ -13,33 +13,25 @@ namespace tinymoe
 
 		SymbolAstResult Statement::GenerateExitAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)
 		{
-			auto block = make_shared<AstBlockStatement>();
+			auto stat = make_shared<AstExpressionStatement>();
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			stat->expression = invoke;
+
+			auto cont = make_shared<AstReferenceExpression>();
+			cont->reference = context.function->continuationArgument;
+			invoke->function = cont;
 			{
-				auto stat = make_shared<AstExpressionStatement>();
-				block->statements.push_back(stat);
-
-				auto invoke = make_shared<AstInvokeExpression>();
-				stat->expression = invoke;
-
-				auto cont = make_shared<AstReferenceExpression>();
-				cont->reference = context.function->continuationArgument;
-				invoke->function = cont;
-				{
-					auto arg = make_shared<AstReferenceExpression>();
-					arg->reference = state;
-					invoke->arguments.push_back(arg);
-				}
-				{
-					auto arg = make_shared<AstReferenceExpression>();
-					arg->reference = context.function->resultVariable;
-					invoke->arguments.push_back(arg);
-				}
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = state;
+				invoke->arguments.push_back(arg);
 			}
 			{
-				auto stat = make_shared<AstReturnStatement>();
-				block->statements.push_back(stat);
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = context.function->resultVariable;
+				invoke->arguments.push_back(arg);
 			}
-			return SymbolAstResult(block);
+			return SymbolAstResult(stat);
 		}
 
 		void Statement::GenerateAssignableArgumentPairAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<Expression> assignable, vector<shared_ptr<ast::AstSymbolDeclaration>>::iterator& itvar, shared_ptr<ast::AstExpression>& reader, shared_ptr<ast::AstExpression>& writer)
@@ -230,10 +222,6 @@ namespace tinymoe
 		{
 			switch (statementSymbol->target)
 			{
-			case GrammarSymbolTarget::Exit:
-				{
-					return GenerateExitAst(scope, context, state);
-				}
 			case GrammarSymbolTarget::Select:
 				{
 					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
@@ -313,7 +301,7 @@ namespace tinymoe
 						}
 						caseResult.AppendStatement(ifstat);
 
-						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, selectContinuation, false);
+						SymbolAstResult bodyResult = childCase->GenerateBodyAst(scope, context, state, selectContinuation);
 						ifstat->trueBranch = bodyResult.statement;
 
 						if (lastIfStat)
@@ -330,7 +318,7 @@ namespace tinymoe
 
 					if (caseElse)
 					{
-						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, selectContinuation, false);
+						SymbolAstResult bodyResult = caseElse->GenerateBodyAst(scope, context, state, selectContinuation);
 
 						if (lastIfStat)
 						{
@@ -391,26 +379,24 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
-					auto block = make_shared<AstBlockStatement>();
+					auto stat = make_shared<AstExpressionStatement>();
+
+					auto invoke = make_shared<AstInvokeExpression>();
+					stat->expression = invoke;
+
+					for (auto decl : context.function->arguments)
 					{
-						auto stat = make_shared<AstExpressionStatement>();
-						block->statements.push_back(stat);
-
-						auto invoke = make_shared<AstInvokeExpression>();
-						stat->expression = invoke;
-
-						for (auto decl : context.function->arguments)
+						if (decl != context.function->continuationArgument)
 						{
 							auto arg = make_shared<AstReferenceExpression>();
 							arg->reference = (decl == context.function->stateArgument ? state : decl);
 							invoke->arguments.push_back(arg);
 						}
 					}
-					{
-						auto stat = make_shared<AstReturnStatement>();
-						block->statements.push_back(stat);
-					}
-					return SymbolAstResult(block);
+
+					auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+					invoke->arguments.push_back(lambda);
+					return SymbolAstResult(nullptr, stat, lambda);
 				}
 			case GrammarSymbolTarget::Assign:
 				{
@@ -649,7 +635,7 @@ namespace tinymoe
 					ref->composedName = "$continuation" + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
-				lambda->statement = GenerateBodyAst(scope, context, state, *(lambda->arguments.end() - 1), false).statement;
+				lambda->statement = GenerateBodyAst(scope, context, state, *(lambda->arguments.end() - 1)).statement;
 				invoke->arguments.push_back(lambda);
 
 				for (int i = context.createdVariables.size() - 1; i >= contextVariableCount; i--)
@@ -675,7 +661,7 @@ namespace tinymoe
 			return statResult;
 		}
 
-		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> continuation, bool callExit)
+		SymbolAstResult Statement::GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> continuation)
 		{
 			SymbolAstResult result;
 			for (auto stat : statements)
@@ -726,10 +712,6 @@ namespace tinymoe
 					}
 				}
 				result.AppendStatement(stat);
-			}
-			else if (callExit)
-			{
-				result.MergeForStatement(GenerateExitAst(scope, context, state), state);
 			}
 			return result;
 		}

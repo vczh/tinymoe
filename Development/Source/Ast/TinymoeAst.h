@@ -391,13 +391,6 @@ namespace tinymoe
 			void							SetParentInternal()override;
 		};
 
-		class AstReturnStatement : public AstStatement
-		{
-		protected:
-			void							PrintInternal(ostream& o, int indentation)override;
-			void							SetParentInternal()override;
-		};
-
 		/*************************************************************
 		Type
 		*************************************************************/

@@ -363,11 +363,6 @@ namespace tinymoe
 			}
 		}
 
-		void AstReturnStatement::PrintInternal(ostream& o, int indentation)
-		{
-			o << Indent(indentation) << "return;";
-		}
-
 		/*************************************************************
 		AstType::Print
 		*************************************************************/
@@ -589,10 +584,6 @@ namespace tinymoe
 			{
 				falseBranch->SetParent(shared_from_this());
 			}
-		}
-
-		void AstReturnStatement::SetParentInternal()
-		{
 		}
 
 		/*************************************************************

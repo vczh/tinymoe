@@ -185,10 +185,6 @@ namespace tinymoe
 				+ "end"
 				);
 			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Exit)
-				+ "exit"
-				);
-			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Block, GrammarSymbolTarget::Select)
 				+ "select" + GrammarFragmentType::Expression
 				);

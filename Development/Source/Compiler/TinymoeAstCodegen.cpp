@@ -604,7 +604,12 @@ namespace tinymoe
 					}
 				}
 
-				ast->statement = func->statement->GenerateBodyAst(scope, context, ast->stateArgument, nullptr, true).statement;
+				{
+					AstDeclaration::Ptr state = ast->stateArgument;
+					SymbolAstResult result = func->statement->GenerateBodyAst(scope, context, state, nullptr);
+					result.MergeForStatement(Statement::GenerateExitAst(scope, context, state), state);
+					ast->statement = result.statement;
+				}
 				if (!dynamic_pointer_cast<AstBlockStatement>(ast->statement))
 				{
 					auto block = make_shared<AstBlockStatement>();
