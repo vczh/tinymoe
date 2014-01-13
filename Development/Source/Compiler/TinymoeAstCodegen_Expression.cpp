@@ -96,7 +96,11 @@ namespace tinymoe
 				auto function = make_shared<AstReferenceExpression>();
 				function->reference = scope->readAsts.find(symbol)->second;
 				invoke->function = function;
-
+				{
+					auto arg = make_shared<AstReferenceExpression>();
+					arg->reference = state;
+					invoke->arguments.push_back(arg);
+				}
 				auto lambda = GenerateContinuationLambdaAst(scope, context, state);
 				invoke->arguments.push_back(lambda);
 

@@ -635,7 +635,7 @@ namespace tinymoe
 					ref->composedName = "$continuation" + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
-				lambda->statement = GenerateBodyAst(scope, context, state, *(lambda->arguments.end() - 1)).statement;
+				lambda->statement = GenerateBodyAst(scope, context, lambda->arguments[0], *(lambda->arguments.end() - 1)).statement;
 				invoke->arguments.push_back(lambda);
 
 				for (int i = context.createdVariables.size() - 1; i >= contextVariableCount; i--)
