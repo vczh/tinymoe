@@ -229,22 +229,29 @@ namespace tinymoe
 				result.MergeForExpression(arg->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 			}
 
-			auto ast = make_shared<AstInvokeExpression>();
+			auto stat = make_shared<AstExpressionStatement>();
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			stat->expression = invoke;
 			auto it = exprs.begin();
-			ast->function = *it++;
+			invoke->function = *it++;
 			{
 				auto ref = make_shared<AstReferenceExpression>();
 				ref->reference = state;
-				ast->arguments.push_back(ref);
+				invoke->arguments.push_back(ref);
 			}
 			while (it != exprs.end())
 			{
-				ast->arguments.push_back(*it++);
+				invoke->arguments.push_back(*it++);
 			}
 
 			auto lambda = GenerateContinuationLambdaAst(scope, context, state);
-			ast->arguments.push_back(lambda);
+			invoke->arguments.push_back(lambda);
+			
+			auto ast = make_shared<AstReferenceExpression>();
+			ast->reference = lambda->arguments[1];
 
+			result.AppendStatement(stat);
 			return result.ReplaceValue(ast, lambda);
 		}
 

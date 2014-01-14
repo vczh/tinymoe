@@ -379,10 +379,17 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
+					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
+
 					auto stat = make_shared<AstExpressionStatement>();
+
 
 					auto invoke = make_shared<AstInvokeExpression>();
 					stat->expression = invoke;
+
+					auto external = make_shared<AstExternalSymbolExpression>();
+					external->name = result.value;
+					invoke->function = external;
 
 					for (auto decl : context.function->arguments)
 					{
@@ -396,7 +403,8 @@ namespace tinymoe
 
 					auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 					invoke->arguments.push_back(lambda);
-					return SymbolAstResult(nullptr, stat, lambda);
+					result.MergeForStatement(SymbolAstResult(nullptr, stat, lambda), state);
+					return result;
 				}
 			case GrammarSymbolTarget::Assign:
 				{
@@ -405,6 +413,7 @@ namespace tinymoe
 
 					AstDeclaration::Ptr variable;
 					bool invoke = false;
+					bool newVariable = false;
 					if (auto ref = dynamic_pointer_cast<ReferenceExpression>(statementExpression->arguments[0]))
 					{
 						auto it = scope->writeAsts.find(ref->symbol);
@@ -424,6 +433,7 @@ namespace tinymoe
 					}
 					else if (auto arg = dynamic_pointer_cast<ArgumentExpression>(statementExpression->arguments[0]))
 					{
+						newVariable = true;
 						variable = make_shared<AstSymbolDeclaration>();
 						variable->composedName = arg->name->GetComposedName();
 
@@ -466,6 +476,29 @@ namespace tinymoe
 						ast->target = access;
 
 						result.AppendStatement(ast);
+						if (newVariable && !result.RequireCps())
+						{
+							auto stat = make_shared<AstExpressionStatement>();
+
+							auto invoke = make_shared<AstInvokeExpression>();
+							stat->expression = invoke;
+
+							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+							invoke->function = lambda;
+							{
+								auto arg = make_shared<AstReferenceExpression>();
+								arg->reference = state;
+								invoke->arguments.push_back(arg);
+							}
+							{
+								auto arg = make_shared<AstLiteralExpression>();
+								arg->literalName = AstLiteralName::Null;
+								invoke->arguments.push_back(arg);
+							}
+
+							result.AppendStatement(stat);
+							result.continuation = lambda;
+						}
 						return result;
 					}
 				}
