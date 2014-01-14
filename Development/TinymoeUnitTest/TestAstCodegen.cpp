@@ -104,3 +104,106 @@ end
 
 	CodeGen(codes, "MultipleDispatchAst");
 }
+
+TEST_CASE(TestYieldReturnAstCodegen)
+{
+	vector<string> codes;
+	codes.push_back(GetCodeForStandardLibrary());
+
+	codes.push_back(R"tinymoe(
+module geometry
+using standard library
+
+symbol yielding return
+symbol yielding break
+ 
+type enumerable collection
+    body
+end
+ 
+type collection enumerator
+    current value
+    continuation
+end
+ 
+phrase new enumerator from (enumerable)
+    set the result to new collection enumerator
+    set field continuation of the result to field body of enumerable
+end
+ 
+sentence move (enumerator) to the next
+    set field current value of enumerator to null
+	set state to new continuation state
+    if field continuation of enumerator <> null
+        call continuation field continuation of enumerator with (null)
+        select field flag of state
+            case yielding return
+                set field current value of enumerator to field argument of state
+                set field continuation of enumerator to field continuation of state
+                reset continuation state state to null
+            case yielding break
+                set field continuation of enumerator to null
+                reset continuation state state to null
+        end
+		if field flag of state <> null
+			copy continuation state state
+		end
+    end
+end
+ 
+phrase (enumerator) reaches the end
+    set the result to field continuation of enumerator = null
+end
+ 
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield return (value)
+    set field flag of state to yielding return
+    set field continuation of state to continuation
+    set field argument of state to value
+end
+ 
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield break
+    reset continuation state state to yielding break
+end
+ 
+cps (state)
+category
+    start ENUMERATING
+    closable
+block (body) create enumerable to (assignable receiver)
+    set receiver to new enumerable collection
+    set field body of receiver to body
+end
+
+sentence print (message)
+	redirect to "printf"
+end
+ 
+phrase main
+    create enumerable to numbers
+        repeat with i from 1 to 10
+            print "Enumerating " & i
+            yield return i
+        end
+        yield break
+    end
+    
+    set enumerator to new enumerator from numbers
+    repeat
+        move enumerator to the next
+        if field current value of enumerator >= 5
+            break
+        end
+    end
+end
+
+
+)tinymoe");
+
+	CodeGen(codes, "YieldReturnAst");
+}

@@ -30,6 +30,13 @@ sentence reset continuation state (state) to (flag)
 end
 
 cps (state) (continuation)
+sentence copy continuation state (new state)
+	set field flag of state to field flag of new state
+	set field argument of state to field argument of new state
+	set field continuation of state to field continuation of new state
+end
+
+cps (state) (continuation)
 category
 	inside REPEAT
 sentence break
