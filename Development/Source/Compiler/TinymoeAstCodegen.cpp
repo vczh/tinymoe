@@ -337,6 +337,14 @@ namespace tinymoe
 					else
 					{
 						scope->readAsts.insert(make_pair(sdp.first, it->second));
+
+						auto itfunc = module->declarationFunctions.find(sdp.second);
+						if (itfunc != module->declarationFunctions.end())
+						{
+							auto ast = decls.find(sdp.second)->second;
+							auto func = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
+							scope->functionPrototypes.insert(make_pair(sdp.first, func));
+						}
 					}
 				}
 			}
