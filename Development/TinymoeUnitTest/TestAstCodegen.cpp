@@ -20,6 +20,26 @@ TEST_CASE(TestStandardLibraryAstCodegen)
 {
 	vector<string> codes;
 	codes.push_back(GetCodeForStandardLibrary());
+	codes.push_back(R"tinymoe(
+module hello world
+using standard library
+
+sentence print (message)
+	redirect to "printf"
+end
+
+phrase sum from (first number) to (last number)
+    set the result to 0
+    repeat with the current number from first number to last number
+        add the current number to the result
+    end
+end
+
+phrase main
+    print "1+ ... +100 = " & sum from 1 to 100
+end
+
+)tinymoe");
 	CodeGen(codes, "StandardLibraryAst");
 }
 
