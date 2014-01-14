@@ -101,7 +101,7 @@ Here are two samples to introduce this language:
 
 ####Make your own "yield return" (Build-in continuation)
 
-	module geometry
+	module enumerable
 	using standard library
 
 	symbol yielding return
@@ -169,6 +169,14 @@ Here are two samples to introduce this language:
 		set receiver to new enumerable collection
 		set field body of receiver to body
 	end
+ 
+	block (sentence deal with (item)) repeat with (argument item) in (items : enumerable collection)
+		set enumerator to new enumerator from numbers
+		repeat
+			move enumerator to the next
+			deal with field current value of items
+		end
+	end
 
 	sentence print (message)
 		redirect to "printf"
@@ -183,10 +191,8 @@ Here are two samples to introduce this language:
 			yield break
 		end
     
-		set enumerator to new enumerator from numbers
-		repeat
-			move enumerator to the next
-			if field current value of enumerator >= 5
+		repeat with number in numbers
+			if number >= 5
 				break
 			end
 		end

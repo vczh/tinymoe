@@ -111,7 +111,7 @@ TEST_CASE(TestYieldReturnAstCodegen)
 	codes.push_back(GetCodeForStandardLibrary());
 
 	codes.push_back(R"tinymoe(
-module geometry
+module enumerable
 using standard library
 
 symbol yielding return
@@ -180,6 +180,14 @@ block (body) create enumerable to (assignable receiver)
     set field body of receiver to body
 end
 
+block (sentence deal with (item)) repeat with (argument item) in (items : enumerable collection)
+    set enumerator to new enumerator from items
+    repeat
+        move enumerator to the next
+        deal with field current value of enumerator
+    end
+end
+
 sentence print (message)
 	redirect to "printf"
 end
@@ -193,15 +201,12 @@ phrase main
         yield break
     end
     
-    set enumerator to new enumerator from numbers
-    repeat
-        move enumerator to the next
-        if field current value of enumerator >= 5
-            break
-        end
-    end
+	repeat with number in numbers
+		if number >= 5
+			break
+		end
+	end
 end
-
 
 )tinymoe");
 

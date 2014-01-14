@@ -327,7 +327,7 @@ namespace tinymoe
 								auto ref = weakRef.lock();
 								for (auto itb = ref->symbolDeclarations.begin(); itb != ref->symbolDeclarations.end(); itb++)
 								{
-									CheckOverloading(this, ita->first, ita->second, this, itb->first, itb->second, true, errors);
+									CheckOverloading(this, ita->first, ita->second, ref.get(), itb->first, itb->second, true, errors);
 								}
 							}
 						}
