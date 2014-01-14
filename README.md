@@ -4,7 +4,7 @@ tinymoe
 ###English-like programming language
 ######with dynamic typing, multiple dispatching and build-in continuation
 
-Here are two samples to introduce this language:
+Here are several samples to introduce this language:
 
 ####Hello world
 
