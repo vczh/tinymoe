@@ -49,7 +49,7 @@ namespace tinymoe
 			typedef vector<Ptr>						List;
 
 			virtual void							CollectSideEffectExpressions(AstExpression::List& exprs) = 0;
-			virtual void							RoughlyOptimize() = 0;
+			virtual void							RoughlyOptimize(AstExpression::Ptr& replacement) = 0;
 			virtual void							CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables) = 0;
 			virtual void							RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables) = 0;
 			virtual shared_ptr<AstDeclaration>		GetRootLeftValue();
@@ -175,7 +175,7 @@ namespace tinymoe
 			AstLiteralName							literalName;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -189,7 +189,7 @@ namespace tinymoe
 			int64_t									value;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -203,7 +203,7 @@ namespace tinymoe
 			double									value;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -217,7 +217,7 @@ namespace tinymoe
 			string									value;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -231,7 +231,7 @@ namespace tinymoe
 			AstExpression::Ptr						name;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -247,7 +247,7 @@ namespace tinymoe
 																		//     AstFunctionDeclaration
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
@@ -263,7 +263,7 @@ namespace tinymoe
 			AstUnaryOperator						op;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -279,7 +279,7 @@ namespace tinymoe
 			AstBinaryOperator						op;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -294,7 +294,7 @@ namespace tinymoe
 			AstExpression::List						fields;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -309,7 +309,7 @@ namespace tinymoe
 			AstType::Ptr							type;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -323,7 +323,7 @@ namespace tinymoe
 			AstExpression::Ptr						length;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -337,7 +337,7 @@ namespace tinymoe
 			AstExpression::List						elements;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -351,7 +351,7 @@ namespace tinymoe
 			AstExpression::Ptr						target;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -366,7 +366,7 @@ namespace tinymoe
 			AstExpression::Ptr						index;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
@@ -382,7 +382,7 @@ namespace tinymoe
 			string									composedFieldName;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
@@ -398,7 +398,7 @@ namespace tinymoe
 			AstExpression::List						arguments;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:
@@ -413,7 +413,7 @@ namespace tinymoe
 			AstStatement::Ptr						statement;
 			
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize()override;
+			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)override;
 		protected:

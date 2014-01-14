@@ -734,95 +734,148 @@ namespace tinymoe
 		AstExpression::RoughlyOptimize
 		*************************************************************/
 
-		void AstLiteralExpression::RoughlyOptimize()
+		void AstLiteralExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
 		}
 
-		void AstIntegerExpression::RoughlyOptimize()
+		void AstIntegerExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
 		}
 
-		void AstFloatExpression::RoughlyOptimize()
+		void AstFloatExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
 		}
 
-		void AstStringExpression::RoughlyOptimize()
+		void AstStringExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
 		}
 
-		void AstExternalSymbolExpression::RoughlyOptimize()
+		void AstExternalSymbolExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			name->RoughlyOptimize();
+			name->RoughlyOptimize(name);
 		}
 
-		void AstReferenceExpression::RoughlyOptimize()
+		void AstReferenceExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
 		}
 
-		void AstUnaryExpression::RoughlyOptimize()
+		void AstUnaryExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			operand->RoughlyOptimize();
+			operand->RoughlyOptimize(operand);
 		}
 
-		void AstBinaryExpression::RoughlyOptimize()
+		void AstBinaryExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			first->RoughlyOptimize();
-			second->RoughlyOptimize();
+			first->RoughlyOptimize(first);
+			second->RoughlyOptimize(second);
 		}
 
-		void AstNewTypeExpression::RoughlyOptimize()
+		void AstNewTypeExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			for (auto field : fields)
+			for (auto& field : fields)
 			{
-				field->RoughlyOptimize();
+				field->RoughlyOptimize(field);
 			}
 		}
 
-		void AstTestTypeExpression::RoughlyOptimize()
+		void AstTestTypeExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			target->RoughlyOptimize();
+			target->RoughlyOptimize(target);
 		}
 
-		void AstNewArrayExpression::RoughlyOptimize()
+		void AstNewArrayExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			length->RoughlyOptimize();
+			length->RoughlyOptimize(length);
 		}
 
-		void AstNewArrayLiteralExpression::RoughlyOptimize()
+		void AstNewArrayLiteralExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			for (auto element : elements)
+			for (auto& element : elements)
 			{
-				element->RoughlyOptimize();
+				element->RoughlyOptimize(element);
 			}
 		}
 
-		void AstArrayLengthExpression::RoughlyOptimize()
+		void AstArrayLengthExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			target->RoughlyOptimize();
+			target->RoughlyOptimize(target);
 		}
 
-		void AstArrayAccessExpression::RoughlyOptimize()
+		void AstArrayAccessExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			target->RoughlyOptimize();
-			index->RoughlyOptimize();
+			target->RoughlyOptimize(target);
+			index->RoughlyOptimize(index);
 		}
 
-		void AstFieldAccessExpression::RoughlyOptimize()
+		void AstFieldAccessExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			target->RoughlyOptimize();
+			target->RoughlyOptimize(target);
 		}
 
-		void AstInvokeExpression::RoughlyOptimize()
+		void AstInvokeExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			function->RoughlyOptimize();
-			for (auto argument : arguments)
+			function->RoughlyOptimize(function);
+			for (auto& argument : arguments)
 			{
-				argument->RoughlyOptimize();
+				argument->RoughlyOptimize(argument);
 			}
 		}
 
-		void AstLambdaExpression::RoughlyOptimize()
+		void AstLambdaExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
+			shared_ptr<AstExpressionStatement> stat;
+			if (!(stat = dynamic_pointer_cast<AstExpressionStatement>(statement)))
+			{
+				if (auto block = dynamic_pointer_cast<AstBlockStatement>(statement))
+				{
+					if (block->statements.size() == 1)
+					{
+						stat = dynamic_pointer_cast<AstExpressionStatement>(block->statements[0]);
+					}
+				}
+			}
+
+			if (stat)
+			{
+				if (auto invoke = dynamic_pointer_cast<AstInvokeExpression>(stat->expression))
+				{
+					if (arguments.size() != invoke->arguments.size())
+					{
+						goto FAIL_TO_OPTIMIZE;
+					}
+					if (auto ref = dynamic_pointer_cast<AstReferenceExpression>(invoke->function))
+					{
+						auto decl = ref->reference.lock();
+						for (auto argument : arguments)
+						{
+							if (decl == argument)
+							{
+								goto FAIL_TO_OPTIMIZE;
+							}
+						}
+
+						for (int i = 0; (size_t)i < arguments.size(); i++)
+						{
+							if (auto arg = dynamic_pointer_cast<AstReferenceExpression>(invoke->arguments[i]))
+							{
+								if (arg->reference.lock() != arguments[i])
+								{
+									goto FAIL_TO_OPTIMIZE;
+								}
+							}
+							else
+							{
+								goto FAIL_TO_OPTIMIZE;
+							}
+						}
+
+						replacement = invoke->function;
+						return;
+					}
+				}
+			}
+
+		FAIL_TO_OPTIMIZE:
 			statement->RoughlyOptimize(statement);
 		}
 
@@ -1071,7 +1124,7 @@ namespace tinymoe
 
 		void AstExpressionStatement::RoughlyOptimize(AstStatement::Ptr& replacement)
 		{
-			expression->RoughlyOptimize();
+			expression->RoughlyOptimize(expression);
 			if (auto invoke = dynamic_pointer_cast<AstInvokeExpression>(expression))
 			{
 				if (auto lambda = dynamic_pointer_cast<AstLambdaExpression>(invoke->function))
@@ -1135,13 +1188,13 @@ namespace tinymoe
 
 		void AstAssignmentStatement::RoughlyOptimize(AstStatement::Ptr& replacement)
 		{
-			target->RoughlyOptimize();
-			value->RoughlyOptimize();
+			target->RoughlyOptimize(target);
+			value->RoughlyOptimize(value);
 		}
 
 		void AstIfStatement::RoughlyOptimize(AstStatement::Ptr& replacement)
 		{
-			condition->RoughlyOptimize();
+			condition->RoughlyOptimize(condition);
 			trueBranch->RoughlyOptimize(trueBranch);
 			if (falseBranch)
 			{
