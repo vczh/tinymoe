@@ -656,6 +656,7 @@ namespace tinymoe
 				}
 			}
 
+			assembly->RoughlyOptimize();
 			assembly->SetParent();
 			return assembly;
 		}

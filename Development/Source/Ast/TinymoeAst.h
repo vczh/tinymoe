@@ -42,6 +42,9 @@ namespace tinymoe
 		public:
 			typedef shared_ptr<AstExpression>		Ptr;
 			typedef vector<Ptr>						List;
+
+			virtual void					CollectSideEffectExpressions(AstExpression::List& exprs) = 0;
+			virtual void					RoughlyOptimize() = 0;
 		};
 
 		class AstStatement : public AstNode
@@ -49,6 +52,9 @@ namespace tinymoe
 		public:
 			typedef shared_ptr<AstStatement>		Ptr;
 			typedef vector<Ptr>						List;
+
+			virtual void					RoughlyOptimize(AstStatement::Ptr& replacement) = 0;
+			virtual void					ExpandBlock(AstStatement::List& stats, bool lastStatement) = 0;
 		};
 
 		class AstDeclaration : public AstNode
@@ -59,6 +65,8 @@ namespace tinymoe
 			typedef vector<Ptr>						List;
 
 			string							composedName;
+
+			virtual void					RoughlyOptimize();
 		};
 
 		/*************************************************************
@@ -111,6 +119,7 @@ namespace tinymoe
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
+			void							RoughlyOptimize()override;
 		};
 
 		/*************************************************************
@@ -155,6 +164,8 @@ namespace tinymoe
 		public:
 			AstLiteralName					literalName;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -165,6 +176,8 @@ namespace tinymoe
 		public:
 			int64_t							value;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -175,6 +188,8 @@ namespace tinymoe
 		public:
 			double							value;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -185,6 +200,8 @@ namespace tinymoe
 		public:
 			string							value;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -195,6 +212,8 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				name;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -207,6 +226,8 @@ namespace tinymoe
 																//     AstSymbolDeclaration
 																//     AstFunctionDeclaration
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -218,6 +239,8 @@ namespace tinymoe
 			AstExpression::Ptr				operand;
 			AstUnaryOperator				op;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -230,6 +253,8 @@ namespace tinymoe
 			AstExpression::Ptr				second;
 			AstBinaryOperator				op;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -241,6 +266,8 @@ namespace tinymoe
 			AstType::Ptr					type;
 			AstExpression::List				fields;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -252,6 +279,8 @@ namespace tinymoe
 			AstExpression::Ptr				target;
 			AstType::Ptr					type;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -262,6 +291,8 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				length;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -272,6 +303,8 @@ namespace tinymoe
 		public:
 			AstExpression::List				elements;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -282,6 +315,8 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				target;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -293,6 +328,8 @@ namespace tinymoe
 			AstExpression::Ptr				target;
 			AstExpression::Ptr				index;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -304,6 +341,8 @@ namespace tinymoe
 			AstExpression::Ptr				target;
 			string							composedFieldName;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -315,6 +354,8 @@ namespace tinymoe
 			AstExpression::Ptr				function;
 			AstExpression::List				arguments;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -326,6 +367,8 @@ namespace tinymoe
 			AstSymbolDeclaration::List		arguments;
 			AstStatement::Ptr				statement;
 			
+			void							CollectSideEffectExpressions(AstExpression::List& exprs)override;
+			void							RoughlyOptimize()override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -340,6 +383,8 @@ namespace tinymoe
 		public:
 			AstStatement::List				statements;
 			
+			void							RoughlyOptimize(AstStatement::Ptr& replacement)override;
+			void							ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -350,6 +395,8 @@ namespace tinymoe
 		public:
 			AstExpression::Ptr				expression;
 			
+			void							RoughlyOptimize(AstStatement::Ptr& replacement)override;
+			void							ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -360,6 +407,8 @@ namespace tinymoe
 		public:
 			AstDeclaration::Ptr				declaration;
 			
+			void							RoughlyOptimize(AstStatement::Ptr& replacement)override;
+			void							ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -374,6 +423,8 @@ namespace tinymoe
 																//     AstArrayAccessExpression
 			AstExpression::Ptr				value;
 			
+			void							RoughlyOptimize(AstStatement::Ptr& replacement)override;
+			void							ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -387,6 +438,8 @@ namespace tinymoe
 			AstStatement::Ptr				trueBranch;
 			AstStatement::Ptr				falseBranch;		// (optional)
 			
+			void							RoughlyOptimize(AstStatement::Ptr& replacement)override;
+			void							ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
@@ -438,6 +491,7 @@ namespace tinymoe
 
 			AstDeclaration::List			declarations;
 			
+			void							RoughlyOptimize();
 		protected:
 			void							PrintInternal(ostream& o, int indentation)override;
 			void							SetParentInternal()override;
