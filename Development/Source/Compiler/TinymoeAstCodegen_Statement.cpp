@@ -329,6 +329,30 @@ namespace tinymoe
 							result.AppendStatement(bodyResult.statement);
 						}
 					}
+					else
+					{
+						auto stat = make_shared<AstExpressionStatement>();
+
+						auto invoke = make_shared<AstInvokeExpression>();
+						stat->expression = invoke;
+						{
+							auto ref = make_shared<AstReferenceExpression>();
+							ref->reference = selectContinuation;
+							invoke->function = ref;
+						}
+						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->reference = state;
+							invoke->arguments.push_back(arg);
+						}
+						{
+							auto arg = make_shared<AstLiteralExpression>();
+							arg->literalName = AstLiteralName::Null;
+							invoke->arguments.push_back(arg);
+						}
+
+						result.AppendStatement(stat);
+					}
 
 					result.continuation = selectLambda;
 					return result;
