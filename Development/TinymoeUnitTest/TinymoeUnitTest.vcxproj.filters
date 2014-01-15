@@ -75,6 +75,9 @@
     <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Expression.cpp">
       <Filter>Tinymoe\Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="CSharpCodegen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">

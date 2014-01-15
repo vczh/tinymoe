@@ -3,6 +3,9 @@
 
 using namespace tinymoe;
 using namespace tinymoe::compiler;
+using namespace tinymoe::ast;
+
+extern void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream& o);
 
 void CodeGen(vector<string>& codes, string name)
 {
@@ -12,8 +15,14 @@ void CodeGen(vector<string>& codes, string name)
 	TEST_ASSERT(assembly->symbolModules.size() == codes.size());
 
 	auto ast = GenerateAst(assembly);
-	ofstream o("../CSharpCodegenTest/" + name + "/GeneratedAst.txt");
-	ast->Print(o, 0);
+	{
+		ofstream o("../CSharpCodegenTest/" + name + "/GeneratedAst.txt");
+		ast->Print(o, 0);
+	}
+	{
+		ofstream o("../CSharpCodegenTest/" + name + "/TinymoeProgram.cs");
+		GenerateCSharpCode(ast, o);
+	}
 }
 
 TEST_CASE(TestStandardLibraryAstCodegen)

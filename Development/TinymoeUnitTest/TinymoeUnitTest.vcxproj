@@ -92,6 +92,7 @@
     <ClCompile Include="..\Source\Compiler\TinymoeLexicalAnalyzer.cpp" />
     <ClCompile Include="..\Source\Compiler\TinymoeStatementAnalyzer.cpp" />
     <ClCompile Include="..\Source\Tinymoe.cpp" />
+    <ClCompile Include="CSharpCodegen.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TestAstCodegen.cpp" />
     <ClCompile Include="TestDeclarationAnalyzer.cpp" />

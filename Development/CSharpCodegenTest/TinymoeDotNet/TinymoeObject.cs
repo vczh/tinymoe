@@ -6,6 +6,95 @@ namespace TinymoeDotNet
 {
     public class TinymoeObject
     {
+    }
+
+    public class TinymoeBoolean : TinymoeObject
+    {
+        public bool Value { get; private set; }
+
+        public TinymoeBoolean(bool value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class TinymoeInteger : TinymoeObject
+    {
+        public int Value { get; private set; }
+
+        public TinymoeInteger(int value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class TinymoeFloat : TinymoeObject
+    {
+        public double Value { get; private set; }
+
+        public TinymoeFloat(double value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class TinymoeString : TinymoeObject
+    {
+        public string Value { get; private set; }
+
+        public TinymoeString(string value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class TinymoeSymbol : TinymoeObject
+    {
+        public string Value { get; private set; }
+
+        public TinymoeSymbol(string value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class TinymoeArray : TinymoeObject
+    {
+        public TinymoeObject[] Elements { get; private set; }
+
+        public TinymoeArray(int length)
+        {
+            this.Elements = new TinymoeObject[length];
+        }
+
+        public TinymoeArray(IEnumerable<TinymoeObject> values)
+        {
+            this.Elements = values.ToArray();
+        }
+    }
+
+    public class TinymoeFunction : TinymoeObject
+    {
+        public Action<TinymoeObject[]> Handler { get; private set; }
+
+        public TinymoeFunction(Action<TinymoeObject[]> value)
+        {
+            this.Handler = value;
+        }
+    }
+
+    public class TinymoeClass : TinymoeObject
+    {
+        public Dictionary<string, TinymoeObject> Fields { get; private set; }
+
+        public TinymoeClass(IEnumerable<string> fieldNames)
+        {
+            this.Fields = fieldNames.ToDictionary(x => x, x => null as TinymoeObject);
+        }
+    }
+
+    public class TinymoeOperations
+    {
         public static readonly Dictionary<string, TinymoeObject> ExternalFunctions = new Dictionary<string, TinymoeObject>();
 
         public static TinymoeObject Positive(TinymoeObject a)
@@ -121,91 +210,6 @@ namespace TinymoeDotNet
         public static TinymoeObject CastToString(TinymoeObject a)
         {
             throw new NotImplementedException();
-        }
-    }
-
-    public class TinymoeBoolean : TinymoeObject
-    {
-        public bool Value { get; private set; }
-
-        public TinymoeBoolean(bool value)
-        {
-            this.Value = value;
-        }
-    }
-
-    public class TinymoeInteger : TinymoeObject
-    {
-        public int Value { get; private set; }
-
-        public TinymoeInteger(int value)
-        {
-            this.Value = value;
-        }
-    }
-
-    public class TinymoeFloat : TinymoeObject
-    {
-        public double Value { get; private set; }
-
-        public TinymoeFloat(double value)
-        {
-            this.Value = value;
-        }
-    }
-
-    public class TinymoeString : TinymoeObject
-    {
-        public string Value { get; private set; }
-
-        public TinymoeString(string value)
-        {
-            this.Value = value;
-        }
-    }
-
-    public class TinymoeSymbol : TinymoeObject
-    {
-        public string Value { get; private set; }
-
-        public TinymoeSymbol(string value)
-        {
-            this.Value = value;
-        }
-    }
-
-    public class TinymoeArray : TinymoeObject
-    {
-        public TinymoeObject[] Elements { get; private set; }
-
-        public TinymoeArray(int length)
-        {
-            this.Elements = new TinymoeObject[length];
-        }
-
-        public TinymoeArray(IEnumerable<TinymoeObject> values)
-        {
-            this.Elements = values.ToArray();
-        }
-    }
-
-    public class TinymoeFunction : TinymoeObject
-    {
-        public Action<TinymoeObject[]> Handler { get; private set; }
-
-        public TinymoeFunction(Action<TinymoeObject[]> value)
-        {
-            this.Handler = value;
-        }
-    }
-
-    public class TinymoeClass : TinymoeObject
-    {
-        public Dictionary<string, TinymoeObject> Fields { get; private set; }
-
-        public TinymoeClass(IEnumerable<string> fieldNames)
-        {
-            this.Fields = fieldNames.ToDictionary(x => x, x => null as TinymoeObject);
         }
     }
 }
