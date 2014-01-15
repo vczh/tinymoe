@@ -66,14 +66,7 @@ namespace tinymoe
 					argument->composedName = "$state";
 				}
 				ast->arguments.push_back(argument);
-				ast->cpsStateArgument = argument;
-			}
-			if (cps && cps->continuationName)
-			{
-				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->composedName = cps->continuationName->GetComposedName();
-				ast->arguments.push_back(argument);
-				ast->cpsContinuationArgument = argument;
+				ast->stateArgument = argument;
 			}
 			if (category && category->signalName)
 			{
@@ -106,7 +99,14 @@ namespace tinymoe
 
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->composedName = "$continuation";
+				if (cps && cps->continuationName)
+				{
+					argument->composedName = cps->continuationName->GetComposedName();
+				}
+				else
+				{
+					argument->composedName = "$continuation";
+				}
 				ast->arguments.push_back(argument);
 				ast->continuationArgument = argument;
 			}

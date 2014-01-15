@@ -560,15 +560,9 @@ namespace tinymoe
 				if (func->cpsStateVariable)
 				{
 					context.createdVariables.push_back(func->cpsStateVariable);
-					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->cpsStateArgument));
+					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->stateArgument));
 				}
 				itdecl++;
-				if (func->cpsContinuationVariable)
-				{
-					context.createdVariables.push_back(func->cpsStateVariable);
-					scope->readAsts.insert(make_pair(func->cpsStateVariable, ast->cpsContinuationArgument));
-					itdecl++;
-				}
 				if (func->categorySignalVariable)
 				{
 					context.createdVariables.push_back(func->categorySignalVariable);

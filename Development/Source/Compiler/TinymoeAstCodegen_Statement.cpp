@@ -427,7 +427,7 @@ namespace tinymoe
 						if (decl != context.function->continuationArgument)
 						{
 							auto arg = make_shared<AstReferenceExpression>();
-							arg->reference = (decl == context.function->cpsStateArgument ? state : decl);
+							arg->reference = (decl == context.function->stateArgument ? state : decl);
 							invoke->arguments.push_back(arg);
 						}
 					}
@@ -682,15 +682,11 @@ namespace tinymoe
 			auto targetFunction = scope->functionPrototypes.find(statementSymbol)->second;
 			auto statementContinuation = Expression::GenerateContinuationLambdaAst(scope, context, state);;
 
-			if (targetFunction->cpsStateArgument)
+			if (targetFunction->stateArgument)
 			{
 				auto arg = make_shared<AstReferenceExpression>();
 				arg->reference = state;
 				invoke->arguments.push_back(arg);
-			}
-			if (targetFunction->cpsContinuationArgument)
-			{
-				invoke->arguments.push_back(statementContinuation);
 			}
 			if (targetFunction->signalArgument)
 			{
@@ -732,16 +728,7 @@ namespace tinymoe
 
 			if (targetFunction->continuationArgument)
 			{
-				if (targetFunction->cpsContinuationArgument)
-				{
-					auto ref = make_shared<AstReferenceExpression>();
-					ref->reference = context.continuation;
-					invoke->arguments.push_back(ref);
-				}
-				else
-				{
-					invoke->arguments.push_back(statementContinuation);
-				}
+				invoke->arguments.push_back(statementContinuation);
 			}
 
 			auto stat = make_shared<AstExpressionStatement>();

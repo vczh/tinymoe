@@ -120,8 +120,7 @@ namespace tinymoe
 
 			AstSymbolDeclaration::Ptr				resultVariable;
 
-			AstSymbolDeclaration::Ptr				cpsStateArgument;			// for function
-			AstSymbolDeclaration::Ptr				cpsContinuationArgument;	// (optional) for cps sentence
+			AstSymbolDeclaration::Ptr				stateArgument;				// for function
 			AstSymbolDeclaration::Ptr				signalArgument;				// (optional) for block
 			AstSymbolDeclaration::Ptr				blockBodyArgument;			// (optional) for block
 			AstSymbolDeclaration::Ptr				continuationArgument;		// for function
