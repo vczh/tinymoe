@@ -350,8 +350,15 @@ namespace tinymoe
 							arg->literalName = AstLiteralName::Null;
 							invoke->arguments.push_back(arg);
 						}
-
-						result.AppendStatement(stat);
+						
+						if (lastIfStat)
+						{
+							lastIfStat->falseBranch = stat;
+						}
+						else
+						{
+							result.AppendStatement(stat);
+						}
 					}
 
 					result.continuation = selectLambda;
