@@ -134,11 +134,15 @@ category (signal)
 	follow IFELSE if
 	start IFELSE if
 	closable
-block (sentence body) else if (condition)
-	set the result to not signal and condition
+block (sentence body) else if (expression condition)
+	set the result to signal
 	select the result
-		case true
-			body
+		case false
+			set the result to condition
+			select the result
+				case true
+					body
+			end
 	end
 end
 
@@ -146,9 +150,9 @@ category (signal)
 	follow IFELSE if
 	closable
 block (sentence body) else
-	set the result to not signal
+	set the result to signal
 	select the result
-		case true
+		case false
 			body
 	end
 end
