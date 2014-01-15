@@ -12,7 +12,7 @@ void CodeGen(vector<string>& codes, string name)
 	TEST_ASSERT(assembly->symbolModules.size() == codes.size());
 
 	auto ast = GenerateAst(assembly);
-	ofstream o("TestResult." + name + ".test.txt");
+	ofstream o("../CSharpCodegenTest/" + name + "/GeneratedAst.txt");
 	ast->Print(o, 0);
 }
 

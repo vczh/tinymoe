@@ -1,0 +1,929 @@
+$symbol standard_library::breaking_repeating;
+
+$symbol standard_library::continuing_repeating;
+
+$symbol standard_library::raising_exception;
+
+$symbol standard_library::exiting_program;
+
+$symbol standard_library::exiting_block;
+
+$type standard_library::continuation_state
+{
+    $symbol flag;
+    $symbol argument;
+    $symbol continuation;
+}
+
+$procedure standard_library::reset_continuation_state_$expression_to_$expression($state, state, flag, $continuation)
+{
+    $symbol $the_result;
+    state.flag = flag;
+    state.argument = $null;
+    state.continuation = $null;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::copy_continuation_state_$expression(state, new_state, continuation)
+{
+    $symbol $the_result;
+    state.flag = new_state.flag;
+    state.argument = new_state.argument;
+    state.continuation = new_state.continuation;
+    continuation(
+        state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::break(state, continuation)
+{
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::breaking_repeating, 
+        $lambda ($state_0, $result_1)
+            {
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::continue(state, continuation)
+{
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::continuing_repeating, 
+        $lambda ($state_0, $result_1)
+            {
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::raise_$expression(state, exception, continuation)
+{
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::raising_exception, 
+        $lambda ($state_0, $result_1)
+            {
+                state.argument = exception;
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::exit_program(state, continuation)
+{
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::exiting_program, 
+        $lambda ($state_0, $result_1)
+            {
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::exit_block_$expression(state, handle, continuation)
+{
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::exiting_block, 
+        $lambda ($state_0, $result_1)
+            {
+                state.argument = handle;
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::repeat(state, body, $continuation)
+{
+    $symbol $the_result;
+    body(
+        state, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $select_continuation_4;
+                $symbol $select_value_5;
+                $select_continuation_4 = $lambda ($state_2, $result_3)
+                    {
+                        $continuation(
+                            state, 
+                            $the_result
+                            );
+                    };
+                $select_value_5 = state.flag;
+                if (($select_value_5 == standard_library::breaking_repeating)
+                    standard_library::reset_continuation_state_$expression_to_$expression(
+                        $state_0, 
+                        state, 
+                        $null, 
+                        $select_continuation_4
+                        );
+                else
+                    if (($select_value_5 == standard_library::continuing_repeating)
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_0, 
+                            state, 
+                            $null, 
+                            $lambda ($state_8, $result_9)
+                                {
+                                    standard_library::repeat(
+                                        $state_8, 
+                                        body, 
+                                        $select_continuation_4
+                                        );
+                                }
+                            );
+                    else
+                        if (($select_value_5 == $null)
+                            standard_library::repeat(
+                                $state_0, 
+                                body, 
+                                $select_continuation_4
+                                );
+                        else
+                            $select_continuation_4(
+                                $state_0, 
+                                $null
+                                );
+            }
+        );
+}
+
+$procedure standard_library::repeat_while_$expression($state, body, condition, $continuation)
+{
+    $symbol $the_result;
+    standard_library::repeat(
+        $state, 
+        $lambda ($state_2, $continuation_3)
+            {
+                condition(
+                    $state_2, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            standard_library::if_$expression(
+                                $state_4, 
+                                standard_library::break, 
+                                !$result_5, 
+                                $lambda ($state_6, $result_7)
+                                    {
+                                        body(
+                                            $state_6, 
+                                            $continuation_3
+                                            );
+                                    }
+                                );
+                        }
+                    );
+            }, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::repeat_with_$argument_from_$expression_to_$expression($state, deal_with_$expression, lower_bound, upper_bound, $continuation)
+{
+    $symbol $the_result;
+    $symbol the_current_number;
+    the_current_number = deal_with_$expression;
+    $symbol $state_0;
+    $state_0 = $state;
+    standard_library::repeat_while_$expression(
+        $state_0, 
+        $lambda ($state_6, $continuation_7)
+            upper_bound(
+                $state_6, 
+                the_current_number, 
+                $lambda ($state_8, $result_9)
+                    {
+                        standard_library::add_$expression_to_assignable(
+                            $state_8, 
+                            1, 
+                            $lambda ($state_10, $continuation_11)
+                                $continuation_11(
+                                    $state_10, 
+                                    the_current_number
+                                    );, 
+                            $lambda ($state_12, $input_13, $continuation_14)
+                                {
+                                    the_current_number = $input_13;
+                                    $continuation_14(
+                                        $state_12, 
+                                        $null
+                                        );
+                                }, 
+                            $continuation_7
+                            );
+                    }
+                );, 
+        $lambda ($state_2, $continuation_3)
+            $continuation_3(
+                $state_2, 
+                (the_current_number <= lower_bound)
+                );, 
+        $lambda ($state_4, $result_5)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    items.$dispatch<>standard_library::repeat_with_$argument_in_$expression(
+        $state, 
+        deal_with_$expression, 
+        items, 
+        $continuation
+        );
+}
+
+$procedure standard_library::repeat_with_$argument_in_$expression<array>($state, deal_with_$expression, items, $continuation)
+{
+    $symbol $the_result;
+    standard_library::repeat_with_$argument_from_$expression_to_$expression(
+        $state, 
+        $lambda ($state_2, index, $continuation_3)
+            deal_with_$expression(
+                $state_2, 
+                items[index], 
+                $continuation_3
+                );, 
+        1, 
+        $ArrayLength(items), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::if_$expression($state, body, condition, $continuation)
+{
+    $symbol $the_result;
+    $the_result = condition;
+    $symbol $select_continuation_2;
+    $symbol $select_value_3;
+    $select_continuation_2 = $lambda ($state_0, $result_1)
+        {
+            $continuation(
+                $state, 
+                $the_result
+                );
+        };
+    $select_value_3 = $the_result;
+    if (($select_value_3 == $true)
+        body(
+            $state, 
+            $select_continuation_2
+            );
+    else
+        $select_continuation_2(
+            $state, 
+            $null
+            );
+}
+
+$procedure standard_library::else_if_$expression($state, signal, body, condition, $continuation)
+{
+    $symbol $the_result;
+    $the_result = signal;
+    $symbol $select_continuation_2;
+    $symbol $select_value_3;
+    $select_continuation_2 = $lambda ($state_0, $result_1)
+        {
+            $continuation(
+                $state, 
+                $the_result
+                );
+        };
+    $select_value_3 = $the_result;
+    if (($select_value_3 == $false)
+        condition(
+            $state, 
+            $lambda ($state_4, $result_5)
+                {
+                    $the_result = $result_5;
+                    $symbol $select_continuation_8;
+                    $symbol $select_value_9;
+                    $select_continuation_8 = $select_continuation_2;
+                    $select_value_9 = $the_result;
+                    if (($select_value_9 == $true)
+                        body(
+                            $state_4, 
+                            $select_continuation_8
+                            );
+                    else
+                        $select_continuation_8(
+                            $state_4, 
+                            $null
+                            );
+                }
+            );
+    else
+        $select_continuation_2(
+            $state, 
+            $null
+            );
+}
+
+$procedure standard_library::else($state, signal, body, $continuation)
+{
+    $symbol $the_result;
+    $the_result = signal;
+    $symbol $select_continuation_2;
+    $symbol $select_value_3;
+    $select_continuation_2 = $lambda ($state_0, $result_1)
+        {
+            $continuation(
+                $state, 
+                $the_result
+                );
+        };
+    $select_value_3 = $the_result;
+    if (($select_value_3 == $false)
+        body(
+            $state, 
+            $select_continuation_2
+            );
+    else
+        $select_continuation_2(
+            $state, 
+            $null
+            );
+}
+
+$procedure standard_library::try(state, body, $continuation)
+{
+    $symbol $the_result;
+    body(
+        state, 
+        $lambda ($state_0, $result_1)
+            {
+                standard_library::if_$expression(
+                    $state_0, 
+                    $lambda ($state_4, $continuation_5)
+                        {
+                            $the_result = state.exception;
+                            standard_library::reset_continuation_state_$expression_to_$expression(
+                                $state_4, 
+                                state, 
+                                $null, 
+                                $continuation_5
+                                );
+                        }, 
+                    (state.flag == standard_library::raising_exception), 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::catch_$argument(state, signal, body, $continuation)
+{
+    $symbol $the_result;
+    standard_library::if_$expression(
+        state, 
+        body, 
+        (signal != $null), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::finally(state, signal, body, $continuation)
+{
+    $symbol $the_result;
+    body(
+        state, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::named_block_$argument(state, body_$expression, $continuation)
+{
+    $symbol $the_result;
+    $symbol handle;
+    handle = new $Object();
+    $symbol $state_0;
+    $state_0 = state;
+    body_$expression(
+        $state_0, 
+        handle, 
+        $lambda ($state_2, $result_3)
+            {
+                standard_library::if_$expression(
+                    $state_2, 
+                    $lambda ($state_6, $continuation_7)
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_6, 
+                            state, 
+                            $null, 
+                            $continuation_7
+                            );, 
+                    ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::add_$expression_to_assignable($state, value, $read_variable, $write_variable, $continuation)
+{
+    $symbol $the_result;
+    $read_variable(
+        $state, 
+        $lambda ($state_0, $result_1)
+            {
+                $write_variable(
+                    $state_0, 
+                    ($result_1 + value), 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::substract_$expression_from_assignable($state, value, $read_variable, $write_variable, $continuation)
+{
+    $symbol $the_result;
+    $read_variable(
+        $state, 
+        $lambda ($state_0, $result_1)
+            {
+                $write_variable(
+                    $state_0, 
+                    ($result_1 - value), 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure geometry::square_root_of_$primitive($state, number, $continuation)
+{
+    $symbol $the_result;
+    $external ("sqrt")(
+        $state, 
+        number, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure geometry::print_$expression($state, message, $continuation)
+{
+    $symbol $the_result;
+    $external ("printf")(
+        $state, 
+        message, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$type geometry::rectangle
+{
+    $symbol width;
+    $symbol height;
+}
+
+$type geometry::triangle
+{
+    $symbol a;
+    $symbol b;
+    $symbol c;
+}
+
+$type geometry::circle
+{
+    $symbol radius;
+}
+
+$procedure geometry::area_of_$primitive($state, shape, $continuation)
+{
+    shape.$dispatch<>geometry::area_of_$primitive(
+        $state, 
+        shape, 
+        $continuation
+        );
+}
+
+$procedure geometry::area_of_$primitive<rectangle>($state, shape, $continuation)
+{
+    $symbol $the_result;
+    $the_result = (shape.width * shape.height);
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure geometry::area_of_$primitive<triangle>($state, shape, $continuation)
+{
+    $symbol $the_result;
+    $symbol a;
+    a = shape.a;
+    $symbol $state_0;
+    $state_0 = $state;
+    $symbol b;
+    b = shape.b;
+    $symbol $state_2;
+    $state_2 = $state_0;
+    $symbol c;
+    c = shape.c;
+    $symbol $state_4;
+    $state_4 = $state_2;
+    $symbol p;
+    p = (((a + b) + c) / 2);
+    $symbol $state_6;
+    $state_6 = $state_4;
+    geometry::square_root_of_$primitive(
+        $state_6, 
+        (((p * (p - a)) * (p - b)) * (p - c)), 
+        $lambda ($state_8, $result_9)
+            {
+                $the_result = $result_9;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure geometry::area_of_$primitive<circle>($state, shape, $continuation)
+{
+    $symbol $the_result;
+    $symbol r;
+    r = shape.radius;
+    $the_result = ((r * r) * 3.14);
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    a.$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure geometry::$primitive<rectangle>_and_$expression<rectangle>_is_the_same_shape($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $the_result = $true;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure geometry::$primitive<triangle>_and_$expression<triangle>_is_the_same_shape($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $the_result = $true;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure geometry::$primitive<circle>_and_$expression<circle>_is_the_same_shape($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $the_result = $true;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure geometry::main($state, $continuation)
+{
+    $symbol $the_result;
+    $symbol shape_one;
+    shape_one = new geometry::triangle(2, 3, 4);
+    $symbol $state_0;
+    $state_0 = $state;
+    $symbol shape_two;
+    shape_two = new geometry::rectangle(1, 2);
+    $symbol $state_2;
+    $state_2 = $state_0;
+    geometry::$primitive_and_$expression_is_the_same_shape(
+        $state_2, 
+        shape_one, 
+        shape_two, 
+        $lambda ($state_4, $result_5)
+            {
+                standard_library::if_$expression(
+                    $state_4, 
+                    $lambda ($state_8, $continuation_9)
+                        geometry::print_$expression(
+                            $state_8, 
+                            "This world is mad!", 
+                            $continuation_9
+                            );, 
+                    $result_5, 
+                    $lambda ($state_6, $result_7)
+                        {
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        "Only enumerable object (like containers) can be iterated using the repeat-with-in statement.", 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Array).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    standard_library::repeat_with_$argument_in_$expression<array>(
+        $state, 
+        deal_with_$expression, 
+        items, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression(
+        $state, 
+        deal_with_$expression, 
+        items, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>geometry::area_of_$primitive($state, shape, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        "This is not a shape.", 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure (geometry::rectangle).$dispatch<>geometry::area_of_$primitive($state, shape, $continuation)
+{
+    geometry::area_of_$primitive<rectangle>(
+        $state, 
+        shape, 
+        $continuation
+        );
+}
+
+$procedure (geometry::triangle).$dispatch<>geometry::area_of_$primitive($state, shape, $continuation)
+{
+    geometry::area_of_$primitive<triangle>(
+        $state, 
+        shape, 
+        $continuation
+        );
+}
+
+$procedure (geometry::circle).$dispatch<>geometry::area_of_$primitive($state, shape, $continuation)
+{
+    geometry::area_of_$primitive<circle>(
+        $state, 
+        shape, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>geometry::area_of_$primitive($state, shape, $continuation)
+{
+    $dispatch_fail<>geometry::area_of_$primitive(
+        $state, 
+        shape, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $the_result = $false;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure (geometry::rectangle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    a.$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure (geometry::rectangle).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    geometry::$primitive<rectangle>_and_$expression<rectangle>_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure (geometry::triangle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    a.$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure (geometry::triangle).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    geometry::$primitive<triangle>_and_$expression<triangle>_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure (geometry::circle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    a.$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure (geometry::circle).$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    geometry::$primitive<circle>_and_$expression<circle>_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+{
+    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
