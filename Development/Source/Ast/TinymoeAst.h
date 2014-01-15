@@ -514,6 +514,7 @@ namespace tinymoe
 			Integer,
 			Float,
 			String,
+			Function,
 		};
 
 		class AstPredefinedType : public AstType

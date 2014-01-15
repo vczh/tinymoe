@@ -221,13 +221,13 @@ $procedure standard_library::repeat_with_$argument_from_$expression_to_$expressi
 {
     $symbol $the_result;
     $symbol the_current_number;
-    the_current_number = deal_with_$expression;
+    the_current_number = lower_bound;
     $symbol $state_0;
     $state_0 = $state;
     standard_library::repeat_while_$expression(
         $state_0, 
         $lambda ($state_6, $continuation_7)
-            upper_bound(
+            deal_with_$expression(
                 $state_6, 
                 the_current_number, 
                 $lambda ($state_8, $result_9)
@@ -255,7 +255,7 @@ $procedure standard_library::repeat_with_$argument_from_$expression_to_$expressi
         $lambda ($state_2, $continuation_3)
             $continuation_3(
                 $state_2, 
-                (the_current_number <= lower_bound)
+                (the_current_number <= upper_bound)
                 );, 
         $lambda ($state_4, $result_5)
             {
@@ -537,10 +537,74 @@ $procedure standard_library::substract_$expression_from_assignable($state, value
         );
 }
 
+$procedure standard_library::boolean_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToBoolean")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToInteger")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::floating_point_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToFloat")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::string_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToString")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
 $procedure geometry::square_root_of_$primitive($state, number, $continuation)
 {
     $symbol $the_result;
-    $external ("sqrt")(
+    $external ("Sqrt")(
         $state, 
         number, 
         $lambda ($state_0, $result_1)
@@ -556,7 +620,7 @@ $procedure geometry::square_root_of_$primitive($state, number, $continuation)
 $procedure geometry::print_$expression($state, message, $continuation)
 {
     $symbol $the_result;
-    $external ("printf")(
+    $external ("Print")(
         $state, 
         message, 
         $lambda ($state_0, $result_1)
@@ -729,42 +793,6 @@ $procedure geometry::main($state, $continuation)
         );
 }
 
-$procedure $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
-{
-    $symbol $the_result;
-    standard_library::raise_$expression(
-        $state, 
-        "Only enumerable object (like containers) can be iterated using the repeat-with-in statement.", 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    $state, 
-                    $the_result
-                    );
-            }
-        );
-}
-
-$procedure ($Array).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
-{
-    standard_library::repeat_with_$argument_in_$expression<array>(
-        $state, 
-        deal_with_$expression, 
-        items, 
-        $continuation
-        );
-}
-
-$procedure ($Object).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
-{
-    $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression(
-        $state, 
-        deal_with_$expression, 
-        items, 
-        $continuation
-        );
-}
-
 $procedure $dispatch_fail<>geometry::area_of_$primitive($state, shape, $continuation)
 {
     $symbol $the_result;
@@ -923,6 +951,42 @@ $procedure ($Object).$dispatch<geometry::triangle>geometry::$primitive_and_$expr
         $state, 
         a, 
         b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        "Only enumerable object (like containers) can be iterated using the repeat-with-in statement.", 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Array).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    standard_library::repeat_with_$argument_in_$expression<array>(
+        $state, 
+        deal_with_$expression, 
+        items, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::repeat_with_$argument_in_$expression($state, deal_with_$expression, items, $continuation)
+{
+    $dispatch_fail<>standard_library::repeat_with_$argument_in_$expression(
+        $state, 
+        deal_with_$expression, 
+        items, 
         $continuation
         );
 }

@@ -121,6 +121,10 @@ namespace tinymoe
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::String)
 				+ "string"
 				);
+			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Function)
+				+ "function"
+				);
 		
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::True)

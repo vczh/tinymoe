@@ -45,6 +45,9 @@ namespace tinymoe
 				case GrammarSymbolTarget::String:
 					typeName = AstPredefinedTypeName::String;
 					break;
+				case GrammarSymbolTarget::Function:
+					typeName = AstPredefinedTypeName::Function;
+					break;
 				}
 
 				auto type = make_shared<AstPredefinedType>();

@@ -537,6 +537,70 @@ $procedure standard_library::substract_$expression_from_assignable($state, value
         );
 }
 
+$procedure standard_library::boolean_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToBoolean")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToInteger")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::floating_point_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToFloat")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::string_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToString")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
 $symbol enumerable::yielding_return;
 
 $symbol enumerable::yielding_break;
@@ -737,7 +801,7 @@ $procedure enumerable::repeat_with_$argument_in_$expression<enumerable_collectio
 $procedure enumerable::print_$expression($state, message, $continuation)
 {
     $symbol $the_result;
-    $external ("printf")(
+    $external ("Print")(
         $state, 
         message, 
         $lambda ($state_0, $result_1)

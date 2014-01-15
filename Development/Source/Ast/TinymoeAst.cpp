@@ -387,7 +387,7 @@ namespace tinymoe
 				o << "$Float";
 				break;
 			case AstPredefinedTypeName::String:
-				o << "$String";
+				o << "$Function";
 				break;
 			}
 		}

@@ -210,6 +210,23 @@ end
 sentence substract (value) from (assignable variable)
 	set variable to variable - value
 end
+
+phrase boolean of (value)
+	redirect to "CastToBoolean"
+end
+
+phrase integer of (value)
+	redirect to "CastToInteger"
+end
+
+phrase floating point of (value)
+	redirect to "CastToFloat"
+end
+
+phrase string of (value)
+	redirect to "CastToString"
+end
+
 )tinymoe";
 	}
 }

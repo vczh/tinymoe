@@ -25,7 +25,7 @@ module hello world
 using standard library
 
 sentence print (message)
-	redirect to "printf"
+	redirect to "Print"
 end
 
 phrase sum from (first number) to (last number)
@@ -53,11 +53,11 @@ module geometry
 using standard library
 
 phrase square root of (number)
-	redirect to "sqrt"
+	redirect to "Sqrt"
 end
 
 sentence print (message)
-	redirect to "printf"
+	redirect to "Print"
 end
 
 type rectangle
@@ -209,7 +209,7 @@ block (sentence deal with (item)) repeat with (argument item) in (items : enumer
 end
 
 sentence print (message)
-	redirect to "printf"
+	redirect to "Print"
 end
  
 phrase main

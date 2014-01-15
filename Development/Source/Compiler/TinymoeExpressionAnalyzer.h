@@ -64,6 +64,7 @@ namespace tinymoe
 			Integer,				// (type)		integer
 			Float,					// (type)		float
 			String,					// (type)		string
+			Function,				// (type)		function
 
 			True,					// (primitive)	true
 			False,					// (primitive)	false
