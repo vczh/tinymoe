@@ -365,15 +365,6 @@ namespace tinymoe
 					return result;
 				}
 			case GrammarSymbolTarget::Call:
-				{
-					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
-
-					auto ast = make_shared<AstExpressionStatement>();
-					ast->expression = result.value;
-
-					result.AppendStatement(ast);
-					return result;
-				}
 			case GrammarSymbolTarget::CallContinuation:
 				{
 					auto func = statementExpression->arguments[0];
@@ -405,7 +396,21 @@ namespace tinymoe
 					auto ast = make_shared<AstExpressionStatement>();
 					ast->expression = invoke;
 
-					result.AppendStatement(ast);
+					switch (statementSymbol->target)
+					{
+					case GrammarSymbolTarget::Call:
+						{
+							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+							invoke->arguments.push_back(lambda);
+
+							SymbolAstResult statResult(nullptr, ast, lambda);
+							result.MergeForStatement(statResult, state);
+						}
+						break;
+					case GrammarSymbolTarget::CallContinuation:
+						result.AppendStatement(ast);
+						break;
+					}
 					return result;
 				}
 			case GrammarSymbolTarget::RedirectTo:

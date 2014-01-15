@@ -119,20 +119,10 @@ namespace tinymoe
 
 		SymbolAstResult InvokeExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)
 		{
-			Expression::Ptr func;
-			Expression::List args;
-
 			if (auto ref = dynamic_pointer_cast<ReferenceExpression>(function))
 			{
 				switch (ref->symbol->target)
 				{
-				case GrammarSymbolTarget::Invoke:
-					func = arguments[0];
-					break;
-				case GrammarSymbolTarget::InvokeWith:
-					func = arguments[0];
-					args = dynamic_pointer_cast<ListExpression>(arguments[1])->elements;
-					break;
 				case GrammarSymbolTarget::NewType:
 					{
 						auto ast = make_shared<AstNewTypeExpression>();
@@ -213,18 +203,12 @@ namespace tinymoe
 					}
 				}
 			}
-			if (!func)
-			{
-				func = function;
-				args = arguments;
-			}
-
 			SymbolAstResult result;
 			vector<AstExpression::Ptr> exprs;
 			int exprStart = 0;
 
-			result.MergeForExpression(func->GenerateAst(scope, context, state), context, exprs, exprStart, state);
-			for (auto arg : args)
+			result.MergeForExpression(function->GenerateAst(scope, context, state), context, exprs, exprStart, state);
+			for (auto arg : arguments)
 			{
 				result.MergeForExpression(arg->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 			}

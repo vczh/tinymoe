@@ -249,11 +249,11 @@ TEST_CASE(TestParseBinaryExpression)
 
 TEST_CASE(TestParseListExpression)
 {
-	auto expr = ParseNonAmbiguousExpression("invoke null with (1, 2, 3)");
+	auto expr = ParseNonAmbiguousExpression("new object of (1, 2, 3)");
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "invoke <expression> with <list>(null, (list: 1, 2, 3))");
-	TEST_ASSERT(code == "(invoke (null) with (1, 2, 3))");
+	TEST_ASSERT(log == "new <type> of <list>(object, (list: 1, 2, 3))");
+	TEST_ASSERT(code == "(new (object) of (1, 2, 3))");
 }
 
 Expression::Ptr ParseNonAmbiguousStatement(const string& code, GrammarStack::Ptr stack = nullptr)

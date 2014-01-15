@@ -76,8 +76,6 @@ namespace tinymoe
 			NewArray,				// (primitive)	new array of <expression> items
 			GetArrayItem,			// (primitive)	item <expression> of array <primitive>
 			GetArrayLength,			// (primitive)	length of array <primitive>
-			Invoke,					// (primitive)	invoke <primitive>
-			InvokeWith,				// (primitive)	invoke <expression> with <list>
 			IsType,					// (primitive)	<primitive> is <type>
 			IsNotType,				// (primitive)	<primitive> is not <type>
 			GetField,				// (primitive)	field <argument> of <primitive>
@@ -86,7 +84,7 @@ namespace tinymoe
 			Select,					// (block)		select <expression>
 			Case,					// (sentence)	case <expression>
 			CaseElse,				// (sentence)	case else
-			Call,					// (sentence)	call <expression>
+			Call,					// (sentence)	call <expression> with <list>
 			CallContinuation,		// (sentence)	call continuation <expression> with <list>
 			RedirectTo,				// (sentence)	redirect to <expression>
 			Assign,					// (sentence)	set <assignable> to <expression>

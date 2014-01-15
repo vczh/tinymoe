@@ -164,14 +164,6 @@ namespace tinymoe
 				+ "length" + "of" + "array" + GrammarFragmentType::Primitive
 				);
 			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::Invoke)
-				+ "invoke" + GrammarFragmentType::Primitive
-				);
-			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::InvokeWith)
-				+ "invoke" + GrammarFragmentType::Expression + "with" + GrammarFragmentType::List
-				);
-			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::IsType)
 				+ GrammarFragmentType::Primitive + "is" + GrammarFragmentType::Type
 				);
@@ -202,7 +194,7 @@ namespace tinymoe
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
-				+ "call" + GrammarFragmentType::Expression
+				+ "call" + GrammarFragmentType::Expression + "with" + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CallContinuation)
@@ -387,44 +379,24 @@ namespace tinymoe
 		string InvokeExpression::ToCode()
 		{
 			auto reference = dynamic_pointer_cast<ReferenceExpression>(function);
-			switch (reference->symbol->type)
+			string result = "(";
+			auto it = arguments.begin();
+			for (auto i = reference->symbol->fragments.begin(); i != reference->symbol->fragments.end(); i++)
 			{
-			case GrammarSymbolType::Phrase:
-			case GrammarSymbolType::Sentence:
-			case GrammarSymbolType::Block:
+				if ((*i)->type == GrammarFragmentType::Name)
 				{
-					string result = "(";
-					auto it = arguments.begin();
-					for (auto i = reference->symbol->fragments.begin(); i != reference->symbol->fragments.end(); i++)
-					{
-						if ((*i)->type == GrammarFragmentType::Name)
-						{
-							result += (*i)->GetUniqueIdFragment();
-						}
-						else
-						{
-							result += (*it++)->ToCode();
-						}
-						if (i + 1 != reference->symbol->fragments.end())
-						{
-							result += " ";
-						}
-					}
-					result += ")";
-					return result;
+					result += (*i)->GetUniqueIdFragment();
+				}
+				else
+				{
+					result += (*it++)->ToCode();
+				}
+				if (i + 1 != reference->symbol->fragments.end())
+				{
+					result += " ";
 				}
 			}
-
-			string result = "(invoke " + function->ToCode() + " with (";
-			for (auto i = arguments.begin(); i != arguments.end(); i++)
-			{
-				result += (*i)->ToCode();
-				if (i + 1 != arguments.end())
-				{
-					result += ", ";
-				}
-			}
-			result += "))";
+			result += ")";
 			return result;
 		}
 
@@ -973,6 +945,17 @@ namespace tinymoe
 			auto resultError = ParseToken("(", input, end, tokenResult);
 			if (tokenResult.size() == 0) return resultError;
 			input = tokenResult[0];
+
+			tokenResult.clear();
+			{
+				auto error = ParseToken(")", input, end, tokenResult);
+				resultError = FoldError(resultError, error);
+				if (tokenResult.size() == 1)
+				{
+					result.push_back(make_pair(tokenResult[0], make_shared<ListExpression>()));
+					return resultError;
+				}
+			}
 		
 			vector<pair<Iterator, ExpressionLink::Ptr>> linkResult, linkFinalResult;
 			linkResult.push_back(make_pair(input, ExpressionLink::Ptr(nullptr)));
