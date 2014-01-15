@@ -81,6 +81,8 @@ block (body) repeat : repeat statement
 		case continuing repeating
 			reset continuation state state to null
 			call invoke repeat statement with (body)
+		case null
+			call invoke repeat statement with (body)
 	end
 end
 
@@ -103,6 +105,7 @@ block (sentence deal with (item)) repeat with (argument item) from (lower bound)
 	set the current number to lower bound
 	repeat while the current number <= upper bound
 		deal with the current number
+		add 1 to the current number
 	end
 end
 
