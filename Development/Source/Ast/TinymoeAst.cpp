@@ -624,9 +624,9 @@ namespace tinymoe
 		{
 			statement->RoughlyOptimize(statement);
 
-			set<AstDeclaration::Ptr> variables;
-			statement->CollectUsedVariables(variables);
-			statement->RemoveUnnecessaryVariables(variables, statement);
+			set<AstDeclaration::Ptr> defined, used;
+			statement->CollectUsedVariables(defined, used);
+			statement->RemoveUnnecessaryVariables(defined, used, statement);
 
 			statement->RoughlyOptimize(statement);
 		}
@@ -883,200 +883,199 @@ namespace tinymoe
 		AstExpression::CollectUsedVariables
 		*************************************************************/
 
-		void AstLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstIntegerExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstIntegerExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstFloatExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstFloatExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstStringExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstStringExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstExternalSymbolExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstExternalSymbolExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			name->CollectUsedVariables(true, variables);
+			name->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstReferenceExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstReferenceExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			if (rightValue)
 			{
-				variables.insert(reference.lock());
+				used.insert(reference.lock());
 			}
 		}
 
-		void AstUnaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstUnaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			operand->CollectUsedVariables(true, variables);
+			operand->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstBinaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstBinaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			first->CollectUsedVariables(true, variables);
-			second->CollectUsedVariables(true, variables);
+			first->CollectUsedVariables(true, defined, used);
+			second->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstNewTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			for (auto field : fields)
 			{
-				field->CollectUsedVariables(true, variables);
+				field->CollectUsedVariables(true, defined, used);
 			}
 		}
 
-		void AstTestTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstTestTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->CollectUsedVariables(true, variables);
+			target->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstNewArrayExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewArrayExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			length->CollectUsedVariables(true, variables);
+			length->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstNewArrayLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewArrayLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			for (auto element : elements)
 			{
-				element->CollectUsedVariables(true, variables);
+				element->CollectUsedVariables(true, defined, used);
 			}
 		}
 
-		void AstArrayLengthExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstArrayLengthExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->CollectUsedVariables(true, variables);
+			target->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstArrayAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstArrayAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->CollectUsedVariables(rightValue, variables);
-			index->CollectUsedVariables(true, variables);
+			target->CollectUsedVariables(rightValue, defined, used);
+			index->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstFieldAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstFieldAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			if (rightValue)
 			{
-				target->CollectUsedVariables(true, variables);
+				target->CollectUsedVariables(true, defined, used);
 			}
 		}
 
-		void AstInvokeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstInvokeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			function->CollectUsedVariables(true, variables);
+			function->CollectUsedVariables(true, defined, used);
 			for (auto argument : arguments)
 			{
-				argument->CollectUsedVariables(true, variables);
+				argument->CollectUsedVariables(true, defined, used);
 			}
 		}
 
-		void AstLambdaExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& variables)
+		void AstLambdaExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			statement->CollectUsedVariables(variables);
+			statement->CollectUsedVariables(defined, used);
 		}
 
 		/*************************************************************
 		AstExpression::RemoveUnnecessaryVariables
 		*************************************************************/
 
-		void AstLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstIntegerExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstIntegerExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstFloatExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstFloatExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstStringExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstStringExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 		}
 
-		void AstExternalSymbolExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstExternalSymbolExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			name->RemoveUnnecessaryVariables(variables);
+			name->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstReferenceExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstReferenceExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			variables.insert(reference.lock());
 		}
 
-		void AstUnaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstUnaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			operand->RemoveUnnecessaryVariables(variables);
+			operand->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstBinaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstBinaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			first->RemoveUnnecessaryVariables(variables);
-			second->RemoveUnnecessaryVariables(variables);
+			first->RemoveUnnecessaryVariables(defined, used);
+			second->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstNewTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			for (auto field : fields)
 			{
-				field->RemoveUnnecessaryVariables(variables);
+				field->RemoveUnnecessaryVariables(defined, used);
 			}
 		}
 
-		void AstTestTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstTestTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->RemoveUnnecessaryVariables(variables);
+			target->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstNewArrayExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewArrayExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			length->RemoveUnnecessaryVariables(variables);
+			length->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstNewArrayLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstNewArrayLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			for (auto element : elements)
 			{
-				element->RemoveUnnecessaryVariables(variables);
+				element->RemoveUnnecessaryVariables(defined, used);
 			}
 		}
 
-		void AstArrayLengthExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstArrayLengthExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->RemoveUnnecessaryVariables(variables);
+			target->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstArrayAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstArrayAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->RemoveUnnecessaryVariables(variables);
-			index->RemoveUnnecessaryVariables(variables);
+			target->RemoveUnnecessaryVariables(defined, used);
+			index->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstFieldAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstFieldAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->RemoveUnnecessaryVariables(variables);
+			target->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstInvokeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstInvokeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			function->RemoveUnnecessaryVariables(variables);
+			function->RemoveUnnecessaryVariables(defined, used);
 			for (auto argument : arguments)
 			{
-				argument->RemoveUnnecessaryVariables(variables);
+				argument->RemoveUnnecessaryVariables(defined, used);
 			}
 		}
 
-		void AstLambdaExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstLambdaExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			statement->RemoveUnnecessaryVariables(variables, statement);
+			statement->RemoveUnnecessaryVariables(defined, used, statement);
 		}
 
 		/*************************************************************
@@ -1250,36 +1249,37 @@ namespace tinymoe
 		AstStatement::CollectUsedVariables
 		*************************************************************/
 
-		void AstBlockStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstBlockStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
 			for (auto stat : statements)
 			{
-				stat->CollectUsedVariables(variables);
+				stat->CollectUsedVariables(defined, used);
 			}
 		}
 
-		void AstExpressionStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstExpressionStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			expression->CollectUsedVariables(true, variables);
+			expression->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstDeclarationStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstDeclarationStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
+			defined.insert(declaration);
 		}
 
-		void AstAssignmentStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstAssignmentStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			target->CollectUsedVariables(false, variables);
-			value->CollectUsedVariables(true, variables);
+			target->CollectUsedVariables(false, defined, used);
+			value->CollectUsedVariables(true, defined, used);
 		}
 
-		void AstIfStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& variables)
+		void AstIfStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			condition->CollectUsedVariables(true, variables);
-			trueBranch->CollectUsedVariables(variables);
+			condition->CollectUsedVariables(true, defined, used);
+			trueBranch->CollectUsedVariables(defined, used);
 			if (falseBranch)
 			{
-				falseBranch->CollectUsedVariables(variables);
+				falseBranch->CollectUsedVariables(defined, used);
 			}
 		}
 
@@ -1287,31 +1287,31 @@ namespace tinymoe
 		AstStatement::RemoveUnnecessaryVariables
 		*************************************************************/
 
-		void AstBlockStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables, AstStatement::Ptr& replacement)
+		void AstBlockStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
 			for (int i = statements.size() - 1; i >= 0; i--)
 			{
-				statements[i]->RemoveUnnecessaryVariables(variables, statements[i]);
+				statements[i]->RemoveUnnecessaryVariables(defined, used, statements[i]);
 			}
 		}
 
-		void AstExpressionStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables, AstStatement::Ptr& replacement)
+		void AstExpressionStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
-			expression->RemoveUnnecessaryVariables(variables);
+			expression->RemoveUnnecessaryVariables(defined, used);
 		}
 
-		void AstDeclarationStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables, AstStatement::Ptr& replacement)
+		void AstDeclarationStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
-			if (variables.find(declaration) == variables.end())
+			if (defined.find(declaration) != defined.end() && used.find(declaration) == used.end())
 			{
 				replacement = make_shared<AstBlockStatement>();
 			}
 		}
 
-		void AstAssignmentStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables, AstStatement::Ptr& replacement)
+		void AstAssignmentStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
 			auto leftValue = target->GetRootLeftValue();
-			if (variables.find(leftValue) == variables.end())
+			if (defined.find(leftValue) != defined.end() && used.find(leftValue) == used.end())
 			{
 				AstExpression::List exprs;
 				target->CollectSideEffectExpressions(exprs);
@@ -1328,12 +1328,12 @@ namespace tinymoe
 			}
 		}
 
-		void AstIfStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& variables, AstStatement::Ptr& replacement)
+		void AstIfStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
-			trueBranch->RemoveUnnecessaryVariables(variables, trueBranch);
+			trueBranch->RemoveUnnecessaryVariables(defined, used, trueBranch);
 			if (falseBranch)
 			{
-				falseBranch->RemoveUnnecessaryVariables(variables, falseBranch);
+				falseBranch->RemoveUnnecessaryVariables(defined, used, falseBranch);
 			}
 		}
 	}
