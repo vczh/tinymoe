@@ -410,6 +410,10 @@ namespace tinymoe
 				{
 					SymbolAstResult result = statementExpression->arguments[1]->GenerateAst(scope, context, state);
 					auto assignValue = result.value;
+					if (result.continuation)
+					{
+						state = result.continuation->arguments[0];
+					}
 
 					AstDeclaration::Ptr variable;
 					bool invoke = false;
@@ -452,11 +456,17 @@ namespace tinymoe
 
 						auto invoke = make_shared<AstInvokeExpression>();
 						ast->expression = invoke;
+						{
+							auto access = make_shared<AstReferenceExpression>();
+							access->reference = variable;
+							invoke->function = access;
+						}
 
-						auto access = make_shared<AstReferenceExpression>();
-						access->reference = variable;
-						invoke->function = access;
-
+						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->reference = state;
+							invoke->arguments.push_back(arg);
+						}
 						invoke->arguments.push_back(assignValue);
 
 						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
