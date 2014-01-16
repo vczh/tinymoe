@@ -85,9 +85,15 @@ $procedure standard_library::break(state, continuation)
         standard_library::breaking_repeating, 
         $lambda ($state_0, $result_1)
             {
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
@@ -102,9 +108,15 @@ $procedure standard_library::continue(state, continuation)
         standard_library::continuing_repeating, 
         $lambda ($state_0, $result_1)
             {
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
@@ -120,9 +132,15 @@ $procedure standard_library::raise_$expression(state, exception, continuation)
         $lambda ($state_0, $result_1)
             {
                 state.argument = exception;
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
@@ -137,9 +155,15 @@ $procedure standard_library::exit_program(state, continuation)
         standard_library::exiting_program, 
         $lambda ($state_0, $result_1)
             {
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
@@ -155,9 +179,15 @@ $procedure standard_library::exit_block_$expression(state, handle, continuation)
         $lambda ($state_0, $result_1)
             {
                 state.argument = handle;
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
