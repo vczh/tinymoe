@@ -17,16 +17,36 @@ symbol raising exception
 symbol exiting program
 symbol exiting block
 
+type continuation trap
+	continuation
+	previous trap
+end
+
 type continuation state
 	flag
 	argument
 	continuation
+	trap
 end
 
 sentence reset continuation state (state) to (flag)
 	set field flag of state to flag
 	set field argument of state to null
 	set field continuation of state to null
+end
+
+cps (state) (continuation)
+sentence trap (expression value)
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence fall into the previous trap
+	set the current trap to field continuation of field trap of state
+	set field trap of state to field previous trap of field trap of state
+	call continuation the current trap of ()
 end
 
 cps (state) (continuation)
@@ -74,15 +94,17 @@ category
 	start REPEAT
 	closable
 block (body) repeat : repeat statement
-	call body with ()
+	trap body of ()
 	select field flag of state
 		case breaking repeating
 			reset continuation state state to null
 		case continuing repeating
 			reset continuation state state to null
-			call repeat statement with (body)
+			call repeat statement of (body)
 		case null
-			call repeat statement with (body)
+			call repeat statement of (body)
+		case else
+			fall into the previous trap
 	end
 end
 
@@ -163,11 +185,14 @@ end
 cps (state)
 category
 	start SEH try
-block (sentence body) try
-	body
-	if field flag of state = raising exception
-		set the result to field exception of state
-		reset continuation state state to null
+block (body) try
+	trap body of ()
+	select field flag of state
+		case raising exception
+			set the result to field exception of state
+			reset continuation state state to null
+		case else
+			fall into the previous trap
 	end
 end
 
@@ -195,11 +220,13 @@ cps (state)
 category
 	start NAMEDBLOCK
 	closable
-block (sentence body (handle)) named block (argument handle)
-	set handle to new object
-	body handle
+block (body) named block (argument handle)
+	set handle to new object of ()
+	trap body of (handle)
 	if field flag of state = exiting block and field argument of state = handle
 		reset continuation state state to null
+	else
+		fall into the previous trap
 	end
 end
 

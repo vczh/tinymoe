@@ -142,10 +142,10 @@ namespace tinymoe
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::TheResult)
 				+ "the" + "result"
 				);
-
+			
 			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewType)
-				+ "new" + GrammarFragmentType::Type
+				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::Invoke)
+				+ GrammarFragmentType::Primitive + "of" + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewTypeOfFields)
@@ -194,11 +194,11 @@ namespace tinymoe
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
-				+ "call" + GrammarFragmentType::Expression + "with" + GrammarFragmentType::List
+				+ "call" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CallContinuation)
-				+ "call" + "continuation" + GrammarFragmentType::Expression + "with" + GrammarFragmentType::List
+				+ "call" + "continuation" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::RedirectTo)

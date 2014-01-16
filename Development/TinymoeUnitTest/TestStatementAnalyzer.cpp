@@ -100,7 +100,7 @@ phrase console input
 end
 
 phrase main
-    set kula to new dog
+    set kula to new dog of ()
 	set field name of kula to console input
 	print "kula's name is " & field name of kula & "."
 end

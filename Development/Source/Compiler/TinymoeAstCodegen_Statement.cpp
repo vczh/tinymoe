@@ -393,8 +393,8 @@ namespace tinymoe
 						invoke->arguments.push_back(*it++);
 					}
 
-					auto ast = make_shared<AstExpressionStatement>();
-					ast->expression = invoke;
+					auto invokeStat = make_shared<AstExpressionStatement>();
+					invokeStat->expression = invoke;
 
 					switch (statementSymbol->target)
 					{
@@ -403,12 +403,25 @@ namespace tinymoe
 							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 							invoke->arguments.push_back(lambda);
 
-							SymbolAstResult statResult(nullptr, ast, lambda);
+							SymbolAstResult statResult(nullptr, invokeStat, lambda);
 							result.MergeForStatement(statResult, state);
 						}
 						break;
 					case GrammarSymbolTarget::CallContinuation:
-						result.AppendStatement(ast);
+						{
+							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+							invoke->arguments.push_back(lambda);
+
+							auto block = make_shared<AstBlockStatement>();
+							block->statements.push_back(invokeStat);
+
+							auto lambdaStat = make_shared<AstExpressionStatement>();
+							lambdaStat->expression = lambda;
+							block->statements.push_back(lambdaStat);
+
+							SymbolAstResult statResult(nullptr, block, lambda);
+							result.MergeForStatement(statResult, state);
+						}
 						break;
 					}
 					return result;

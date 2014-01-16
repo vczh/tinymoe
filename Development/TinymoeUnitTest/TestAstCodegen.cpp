@@ -156,15 +156,15 @@ type collection enumerator
 end
  
 phrase new enumerator from (enumerable)
-    set the result to new collection enumerator
+    set the result to new collection enumerator of ()
     set field continuation of the result to field body of enumerable
 end
  
 sentence move (enumerator) to the next
     set field current value of enumerator to null
-	set state to new continuation state
+	set state to new continuation state of ()
     if field continuation of enumerator <> null
-        call continuation field continuation of enumerator with (null)
+        call continuation field continuation of enumerator of (null)
         select field flag of state
             case yielding return
                 set field current value of enumerator to field argument of state
@@ -205,7 +205,7 @@ category
     start ENUMERATING
     closable
 block (body) create enumerable to (assignable receiver)
-    set receiver to new enumerable collection
+    set receiver to new enumerable collection of ()
     set field body of receiver to body
 end
 
