@@ -61,6 +61,7 @@ category
 	inside REPEAT
 sentence break
 	reset continuation state state to breaking repeating
+	fall into the previous trap
 end
 
 cps (state) (continuation)
@@ -68,17 +69,20 @@ category
 	inside REPEAT
 sentence continue
 	reset continuation state state to continuing repeating
+	fall into the previous trap
 end
 
 cps (state) (continuation)
 sentence raise (exception)
 	reset continuation state state to raising exception
 	set field argument of state to exception
+	fall into the previous trap
 end
 
 cps (state) (continuation)
 sentence exit program
 	reset continuation state state to exiting program
+	fall into the previous trap
 end
 
 cps (state) (continuation)
@@ -87,6 +91,7 @@ category
 sentence exit block (handle)
 	reset continuation state state to exiting block
 	set field argument of state to handle
+	fall into the previous trap
 end
 
 cps (state)
