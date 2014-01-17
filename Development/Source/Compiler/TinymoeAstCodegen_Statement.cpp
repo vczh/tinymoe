@@ -172,6 +172,56 @@ namespace tinymoe
 			}
 		}
 
+		void Statement::GenerateExpressionArgumentAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<Expression> expression, shared_ptr<ast::AstExpression>& reader)
+		{
+			if (auto ref = dynamic_pointer_cast<ReferenceExpression>(expression))
+			{
+				auto itwrite = scope->writeAsts.find(ref->symbol);
+				auto itread = scope->readAsts.find(ref->symbol);
+
+				if (itwrite != scope->writeAsts.end())
+				{
+					auto expr = make_shared<AstReferenceExpression>();
+					expr->reference = itread->second;
+					reader = expr;
+					return;
+				}
+			}
+
+			auto lambda = make_shared<AstLambdaExpression>();
+			{
+				auto decl = make_shared<AstSymbolDeclaration>();
+				decl->composedName = "$state" + context.GetUniquePostfix();
+				lambda->arguments.push_back(decl);
+			}
+			{
+				auto decl = make_shared<AstSymbolDeclaration>();
+				decl->composedName = "$continuation" + context.GetUniquePostfix();
+				lambda->arguments.push_back(decl);
+			}
+			SymbolAstResult result = expression->GenerateAst(scope, context, lambda->arguments[0]);
+
+			auto stat = make_shared<AstExpressionStatement>();
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			stat->expression = invoke;
+			{
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->reference = lambda->arguments[1];
+				invoke->function = ref;
+			}
+			{
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->reference = lambda->arguments[0];
+				invoke->arguments.push_back(ref);
+			}
+			invoke->arguments.push_back(result.value);
+			result.AppendStatement(stat);
+			lambda->statement = result.statement;
+
+			reader = lambda;
+		}
+
 		void Statement::CreateNewVariableDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, vector<shared_ptr<ast::AstSymbolDeclaration>>& newVariableDecls, SymbolAstResult& statResult)
 		{
 			for (auto symbol : newVariables)
@@ -582,39 +632,9 @@ namespace tinymoe
 						break;
 					case FunctionArgumentType::Expression:
 						{
-							auto lambda = make_shared<AstLambdaExpression>();
-							{
-								auto decl = make_shared<AstSymbolDeclaration>();
-								decl->composedName = "$state" + context.GetUniquePostfix();
-								lambda->arguments.push_back(decl);
-							}
-							{
-								auto decl = make_shared<AstSymbolDeclaration>();
-								decl->composedName = "$continuation" + context.GetUniquePostfix();
-								lambda->arguments.push_back(decl);
-							}
-							SymbolAstResult result = (*itarg)->GenerateAst(scope, context, lambda->arguments[0]);
-
-							auto stat = make_shared<AstExpressionStatement>();
-
-							auto invoke = make_shared<AstInvokeExpression>();
-							stat->expression = invoke;
-							{
-								auto ref = make_shared<AstReferenceExpression>();
-								ref->reference = lambda->arguments[1];
-								invoke->function = ref;
-							}
-							{
-								auto ref = make_shared<AstReferenceExpression>();
-								ref->reference = lambda->arguments[0];
-								invoke->arguments.push_back(ref);
-							}
-							invoke->arguments.push_back(result.value);
-							result.AppendStatement(stat);
-							lambda->statement = result.statement;
-
-							exprs.push_back(lambda);
-							itarg++;
+							AstExpression::Ptr reader;
+							GenerateExpressionArgumentAst(scope, context, state, signal, *itarg++, reader);
+							exprs.push_back(reader);
 						}
 						break;
 					default:
