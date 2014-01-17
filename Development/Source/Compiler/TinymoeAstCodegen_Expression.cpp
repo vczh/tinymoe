@@ -121,7 +121,7 @@ namespace tinymoe
 		{
 			Expression::Ptr realFunction;
 			Expression::List realArguments;
-			bool invokeContinuation = true;
+			bool invokeContinuation = false;
 			if (auto ref = dynamic_pointer_cast<ReferenceExpression>(function))
 			{
 				switch (ref->symbol->target)
