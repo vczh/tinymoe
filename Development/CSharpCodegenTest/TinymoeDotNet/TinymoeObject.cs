@@ -60,6 +60,11 @@ namespace TinymoeDotNet
         {
             this.Value = value;
         }
+
+        public override string ToString()
+        {
+            return "(boolean)" + Value.ToString();
+        }
     }
 
     public class TinymoeInteger : TinymoeObject
@@ -69,6 +74,11 @@ namespace TinymoeDotNet
         public TinymoeInteger(int value)
         {
             this.Value = value;
+        }
+
+        public override string ToString()
+        {
+            return "(integer)" + Value.ToString();
         }
     }
 
@@ -80,6 +90,11 @@ namespace TinymoeDotNet
         {
             this.Value = value;
         }
+
+        public override string ToString()
+        {
+            return "(float)" + Value.ToString();
+        }
     }
 
     public class TinymoeString : TinymoeObject
@@ -90,6 +105,11 @@ namespace TinymoeDotNet
         {
             this.Value = value;
         }
+
+        public override string ToString()
+        {
+            return "(string)" + Value.ToString();
+        }
     }
 
     public class TinymoeSymbol : TinymoeObject
@@ -99,6 +119,11 @@ namespace TinymoeDotNet
         public TinymoeSymbol(string value)
         {
             this.Value = value;
+        }
+
+        public override string ToString()
+        {
+            return "(symbol)" + Value.ToString();
         }
     }
 
@@ -115,6 +140,11 @@ namespace TinymoeDotNet
         {
             this.Elements = values.ToArray();
         }
+
+        public override string ToString()
+        {
+            return "[" + Elements.Aggregate("", (a, b) => a + (a == "" ? "" : ",") + b.ToString()) + "]";
+        }
     }
 
     public class TinymoeFunction : TinymoeObject
@@ -124,6 +154,11 @@ namespace TinymoeDotNet
         public TinymoeFunction(Action<TinymoeObject[]> value)
         {
             this.Handler = value;
+        }
+
+        public override string ToString()
+        {
+            return "(function)";
         }
     }
 
@@ -155,7 +190,7 @@ namespace TinymoeDotNet
         public static TinymoeObject Not(TinymoeObject a)
         {
             var value = CastToBoolean(a);
-            return new TinymoeBoolean(value.Value);
+            return new TinymoeBoolean(!value.Value);
         }
 
         public static TinymoeObject Concat(TinymoeObject a, TinymoeObject b)
@@ -199,6 +234,12 @@ namespace TinymoeDotNet
 
         private static int Compare(TinymoeObject a, TinymoeObject b)
         {
+            if (a is TinymoeBoolean && b is TinymoeBoolean)
+            {
+                var va = (TinymoeBoolean)a;
+                var vb = (TinymoeBoolean)b;
+                return va.Value ? vb.Value ? 0 : 1 : vb.Value ? -1 : 0;
+            }
             if (a is TinymoeInteger)
             {
                 var va = (TinymoeInteger)a;
@@ -207,13 +248,13 @@ namespace TinymoeDotNet
                     var vb = (TinymoeInteger)b;
                     return va.Value < vb.Value ? -1 : va.Value > vb.Value ? 1 : 0;
                 }
-                else
+                else if (b is TinymoeFloat)
                 {
                     var vb = (TinymoeFloat)b;
                     return va.Value < vb.Value ? -1 : va.Value > vb.Value ? 1 : 0;
                 }
             }
-            else
+            else if (a is TinymoeFloat)
             {
                 var va = (TinymoeFloat)a;
                 if (b is TinymoeInteger)
@@ -221,16 +262,37 @@ namespace TinymoeDotNet
                     var vb = (TinymoeInteger)b;
                     return va.Value < vb.Value ? -1 : va.Value > vb.Value ? 1 : 0;
                 }
-                else
+                else if (b is TinymoeFloat)
                 {
                     var vb = (TinymoeFloat)b;
                     return va.Value < vb.Value ? -1 : va.Value > vb.Value ? 1 : 0;
                 }
             }
 
-            var sa = CastToString(a);
-            var sb = CastToString(b);
-            return string.Compare(sa.Value, sb.Value);
+            if (a == null)
+            {
+                if (b == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                if (b == null)
+                {
+                    return 1;
+                }
+                else
+                {
+                    var sa = CastToString(a);
+                    var sb = CastToString(b);
+                    return string.Compare(sa.Value, sb.Value);
+                }
+            }
         }
 
         public static TinymoeObject Add(TinymoeObject a, TinymoeObject b)
@@ -340,7 +402,7 @@ namespace TinymoeDotNet
             return new TinymoeFunction(__args__ =>
             {
                 var result = function(__args__.Skip(1).Take(__args__.Length - 2).ToArray());
-                Invoke(__args__[1], new TinymoeObject[] { __args__[0], result });
+                Invoke(__args__[2], new TinymoeObject[] { __args__[0], result });
             });
         }
 
