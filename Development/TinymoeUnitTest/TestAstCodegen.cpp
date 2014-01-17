@@ -45,7 +45,7 @@ phrase sum from (first number) to (last number)
 end
 
 phrase main
-    print "1+ ... +100 = " & sum from 1 to 100
+    print "1+ ... +10 = " & sum from 1 to 10
 end
 
 )tinymoe");
@@ -167,9 +167,11 @@ sentence move (enumerator) to the next
 		set state to new continuation state of ()
 		if field body of enumerator <> null
 			trap field body of enumerator of ()
+			untrap
 			set field body of enumerator to null
 		else if field continuation of enumerator <> null
 			trap continuation field continuation of enumerator of (null)
+			untrap
 		else
 			exit block moving to the next
 		end

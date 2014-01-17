@@ -488,6 +488,7 @@ namespace tinymoe
 						{
 							error.message += "\r\n\tStatement can be parsed as ¡¾" + r->ToCode() + "¡¿";
 						}
+						errors.push_back(error);
 						throw ParsingFailedException();
 					}
 					else
