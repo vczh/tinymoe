@@ -8,6 +8,7 @@ namespace TinymoeDotNet
     {
         private static readonly Dictionary<Tuple<Type, string>, TinymoeObject> extensions = new Dictionary<Tuple<Type, string>, TinymoeObject>();
         private Dictionary<string, TinymoeObject> fields = new Dictionary<string, TinymoeObject>();
+        private List<string> fieldNames = new List<string>();
 
         public static void SetExtension(Type type, string name, TinymoeObject value)
         {
@@ -17,6 +18,7 @@ namespace TinymoeDotNet
         public void SetField(string name, TinymoeObject value)
         {
             fields[name] = value;
+            fieldNames.Add(name);
         }
 
         public TinymoeObject GetField(string name)
@@ -38,6 +40,15 @@ namespace TinymoeDotNet
             }
 
             throw new ArgumentOutOfRangeException("name");
+        }
+
+        public TinymoeObject SetFields(TinymoeObject[] values)
+        {
+            foreach (var x in fieldNames.Zip(values, Tuple.Create))
+            {
+                fields[x.Item1] = x.Item2;
+            }
+            return this;
         }
     }
 
@@ -100,7 +111,7 @@ namespace TinymoeDotNet
             this.Elements = new TinymoeObject[length];
         }
 
-        public TinymoeArray(IEnumerable<TinymoeObject> values)
+        public TinymoeArray(TinymoeObject[] values)
         {
             this.Elements = values.ToArray();
         }
@@ -118,7 +129,9 @@ namespace TinymoeDotNet
 
     public class TinymoeOperations
     {
-        public static readonly Dictionary<string, TinymoeObject> ExternalFunctions = new Dictionary<string, TinymoeObject>();
+        static TinymoeOperations()
+        {
+        }
 
         public static TinymoeObject Positive(TinymoeObject a)
         {
@@ -215,6 +228,59 @@ namespace TinymoeDotNet
             throw new NotImplementedException();
         }
 
+        public static TinymoeObject ArrayLength(TinymoeObject array)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static TinymoeObject ArrayGet(TinymoeObject array, TinymoeObject index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void ArraySet(TinymoeObject array, TinymoeObject index, TinymoeObject value)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static readonly Dictionary<string,TinymoeObject> externalFunctions=new Dictionary<string,TinymoeObject>();
+
+        public static TinymoeObject BuildExternalFunction(Func<TinymoeObject[],TinymoeObject> function)
+        {
+            return new TinymoeFunction(__args__ =>
+            {
+                var result = function(__args__.Skip(1).Take(__args__.Length - 2).ToArray());
+                Invoke(__args__[1], new TinymoeObject[] { __args__[0], result });
+            });
+        }
+
+        public static TinymoeObject GetExternalFunction(TinymoeObject name)
+        {
+            var realName = ((TinymoeString)CastToString(name)).Value;
+            TinymoeObject function=null;
+            if(!externalFunctions.TryGetValue(realName,out function))
+            {
+                switch(realName)
+                {
+                    case "CastToBoolean":
+                        return BuildExternalFunction(__args__ => CastToBoolean(__args__[0]));
+                    case "CastToInteger":
+                        return BuildExternalFunction(__args__ => CastToInteger(__args__[0]));
+                    case "CastToFloat":
+                        return BuildExternalFunction(__args__ => CastToFloat(__args__[0]));
+                    case "CastToString":
+                        return BuildExternalFunction(__args__ => CastToString(__args__[0]));
+                    case "Print":
+                        return BuildExternalFunction(__args__ => Print(__args__[0]));
+                    case "Sqrt":
+                        return BuildExternalFunction(__args__ => Sqrt(__args__[0]));
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", realName));
+                }
+            }
+            return function;
+        }
+
         public static TinymoeObject CastToBoolean(TinymoeObject a)
         {
             throw new NotImplementedException();
@@ -231,6 +297,16 @@ namespace TinymoeDotNet
         }
 
         public static TinymoeObject CastToString(TinymoeObject a)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static TinymoeObject Print(TinymoeObject a)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static TinymoeObject Sqrt(TinymoeObject a)
         {
             throw new NotImplementedException();
         }
