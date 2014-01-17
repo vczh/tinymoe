@@ -76,19 +76,13 @@ $procedure standard_library::untrap(state, continuation)
 
 $procedure standard_library::fall_into_the_previous_trap(state, continuation)
 {
-    $symbol $the_result;
+    $symbol the_current_trap;
+    the_current_trap = state.trap.continuation;
     $symbol $state_0;
     $state_0 = state;
-    standard_library::call_$expression(
+    the_current_trap(
         $state_0, 
-        $null, 
-        $lambda ($state_2, $result_3)
-            {
-                continuation(
-                    state, 
-                    $the_result
-                    );
-            }
+        $null
         );
 }
 

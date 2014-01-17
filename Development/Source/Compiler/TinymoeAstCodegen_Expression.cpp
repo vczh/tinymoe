@@ -251,8 +251,13 @@ namespace tinymoe
 				auto ast = make_shared<AstLiteralExpression>();
 				ast->literalName = AstLiteralName::Null;
 				
+				auto lambda = GenerateContinuationLambdaAst(scope, context, state);
+				auto lambdaStat = make_shared<AstExpressionStatement>();
+				lambdaStat->expression = lambda;
+				
 				result.AppendStatement(stat);
-				return result.ReplaceValue(ast);
+				result.AppendStatement(lambdaStat);
+				return result.ReplaceValue(ast, lambda);
 			}
 			else
 			{

@@ -53,7 +53,7 @@ end
 cps (state) (continuation)
 sentence fall into the previous trap
 	set the current trap to field continuation of (field trap of state)
-	call continuation the current trap of ()
+	call continuation the current trap of (null)
 end
 
 cps (state) (continuation)

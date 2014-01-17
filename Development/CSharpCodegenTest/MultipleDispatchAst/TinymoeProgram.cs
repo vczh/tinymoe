@@ -92,22 +92,14 @@ namespace TinymoeProgramNamespace
 
 		public void standard_library__fall_into_the_previous_trap(TinymoeObject state, TinymoeObject continuation)
 		{
-			TinymoeObject _the_result = null;
+			TinymoeObject the_current_trap = null;
+			the_current_trap = state.GetField("trap").GetField("continuation");
 			TinymoeObject _state_0 = null;
 			_state_0 = state;
-			standard_library__call__expression(
+			Invoke(the_current_trap, new TinymoeObject[] {
 				_state_0,
-				null,
-				new TinymoeFunction(__args__ => 
-				{
-					TinymoeObject _state_2 = __args__[0];
-					TinymoeObject _result_3 = __args__[1];
-					Invoke(continuation, new TinymoeObject[] {
-						state,
-						_the_result
-						});
-				})
-				);
+				null
+				});
 		}
 
 		public void standard_library__break(TinymoeObject state, TinymoeObject continuation)
