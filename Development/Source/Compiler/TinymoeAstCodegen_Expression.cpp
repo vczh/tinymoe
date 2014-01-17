@@ -121,6 +121,7 @@ namespace tinymoe
 		{
 			Expression::Ptr realFunction;
 			Expression::List realArguments;
+			bool invokeContinuation = true;
 			if (auto ref = dynamic_pointer_cast<ReferenceExpression>(function))
 			{
 				switch (ref->symbol->target)
@@ -129,6 +130,13 @@ namespace tinymoe
 					{
 						realFunction = arguments[0];
 						realArguments = dynamic_pointer_cast<ListExpression>(arguments[1])->elements;
+					}
+					break;
+				case GrammarSymbolTarget::InvokeContinuation:
+					{
+						realFunction = arguments[0];
+						realArguments = dynamic_pointer_cast<ListExpression>(arguments[1])->elements;
+						invokeContinuation = true;
 					}
 					break;
 				case GrammarSymbolTarget::NewTypeOfFields:
@@ -238,14 +246,25 @@ namespace tinymoe
 				invoke->arguments.push_back(*it++);
 			}
 
-			auto lambda = GenerateContinuationLambdaAst(scope, context, state);
-			invoke->arguments.push_back(lambda);
+			if (invokeContinuation)
+			{
+				auto ast = make_shared<AstLiteralExpression>();
+				ast->literalName = AstLiteralName::Null;
+				
+				result.AppendStatement(stat);
+				return result.ReplaceValue(ast);
+			}
+			else
+			{
+				auto lambda = GenerateContinuationLambdaAst(scope, context, state);
+				invoke->arguments.push_back(lambda);
 			
-			auto ast = make_shared<AstReferenceExpression>();
-			ast->reference = lambda->arguments[1];
+				auto ast = make_shared<AstReferenceExpression>();
+				ast->reference = lambda->arguments[1];
 
-			result.AppendStatement(stat);
-			return result.ReplaceValue(ast, lambda);
+				result.AppendStatement(stat);
+				return result.ReplaceValue(ast, lambda);
+			}
 		}
 
 		SymbolAstResult ListExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)

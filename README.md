@@ -113,19 +113,28 @@ Here are several samples to introduce this language:
  
 	type collection enumerator
 		current value
+		body
 		continuation
 	end
  
 	phrase new enumerator from (enumerable)
-		set the result to new collection enumerator
-		set field continuation of the result to field body of enumerable
+		set the result to new collection enumerator of (null, field body of enumerable, null)
 	end
- 
+
+	cps (state) (continuation)
 	sentence move (enumerator) to the next
-		set field current value of enumerator to null
-		set state to new continuation state
-		if field continuation of enumerator <> null
-			call continuation field continuation of enumerator with (null)
+		named block moving to the next
+			set field current value of enumerator to null
+			set state to new continuation state of ()
+			if field body of enumerator <> null
+				trap field body of enumerator of ()
+				set field body of enumerator to null
+			else if field continuation of enumerator <> null
+				trap continuation field continuation of enumerator of (null)
+			else
+				exit block moving to the next
+			end
+
 			select field flag of state
 				case yielding return
 					set field current value of enumerator to field argument of state
@@ -134,15 +143,16 @@ Here are several samples to introduce this language:
 				case yielding break
 					set field continuation of enumerator to null
 					reset continuation state state to null
-			end
-			if field flag of state <> null
-				copy continuation state state
+				case null
+					set field continuation of enumerator to null
+				case else
+					fall into the previous trap
 			end
 		end
 	end
  
 	phrase (enumerator) reaches the end
-		set the result to field continuation of enumerator = null
+		set the result to field body of enumerator = null and field continuation of enumerator = null
 	end
  
 	cps (state) (continuation)
@@ -166,20 +176,20 @@ Here are several samples to introduce this language:
 		start ENUMERATING
 		closable
 	block (body) create enumerable to (assignable receiver)
-		set receiver to new enumerable collection
+		set receiver to new enumerable collection of ()
 		set field body of receiver to body
 	end
- 
+
 	block (sentence deal with (item)) repeat with (argument item) in (items : enumerable collection)
-		set enumerator to new enumerator from numbers
+		set enumerator to new enumerator from items
 		repeat
 			move enumerator to the next
-			deal with field current value of items
+			deal with field current value of enumerator
 		end
 	end
 
 	sentence print (message)
-		redirect to "printf"
+		redirect to "Print"
 	end
  
 	phrase main

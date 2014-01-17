@@ -152,36 +152,46 @@ end
  
 type collection enumerator
     current value
+	body
     continuation
 end
  
 phrase new enumerator from (enumerable)
-    set the result to new collection enumerator of ()
-    set field continuation of the result to field body of enumerable
+    set the result to new collection enumerator of (null, field body of enumerable, null)
 end
- 
+
+cps (state) (continuation)
 sentence move (enumerator) to the next
-    set field current value of enumerator to null
-	set state to new continuation state of ()
-    if field continuation of enumerator <> null
-        call continuation field continuation of enumerator of (null)
-        select field flag of state
-            case yielding return
-                set field current value of enumerator to field argument of state
-                set field continuation of enumerator to field continuation of state
-                reset continuation state state to null
-            case yielding break
-                set field continuation of enumerator to null
-                reset continuation state state to null
-        end
-		if field flag of state <> null
-			copy continuation state state
+	named block moving to the next
+		set field current value of enumerator to null
+		set state to new continuation state of ()
+		if field body of enumerator <> null
+			trap field body of enumerator of ()
+			set field body of enumerator to null
+		else if field continuation of enumerator <> null
+			trap continuation field continuation of enumerator of (null)
+		else
+			exit block moving to the next
 		end
-    end
+
+		select field flag of state
+			case yielding return
+				set field current value of enumerator to field argument of state
+				set field continuation of enumerator to field continuation of state
+				reset continuation state state to null
+			case yielding break
+				set field continuation of enumerator to null
+				reset continuation state state to null
+			case null
+				set field continuation of enumerator to null
+			case else
+				fall into the previous trap
+		end
+	end
 end
  
 phrase (enumerator) reaches the end
-    set the result to field continuation of enumerator = null
+    set the result to field body of enumerator = null and field continuation of enumerator = null
 end
  
 cps (state) (continuation)

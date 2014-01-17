@@ -35,6 +35,9 @@ sentence reset continuation state (state) to (flag)
 	set field continuation of state to null
 end
 
+sentence call (value)
+end
+
 cps (state) (continuation)
 sentence trap (expression value)
 	set the current trap to new continuation trap of (continuation, field trap of state)
@@ -47,13 +50,6 @@ sentence fall into the previous trap
 	set the current trap to field continuation of field trap of state
 	set field trap of state to field previous trap of field trap of state
 	call continuation the current trap of ()
-end
-
-cps (state) (continuation)
-sentence copy continuation state (new state)
-	set field flag of state to field flag of new state
-	set field argument of state to field argument of new state
-	set field continuation of state to field continuation of new state
 end
 
 cps (state) (continuation)

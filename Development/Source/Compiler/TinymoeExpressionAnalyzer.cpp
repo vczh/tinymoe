@@ -148,6 +148,10 @@ namespace tinymoe
 				+ GrammarFragmentType::Primitive + "of" + GrammarFragmentType::List
 				);
 			symbols.push_back(
+				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::InvokeContinuation)
+				+ "continuation" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
+				);
+			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewTypeOfFields)
 				+ "new" + GrammarFragmentType::Type + "of" + GrammarFragmentType::List
 				);
@@ -191,14 +195,6 @@ namespace tinymoe
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CaseElse)
 				+ "case" + "else"
-				);
-			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Call)
-				+ "call" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
-				);
-			symbols.push_back(
-				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CallContinuation)
-				+ "call" + "continuation" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::RedirectTo)

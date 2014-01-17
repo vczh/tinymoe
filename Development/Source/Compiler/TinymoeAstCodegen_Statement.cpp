@@ -364,68 +364,6 @@ namespace tinymoe
 					result.continuation = selectLambda;
 					return result;
 				}
-			case GrammarSymbolTarget::Call:
-			case GrammarSymbolTarget::CallContinuation:
-				{
-					auto func = statementExpression->arguments[0];
-					auto& args = dynamic_pointer_cast<ListExpression>(statementExpression->arguments[1])->elements;
-
-					SymbolAstResult result;
-					vector<AstExpression::Ptr> exprs;
-					int exprStart = 0;
-
-					result.MergeForExpression(func->GenerateAst(scope, context, state), context, exprs, exprStart, state);
-					for (auto arg : args)
-					{
-						result.MergeForExpression(arg->GenerateAst(scope, context, state), context, exprs, exprStart, state);
-					}
-
-					auto invoke = make_shared<AstInvokeExpression>();
-					auto it = exprs.begin();
-					invoke->function = *it++;
-					{
-						auto ref = make_shared<AstReferenceExpression>();
-						ref->reference = state;
-						invoke->arguments.push_back(ref);
-					}
-					while (it != exprs.end())
-					{
-						invoke->arguments.push_back(*it++);
-					}
-
-					auto invokeStat = make_shared<AstExpressionStatement>();
-					invokeStat->expression = invoke;
-
-					switch (statementSymbol->target)
-					{
-					case GrammarSymbolTarget::Call:
-						{
-							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
-							invoke->arguments.push_back(lambda);
-
-							SymbolAstResult statResult(nullptr, invokeStat, lambda);
-							result.MergeForStatement(statResult, state);
-						}
-						break;
-					case GrammarSymbolTarget::CallContinuation:
-						{
-							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
-							invoke->arguments.push_back(lambda);
-
-							auto block = make_shared<AstBlockStatement>();
-							block->statements.push_back(invokeStat);
-
-							auto lambdaStat = make_shared<AstExpressionStatement>();
-							lambdaStat->expression = lambda;
-							block->statements.push_back(lambdaStat);
-
-							SymbolAstResult statResult(nullptr, block, lambda);
-							result.MergeForStatement(statResult, state);
-						}
-						break;
-					}
-					return result;
-				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
 					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
