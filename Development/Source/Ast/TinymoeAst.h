@@ -44,6 +44,7 @@ namespace tinymoe
 		{
 		public:
 			typedef shared_ptr<AstType>				Ptr;
+			typedef weak_ptr<AstType>				WeakPtr;
 			typedef vector<Ptr>						List;
 
 			virtual void							Accept(AstTypeVisitor* visitor) = 0;
@@ -53,6 +54,7 @@ namespace tinymoe
 		{
 		public:
 			typedef shared_ptr<AstExpression>		Ptr;
+			typedef weak_ptr<AstExpression>			WeakPtr;
 			typedef vector<Ptr>						List;
 			
 			virtual void							Accept(AstExpressionVisitor* visitor) = 0;
@@ -67,6 +69,7 @@ namespace tinymoe
 		{
 		public:
 			typedef shared_ptr<AstStatement>		Ptr;
+			typedef weak_ptr<AstStatement>			WeakPtr;
 			typedef vector<Ptr>						List;
 			
 			virtual void							Accept(AstStatementVisitor* visitor) = 0;

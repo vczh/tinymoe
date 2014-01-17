@@ -6,6 +6,39 @@ namespace TinymoeDotNet
 {
     public class TinymoeObject
     {
+        private static readonly Dictionary<Tuple<Type, string>, TinymoeObject> extensions = new Dictionary<Tuple<Type, string>, TinymoeObject>();
+        private Dictionary<string, TinymoeObject> fields = new Dictionary<string, TinymoeObject>();
+
+        public static void SetExtension(Type type, string name, TinymoeObject value)
+        {
+            extensions[Tuple.Create(type, name)] = value;
+        }
+
+        public void SetField(string name, TinymoeObject value)
+        {
+            fields[name] = value;
+        }
+
+        public TinymoeObject GetField(string name)
+        {
+            TinymoeObject value = null;
+            if (fields.TryGetValue(name, out value))
+            {
+                return value;
+            }
+
+            Type type = GetType();
+            while (type != null)
+            {
+                if (extensions.TryGetValue(Tuple.Create(type, name), out value))
+                {
+                    return value;
+                }
+                type = type.BaseType;
+            }
+
+            throw new ArgumentOutOfRangeException("name");
+        }
     }
 
     public class TinymoeBoolean : TinymoeObject
@@ -80,16 +113,6 @@ namespace TinymoeDotNet
         public TinymoeFunction(Action<TinymoeObject[]> value)
         {
             this.Handler = value;
-        }
-    }
-
-    public class TinymoeClass : TinymoeObject
-    {
-        public Dictionary<string, TinymoeObject> Fields { get; private set; }
-
-        public TinymoeClass(IEnumerable<string> fieldNames)
-        {
-            this.Fields = fieldNames.ToDictionary(x => x, x => null as TinymoeObject);
         }
     }
 
