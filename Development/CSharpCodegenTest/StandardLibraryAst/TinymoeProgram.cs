@@ -640,7 +640,7 @@ namespace TinymoeProgramNamespace
 					_select_value_9 = state.GetField("flag");
 					if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, standard_library__raising_exception))).Value)
 					{
-						_the_result = state.GetField("exception");
+						_the_result = state.GetField("argument");
 						standard_library__reset_continuation_state__expression_to__expression(
 							_state_4,
 							state,
@@ -655,6 +655,75 @@ namespace TinymoeProgramNamespace
 							_select_continuation_8
 							);
 					}
+				})
+				);
+		}
+
+		public void standard_library__else_try(TinymoeObject state, TinymoeObject signal, TinymoeObject body, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__if__expression(
+				state,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _continuation_3 = __args__[1];
+					standard_library__trap__expression(
+						_state_2,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_4 = __args___x2[0];
+							TinymoeObject _continuation_5 = __args___x2[1];
+							Invoke(body, new TinymoeObject[] {
+								_state_4,
+								new TinymoeFunction(__args___x3 => 
+								{
+									TinymoeObject _state_6 = __args___x3[0];
+									TinymoeObject _result_7 = __args___x3[1];
+									Invoke(_continuation_5, new TinymoeObject[] {
+										_state_4,
+										_result_7
+										});
+								})
+								});
+						}),
+						new TinymoeFunction(__args___x4 => 
+						{
+							TinymoeObject _state_8 = __args___x4[0];
+							TinymoeObject _result_9 = __args___x4[1];
+							TinymoeObject _select_continuation_12 = null;
+							TinymoeObject _select_value_13 = null;
+							_select_continuation_12 = _continuation_3;
+							_select_value_13 = state.GetField("flag");
+							if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_13, standard_library__raising_exception))).Value)
+							{
+								_the_result = state.GetField("argument");
+								standard_library__reset_continuation_state__expression_to__expression(
+									_state_8,
+									state,
+									null,
+									_select_continuation_12
+									);
+							}
+							else
+							{
+								standard_library__fall_into_the_previous_trap(
+									_state_8,
+									_select_continuation_12
+									);
+							}
+						})
+						);
+				}),
+				NE(signal, null),
+				new TinymoeFunction(__args___x5 => 
+				{
+					TinymoeObject _state_0 = __args___x5[0];
+					TinymoeObject _result_1 = __args___x5[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						state,
+						_the_result
+						});
 				})
 				);
 		}

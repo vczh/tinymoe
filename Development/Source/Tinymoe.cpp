@@ -190,11 +190,29 @@ block (body) try
 	trap body of ()
 	select field flag of state
 		case raising exception
-			set the result to field exception of state
+			set the result to field argument of state
 			reset continuation state state to null
 		case else
 			fall into the previous trap
 	end
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	start SEH try
+	closable
+block (body) else try
+	if signal <> null
+		trap body of ()
+		select field flag of state
+			case raising exception
+				set the result to field argument of state
+				reset continuation state state to null
+			case else
+				fall into the previous trap
+		end
+	end	
 end
 
 cps (state)
