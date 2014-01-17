@@ -6,6 +6,10 @@ namespace TinymoeProgramNamespace
 {
 	public class TinymoeProgram : TinymoeOperations
 	{
+		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeString("standard_library__breaking_repeating");
+
+		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeString("standard_library__continuing_repeating");
+
 		public readonly TinymoeObject standard_library__raising_exception = new TinymoeString("standard_library__raising_exception");
 
 		public readonly TinymoeObject standard_library__exiting_program = new TinymoeString("standard_library__exiting_program");
@@ -140,10 +144,6 @@ namespace TinymoeProgramNamespace
 		{
 		}
 
-		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeString("standard_library__breaking_repeating");
-
-		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeString("standard_library__continuing_repeating");
-
 		public readonly TinymoeObject enumerable__yielding_return = new TinymoeString("enumerable__yielding_return");
 
 		public readonly TinymoeObject enumerable__yielding_break = new TinymoeString("enumerable__yielding_break");
@@ -235,6 +235,19 @@ namespace TinymoeProgramNamespace
 				"_dispatch__standard_library__repeat_with__argument_in__expression_x3",
 				new TinymoeFunction(__args__ => TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x3(__args__[0], __args__[1], __args__[2], __args__[3]))
 				); 
+		}
+
+		static void Main(string[] args)
+		{
+			var program = new TinymoeProgram();
+			var continuation = new TinymoeFunction((TinymoeObject[] arguments) =>
+			{
+			});
+			var trap = new TinymoeProgram.standard_library__continuation_trap();
+			trap.SetField("continuation", continuation);
+			var state = new TinymoeProgram.standard_library__continuation_state();
+			state.SetField("trap", trap);
+			program.enumerable__main(state, continuation);
 		}
 	}
 }

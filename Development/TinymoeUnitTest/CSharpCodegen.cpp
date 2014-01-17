@@ -277,6 +277,33 @@ void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream& o)
 		}
 	}
 	o << "\t\t}" << endl;
+	o << endl;
+	{
+		string mainName;
+		for (auto decl : assembly->declarations)
+		{
+			if (decl->composedName.size() >= 6)
+			{
+				if (decl->composedName.substr(decl->composedName.size() - 6, 6) == "::main")
+				{
+					mainName = resolver.Resolve(decl.get());
+					break;
+				}
+			}
+		}
+		o << "\t\tstatic void Main(string[] args)" << endl;
+		o << "\t\t{" << endl;
+		o << "\t\t\tvar program = new TinymoeProgram();" << endl;
+		o << "\t\t\tvar continuation = new TinymoeFunction((TinymoeObject[] arguments) =>" << endl;
+		o << "\t\t\t{" << endl;
+		o << "\t\t\t});" << endl;
+		o << "\t\t\tvar trap = new TinymoeProgram.standard_library__continuation_trap();" << endl;
+		o << "\t\t\ttrap.SetField(\"continuation\", continuation);" << endl;
+		o << "\t\t\tvar state = new TinymoeProgram.standard_library__continuation_state();" << endl;
+		o << "\t\t\tstate.SetField(\"trap\", trap);" << endl;
+		o << "\t\t\tprogram." << mainName << "(state, continuation);" << endl;
+		o << "\t\t}" << endl;
+	}
 	o << "\t}" << endl;
 	o << "}" << endl;
 }
