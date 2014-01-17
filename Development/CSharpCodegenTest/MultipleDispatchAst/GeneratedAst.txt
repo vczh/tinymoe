@@ -930,9 +930,9 @@ $procedure geometry::area_of_$primitive<circle>($state, shape, $continuation)
         );
 }
 
-$procedure geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    a.$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape(
+    a.$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -940,7 +940,7 @@ $procedure geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, 
         );
 }
 
-$procedure geometry::$primitive<rectangle>_and_$expression<rectangle>_is_the_same_shape($state, a, b, $continuation)
+$procedure geometry::$primitive<rectangle>_and_$expression<rectangle>_are_the_same_shape($state, a, b, $continuation)
 {
     $symbol $the_result;
     $the_result = $true;
@@ -950,7 +950,7 @@ $procedure geometry::$primitive<rectangle>_and_$expression<rectangle>_is_the_sam
         );
 }
 
-$procedure geometry::$primitive<triangle>_and_$expression<triangle>_is_the_same_shape($state, a, b, $continuation)
+$procedure geometry::$primitive<triangle>_and_$expression<triangle>_are_the_same_shape($state, a, b, $continuation)
 {
     $symbol $the_result;
     $the_result = $true;
@@ -960,7 +960,7 @@ $procedure geometry::$primitive<triangle>_and_$expression<triangle>_is_the_same_
         );
 }
 
-$procedure geometry::$primitive<circle>_and_$expression<circle>_is_the_same_shape($state, a, b, $continuation)
+$procedure geometry::$primitive<circle>_and_$expression<circle>_are_the_same_shape($state, a, b, $continuation)
 {
     $symbol $the_result;
     $the_result = $true;
@@ -981,7 +981,7 @@ $procedure geometry::main($state, $continuation)
     shape_two = new geometry::rectangle(1, 2);
     $symbol $state_2;
     $state_2 = $state_0;
-    geometry::$primitive_and_$expression_is_the_same_shape(
+    geometry::$primitive_and_$expression_are_the_same_shape(
         $state_2, 
         shape_one, 
         shape_two, 
@@ -998,9 +998,22 @@ $procedure geometry::main($state, $continuation)
                     $result_5, 
                     $lambda ($state_6, $result_7)
                         {
-                            $continuation(
-                                $state, 
-                                $the_result
+                            standard_library::else(
+                                $state_6, 
+                                $result_7, 
+                                $lambda ($state_14, $continuation_15)
+                                    geometry::print_$expression(
+                                        $state_14, 
+                                        "Triangle and rectangle are not the same shape!", 
+                                        $continuation_15
+                                        );, 
+                                $lambda ($state_12, $result_13)
+                                    {
+                                        $continuation(
+                                            $state, 
+                                            $the_result
+                                            );
+                                    }
                                 );
                         }
                     );
@@ -1096,7 +1109,7 @@ $procedure ($Object).$dispatch<>geometry::area_of_$primitive($state, shape, $con
         );
 }
 
-$procedure $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure $dispatch_fail<>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
     $symbol $the_result;
     $the_result = $false;
@@ -1106,9 +1119,9 @@ $procedure $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shap
         );
 }
 
-$procedure (geometry::rectangle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::rectangle).$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    a.$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape(
+    b.$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1116,9 +1129,9 @@ $procedure (geometry::rectangle).$dispatch<>geometry::$primitive_and_$expression
         );
 }
 
-$procedure (geometry::rectangle).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::rectangle).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    geometry::$primitive<rectangle>_and_$expression<rectangle>_is_the_same_shape(
+    geometry::$primitive<rectangle>_and_$expression<rectangle>_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1126,9 +1139,9 @@ $procedure (geometry::rectangle).$dispatch<geometry::rectangle>geometry::$primit
         );
 }
 
-$procedure (geometry::triangle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::triangle).$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    a.$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape(
+    b.$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1136,9 +1149,9 @@ $procedure (geometry::triangle).$dispatch<>geometry::$primitive_and_$expression_
         );
 }
 
-$procedure (geometry::triangle).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::triangle).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    geometry::$primitive<triangle>_and_$expression<triangle>_is_the_same_shape(
+    geometry::$primitive<triangle>_and_$expression<triangle>_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1146,9 +1159,9 @@ $procedure (geometry::triangle).$dispatch<geometry::triangle>geometry::$primitiv
         );
 }
 
-$procedure (geometry::circle).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::circle).$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    a.$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape(
+    b.$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1156,9 +1169,9 @@ $procedure (geometry::circle).$dispatch<>geometry::$primitive_and_$expression_is
         );
 }
 
-$procedure (geometry::circle).$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure (geometry::circle).$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    geometry::$primitive<circle>_and_$expression<circle>_is_the_same_shape(
+    geometry::$primitive<circle>_and_$expression<circle>_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1166,9 +1179,9 @@ $procedure (geometry::circle).$dispatch<geometry::circle>geometry::$primitive_an
         );
 }
 
-$procedure ($Object).$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure ($Object).$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+    $dispatch_fail<>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1176,9 +1189,9 @@ $procedure ($Object).$dispatch<>geometry::$primitive_and_$expression_is_the_same
         );
 }
 
-$procedure ($Object).$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure ($Object).$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+    $dispatch_fail<>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1186,9 +1199,9 @@ $procedure ($Object).$dispatch<geometry::circle>geometry::$primitive_and_$expres
         );
 }
 
-$procedure ($Object).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure ($Object).$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+    $dispatch_fail<>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 
@@ -1196,9 +1209,9 @@ $procedure ($Object).$dispatch<geometry::rectangle>geometry::$primitive_and_$exp
         );
 }
 
-$procedure ($Object).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape($state, a, b, $continuation)
+$procedure ($Object).$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape($state, a, b, $continuation)
 {
-    $dispatch_fail<>geometry::$primitive_and_$expression_is_the_same_shape(
+    $dispatch_fail<>geometry::$primitive_and_$expression_are_the_same_shape(
         $state, 
         a, 
         b, 

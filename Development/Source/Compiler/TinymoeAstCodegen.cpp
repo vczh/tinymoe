@@ -512,7 +512,7 @@ namespace tinymoe
 							}
 							else
 							{
-								FillMultipleDispatchStepAst(ast, functionName, ast->readArgumentAstMap.find(*itd)->second);
+								FillMultipleDispatchStepAst(ast, functionName, ast->readArgumentAstMap.find(*itd2)->second);
 							}
 						}
 					}

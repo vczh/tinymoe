@@ -728,7 +728,7 @@ public:
 		if (node->ownerType)
 		{
 			auto typeName = CSharpTypeCodegen::ToString(node->ownerType, resolver);
-			auto methodName = FunctionToName(resolver, node);
+			auto methodName = node->composedName;
 			auto targetName = FunctionToValue(resolver, node, nullptr);
 			o << prefix << "TinymoeObject.SetExtension(" << endl;
 			o << prefix << "\ttypeof(" << typeName << ")," << endl;

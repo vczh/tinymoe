@@ -1131,9 +1131,9 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			Invoke(a.GetField("$dispatch<>geometry::$primitive_and_$expression_is_the_same_shape"), new TinymoeObject[] {
+			Invoke(a.GetField("$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape"), new TinymoeObject[] {
 				_state,
 				a,
 				b,
@@ -1141,7 +1141,7 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry___primitive_rectangle__and__expression_rectangle__is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry___primitive_rectangle__and__expression_rectangle__are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			_the_result = new TinymoeBoolean(true);
@@ -1151,7 +1151,7 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry___primitive_triangle__and__expression_triangle__is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry___primitive_triangle__and__expression_triangle__are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			_the_result = new TinymoeBoolean(true);
@@ -1161,7 +1161,7 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry___primitive_circle__and__expression_circle__is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry___primitive_circle__and__expression_circle__are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			_the_result = new TinymoeBoolean(true);
@@ -1182,7 +1182,7 @@ namespace TinymoeProgramNamespace
 			shape_two = new geometry__rectangle().SetFields(new TinymoeObject[] {new TinymoeInteger(1), new TinymoeInteger(2)});
 			TinymoeObject _state_2 = null;
 			_state_2 = _state_0;
-			geometry___primitive_and__expression_is_the_same_shape(
+			geometry___primitive_and__expression_are_the_same_shape(
 				_state_2,
 				shape_one,
 				shape_two,
@@ -1207,10 +1207,29 @@ namespace TinymoeProgramNamespace
 						{
 							TinymoeObject _state_6 = __args___x3[0];
 							TinymoeObject _result_7 = __args___x3[1];
-							Invoke(_continuation, new TinymoeObject[] {
-								_state,
-								_the_result
-								});
+							standard_library__else(
+								_state_6,
+								_result_7,
+								new TinymoeFunction(__args___x4 => 
+								{
+									TinymoeObject _state_14 = __args___x4[0];
+									TinymoeObject _continuation_15 = __args___x4[1];
+									geometry__print__expression(
+										_state_14,
+										new TinymoeString("Triangle and rectangle are not the same shape!"),
+										_continuation_15
+										);
+								}),
+								new TinymoeFunction(__args___x5 => 
+								{
+									TinymoeObject _state_12 = __args___x5[0];
+									TinymoeObject _result_13 = __args___x5[1];
+									Invoke(_continuation, new TinymoeObject[] {
+										_state,
+										_the_result
+										});
+								})
+								);
 						})
 						);
 				})
@@ -1309,7 +1328,7 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void _dispatch_fail__geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void _dispatch_fail__geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			_the_result = new TinymoeBoolean(false);
@@ -1319,9 +1338,9 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry__rectangle___dispatch__geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__rectangle___dispatch__geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			Invoke(a.GetField("$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_is_the_same_shape"), new TinymoeObject[] {
+			Invoke(b.GetField("$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape"), new TinymoeObject[] {
 				_state,
 				a,
 				b,
@@ -1329,9 +1348,9 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			geometry___primitive_rectangle__and__expression_rectangle__is_the_same_shape(
+			geometry___primitive_rectangle__and__expression_rectangle__are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1339,9 +1358,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void geometry__triangle___dispatch__geometry___primitive_and__expression_is_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__triangle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			Invoke(a.GetField("$dispatch<geometry::triangle>geometry::$primitive_and_$expression_is_the_same_shape"), new TinymoeObject[] {
+			Invoke(b.GetField("$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape"), new TinymoeObject[] {
 				_state,
 				a,
 				b,
@@ -1349,9 +1368,9 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			geometry___primitive_triangle__and__expression_triangle__is_the_same_shape(
+			geometry___primitive_triangle__and__expression_triangle__are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1359,9 +1378,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void geometry__circle___dispatch__geometry___primitive_and__expression_is_the_same_shape_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__circle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			Invoke(a.GetField("$dispatch<geometry::circle>geometry::$primitive_and_$expression_is_the_same_shape"), new TinymoeObject[] {
+			Invoke(b.GetField("$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape"), new TinymoeObject[] {
 				_state,
 				a,
 				b,
@@ -1369,9 +1388,9 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			geometry___primitive_circle__and__expression_circle__is_the_same_shape(
+			geometry___primitive_circle__and__expression_circle__are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1379,9 +1398,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void TinymoeObject___dispatch__geometry___primitive_and__expression_is_the_same_shape_x4(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void TinymoeObject___dispatch__geometry___primitive_and__expression_are_the_same_shape_x4(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			_dispatch_fail__geometry___primitive_and__expression_is_the_same_shape(
+			_dispatch_fail__geometry___primitive_and__expression_are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1389,9 +1408,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			_dispatch_fail__geometry___primitive_and__expression_is_the_same_shape(
+			_dispatch_fail__geometry___primitive_and__expression_are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1399,9 +1418,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			_dispatch_fail__geometry___primitive_and__expression_is_the_same_shape(
+			_dispatch_fail__geometry___primitive_and__expression_are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1409,9 +1428,9 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		public void TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			_dispatch_fail__geometry___primitive_and__expression_is_the_same_shape(
+			_dispatch_fail__geometry___primitive_and__expression_are_the_same_shape(
 				_state,
 				a,
 				b,
@@ -1423,83 +1442,83 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject.SetExtension(
 				typeof(TinymoeArray),
-				"_dispatch__standard_library__repeat_with__argument_in__expression",
+				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
 				new TinymoeFunction(__args__ => TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(__args__[0], __args__[1], __args__[2], __args__[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch__standard_library__repeat_with__argument_in__expression_x2",
+				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
 				new TinymoeFunction(__args___x2 => TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(__args___x2[0], __args___x2[1], __args___x2[2], __args___x2[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__rectangle),
-				"_dispatch__geometry__area_of__primitive",
+				"$dispatch<>geometry::area_of_$primitive",
 				new TinymoeFunction(__args___x3 => geometry__rectangle___dispatch__geometry__area_of__primitive(__args___x3[0], __args___x3[1], __args___x3[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__triangle),
-				"_dispatch__geometry__area_of__primitive_x2",
+				"$dispatch<>geometry::area_of_$primitive",
 				new TinymoeFunction(__args___x4 => geometry__triangle___dispatch__geometry__area_of__primitive_x2(__args___x4[0], __args___x4[1], __args___x4[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__circle),
-				"_dispatch__geometry__area_of__primitive_x3",
+				"$dispatch<>geometry::area_of_$primitive",
 				new TinymoeFunction(__args___x5 => geometry__circle___dispatch__geometry__area_of__primitive_x3(__args___x5[0], __args___x5[1], __args___x5[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch__geometry__area_of__primitive_x4",
+				"$dispatch<>geometry::area_of_$primitive",
 				new TinymoeFunction(__args___x6 => TinymoeObject___dispatch__geometry__area_of__primitive_x4(__args___x6[0], __args___x6[1], __args___x6[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__rectangle),
-				"_dispatch__geometry___primitive_and__expression_is_the_same_shape",
-				new TinymoeFunction(__args___x7 => geometry__rectangle___dispatch__geometry___primitive_and__expression_is_the_same_shape(__args___x7[0], __args___x7[1], __args___x7[2], __args___x7[3]))
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x7 => geometry__rectangle___dispatch__geometry___primitive_and__expression_are_the_same_shape(__args___x7[0], __args___x7[1], __args___x7[2], __args___x7[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__rectangle),
-				"_dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape",
-				new TinymoeFunction(__args___x8 => geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape(__args___x8[0], __args___x8[1], __args___x8[2], __args___x8[3]))
+				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x8 => geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape(__args___x8[0], __args___x8[1], __args___x8[2], __args___x8[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__triangle),
-				"_dispatch__geometry___primitive_and__expression_is_the_same_shape_x2",
-				new TinymoeFunction(__args___x9 => geometry__triangle___dispatch__geometry___primitive_and__expression_is_the_same_shape_x2(__args___x9[0], __args___x9[1], __args___x9[2], __args___x9[3]))
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x9 => geometry__triangle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x2(__args___x9[0], __args___x9[1], __args___x9[2], __args___x9[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__triangle),
-				"_dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape",
-				new TinymoeFunction(__args___x10 => geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape(__args___x10[0], __args___x10[1], __args___x10[2], __args___x10[3]))
+				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x10 => geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape(__args___x10[0], __args___x10[1], __args___x10[2], __args___x10[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__circle),
-				"_dispatch__geometry___primitive_and__expression_is_the_same_shape_x3",
-				new TinymoeFunction(__args___x11 => geometry__circle___dispatch__geometry___primitive_and__expression_is_the_same_shape_x3(__args___x11[0], __args___x11[1], __args___x11[2], __args___x11[3]))
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x11 => geometry__circle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x3(__args___x11[0], __args___x11[1], __args___x11[2], __args___x11[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(geometry__circle),
-				"_dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape",
-				new TinymoeFunction(__args___x12 => geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape(__args___x12[0], __args___x12[1], __args___x12[2], __args___x12[3]))
+				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x12 => geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape(__args___x12[0], __args___x12[1], __args___x12[2], __args___x12[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch__geometry___primitive_and__expression_is_the_same_shape_x4",
-				new TinymoeFunction(__args___x13 => TinymoeObject___dispatch__geometry___primitive_and__expression_is_the_same_shape_x4(__args___x13[0], __args___x13[1], __args___x13[2], __args___x13[3]))
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x13 => TinymoeObject___dispatch__geometry___primitive_and__expression_are_the_same_shape_x4(__args___x13[0], __args___x13[1], __args___x13[2], __args___x13[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape_x2",
-				new TinymoeFunction(__args___x14 => TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_is_the_same_shape_x2(__args___x14[0], __args___x14[1], __args___x14[2], __args___x14[3]))
+				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x14 => TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x14[0], __args___x14[1], __args___x14[2], __args___x14[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape_x2",
-				new TinymoeFunction(__args___x15 => TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_is_the_same_shape_x2(__args___x15[0], __args___x15[1], __args___x15[2], __args___x15[3]))
+				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x15 => TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x15[0], __args___x15[1], __args___x15[2], __args___x15[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape_x2",
-				new TinymoeFunction(__args___x16 => TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_is_the_same_shape_x2(__args___x16[0], __args___x16[1], __args___x16[2], __args___x16[3]))
+				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x16 => TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x16[0], __args___x16[1], __args___x16[2], __args___x16[3]))
 				); 
 		}
 

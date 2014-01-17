@@ -1143,12 +1143,12 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject.SetExtension(
 				typeof(TinymoeArray),
-				"_dispatch__standard_library__repeat_with__argument_in__expression",
+				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
 				new TinymoeFunction(__args__ => TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(__args__[0], __args__[1], __args__[2], __args__[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"_dispatch__standard_library__repeat_with__argument_in__expression_x2",
+				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
 				new TinymoeFunction(__args___x2 => TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(__args___x2[0], __args___x2[1], __args___x2[2], __args___x2[3]))
 				); 
 		}

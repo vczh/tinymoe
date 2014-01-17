@@ -105,27 +105,29 @@ phrase area of (shape : circle)
 	set the result to r * r * 3.14
 end
 
-phrase (a) and (b) is the same shape
+phrase (a) and (b) are the same shape
 	set the result to false
 end
 
-phrase (a : rectangle) and (b : rectangle) is the same shape
+phrase (a : rectangle) and (b : rectangle) are the same shape
 	set the result to true
 end
 
-phrase (a : triangle) and (b : triangle) is the same shape
+phrase (a : triangle) and (b : triangle) are the same shape
 	set the result to true
 end
 
-phrase (a : circle) and (b : circle) is the same shape
+phrase (a : circle) and (b : circle) are the same shape
 	set the result to true
 end
 
 phrase main
 	set shape one to new triangle of (2, 3, 4)
 	set shape two to new rectangle of (1, 2)
-	if shape one and shape two is the same shape
+	if shape one and shape two are the same shape
 		print "This world is mad!"
+	else
+		print "Triangle and rectangle are not the same shape!"
 	end
 end
 

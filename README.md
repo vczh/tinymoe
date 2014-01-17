@@ -32,11 +32,11 @@ Here are several samples to introduce this language:
 	using standard library
 
 	phrase square root of (number)
-		redirect to "sqrt"
+		redirect to "Sqrt"
 	end
 
 	sentence print (message)
-		redirect to "printf"
+		redirect to "Print"
 	end
 
 	type rectangle
@@ -75,27 +75,29 @@ Here are several samples to introduce this language:
 		set the result to r * r * 3.14
 	end
 
-	phrase (a) and (b) is the same shape
+	phrase (a) and (b) are the same shape
 		set the result to false
 	end
 
-	phrase (a : rectangle) and (b : rectangle) is the same shape
+	phrase (a : rectangle) and (b : rectangle) are the same shape
 		set the result to true
 	end
 
-	phrase (a : triangle) and (b : triangle) is the same shape
+	phrase (a : triangle) and (b : triangle) are the same shape
 		set the result to true
 	end
 
-	phrase (a : circle) and (b : circle) is the same shape
+	phrase (a : circle) and (b : circle) are the same shape
 		set the result to true
 	end
 
 	phrase main
 		set shape one to new triangle of (2, 3, 4)
 		set shape two to new rectangle of (1, 2)
-		if shape one and shape two is the same shape
+		if shape one and shape two are the same shape
 			print "This world is mad!"
+		else
+			print "Triangle and rectangle are not the same shape!"
 		end
 	end
 
@@ -128,9 +130,11 @@ Here are several samples to introduce this language:
 			set state to new continuation state of ()
 			if field body of enumerator <> null
 				trap field body of enumerator of ()
+				untrap
 				set field body of enumerator to null
 			else if field continuation of enumerator <> null
 				trap continuation field continuation of enumerator of (null)
+				untrap
 			else
 				exit block moving to the next
 			end
@@ -162,6 +166,7 @@ Here are several samples to introduce this language:
 		set field flag of state to yielding return
 		set field continuation of state to continuation
 		set field argument of state to value
+		fall into the previous trap
 	end
  
 	cps (state) (continuation)
@@ -169,6 +174,7 @@ Here are several samples to introduce this language:
 		inside ENUMERATING
 	sentence yield break
 		reset continuation state state to yielding break
+		fall into the previous trap
 	end
  
 	cps (state)
@@ -198,12 +204,12 @@ Here are several samples to introduce this language:
 				print "Enumerating " & i
 				yield return i
 			end
-			yield break
 		end
     
 		repeat with number in numbers
 			if number >= 5
 				break
 			end
+			print "Printing " & number
 		end
 	end
