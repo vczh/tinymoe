@@ -201,6 +201,7 @@ sentence yield return (value)
     set field flag of state to yielding return
     set field continuation of state to continuation
     set field argument of state to value
+	fall into the previous trap
 end
  
 cps (state) (continuation)
@@ -208,6 +209,7 @@ category
     inside ENUMERATING
 sentence yield break
     reset continuation state state to yielding break
+	fall into the previous trap
 end
  
 cps (state)
@@ -237,13 +239,13 @@ phrase main
             print "Enumerating " & i
             yield return i
         end
-        yield break
     end
     
 	repeat with number in numbers
 		if number >= 5
 			break
 		end
+		print "Printing " & number
 	end
 end
 

@@ -1,3 +1,7 @@
+$symbol standard_library::breaking_repeating;
+
+$symbol standard_library::continuing_repeating;
+
 $symbol standard_library::raising_exception;
 
 $symbol standard_library::exiting_program;
@@ -722,10 +726,6 @@ $procedure standard_library::string_of_$primitive($state, value, $continuation)
         );
 }
 
-$symbol standard_library::breaking_repeating;
-
-$symbol standard_library::continuing_repeating;
-
 $symbol enumerable::yielding_return;
 
 $symbol enumerable::yielding_break;
@@ -899,9 +899,15 @@ $procedure enumerable::yield_return_$expression(state, value, continuation)
     state.flag = enumerable::yielding_return;
     state.continuation = continuation;
     state.argument = value;
-    continuation(
+    standard_library::fall_into_the_previous_trap(
         state, 
-        $the_result
+        $lambda ($state_0, $result_1)
+            {
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
         );
 }
 
@@ -914,9 +920,15 @@ $procedure enumerable::yield_break(state, continuation)
         enumerable::yielding_break, 
         $lambda ($state_0, $result_1)
             {
-                continuation(
-                    state, 
-                    $the_result
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );
@@ -1022,13 +1034,7 @@ $procedure enumerable::main($state, $continuation)
                         );, 
                 1, 
                 10, 
-                $lambda ($state_9, $result_10)
-                    {
-                        enumerable::yield_break(
-                            $state_9, 
-                            $continuation_8
-                            );
-                    }
+                $continuation_8
                 );, 
         $lambda ($state_0, $continuation_1)
             $continuation_1(
@@ -1047,15 +1053,22 @@ $procedure enumerable::main($state, $continuation)
             {
                 standard_library::repeat_with_$argument_in_$expression(
                     $state_5, 
-                    $lambda ($state_21, number, $continuation_22)
+                    $lambda ($state_19, number, $continuation_20)
                         standard_library::if_$expression(
-                            $state_21, 
+                            $state_19, 
                             standard_library::break, 
                             (number >= 5), 
-                            $continuation_22
+                            $lambda ($state_21, $result_22)
+                                {
+                                    enumerable::print_$expression(
+                                        $state_21, 
+                                        ("Printing " & number), 
+                                        $continuation_20
+                                        );
+                                }
                             );, 
                     numbers, 
-                    $lambda ($state_19, $result_20)
+                    $lambda ($state_17, $result_18)
                         {
                             $continuation(
                                 $state, 
