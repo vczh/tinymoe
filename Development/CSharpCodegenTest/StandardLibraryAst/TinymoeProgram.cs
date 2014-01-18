@@ -61,7 +61,7 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject the_current_trap = null;
-			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")});
+			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
 			TinymoeObject _state_0 = null;
 			_state_0 = state;
 			state.SetField("trap", the_current_trap);
@@ -805,7 +805,7 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject handle = null;
-			handle = new TinymoeObject().SetFields(new TinymoeObject[] {});
+			handle = new TinymoeObject().SetFields(new TinymoeObject[] {}).FinishConstruction();
 			TinymoeObject _state_0 = null;
 			_state_0 = state;
 			standard_library__trap__expression(

@@ -311,7 +311,7 @@ public:
 	{
 		o << "new " << CSharpTypeCodegen::ToString(node->type, resolver) << "().SetFields(new TinymoeObject[] {";
 		PrintExpressionList(node->fields);
-		o << "})";
+		o << "}).FinishConstruction()";
 	}
 
 	void Visit(AstTestTypeExpression* node)

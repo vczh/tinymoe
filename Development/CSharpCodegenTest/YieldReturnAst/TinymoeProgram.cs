@@ -61,7 +61,7 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject the_current_trap = null;
-			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")});
+			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
 			TinymoeObject _state_0 = null;
 			_state_0 = state;
 			state.SetField("trap", the_current_trap);
@@ -805,7 +805,7 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject handle = null;
-			handle = new TinymoeObject().SetFields(new TinymoeObject[] {});
+			handle = new TinymoeObject().SetFields(new TinymoeObject[] {}).FinishConstruction();
 			TinymoeObject _state_0 = null;
 			_state_0 = state;
 			standard_library__trap__expression(
@@ -1036,7 +1036,7 @@ namespace TinymoeProgramNamespace
 		public void enumerable__new_enumerator_from__primitive(TinymoeObject _state, TinymoeObject enumerable, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
-			_the_result = new enumerable__collection_enumerator().SetFields(new TinymoeObject[] {null, enumerable.GetField("body"), null});
+			_the_result = new enumerable__collection_enumerator().SetFields(new TinymoeObject[] {null, enumerable.GetField("body"), null}).FinishConstruction();
 			Invoke(_continuation, new TinymoeObject[] {
 				_state,
 				_the_result
@@ -1284,7 +1284,7 @@ namespace TinymoeProgramNamespace
 			TinymoeObject _the_result = null;
 			Invoke(_write_receiver, new TinymoeObject[] {
 				state,
-				new enumerable__enumerable_collection().SetFields(new TinymoeObject[] {}),
+				new enumerable__enumerable_collection().SetFields(new TinymoeObject[] {}).FinishConstruction(),
 				new TinymoeFunction(__args__ => 
 				{
 					TinymoeObject _state_0 = __args__[0];

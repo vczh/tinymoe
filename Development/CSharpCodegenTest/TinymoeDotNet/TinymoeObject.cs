@@ -10,6 +10,7 @@ namespace TinymoeDotNet
         private static UInt64 counter = 0;
         private Dictionary<string, TinymoeObject> fields = new Dictionary<string, TinymoeObject>();
         private List<string> fieldNames = new List<string>();
+        private bool finishedConstruction = false;
         private UInt64 id = counter++;
 
         public static void SetExtension(Type type, string name, TinymoeObject value)
@@ -19,8 +20,19 @@ namespace TinymoeDotNet
 
         public void SetField(string name, TinymoeObject value)
         {
-            this.fields[name] = value;
-            this.fieldNames.Add(name);
+            if (finishedConstruction)
+            {
+                if(!this.fieldNames.Contains(name))
+                {
+                    throw new ArgumentOutOfRangeException("name");
+                }
+                this.fields[name] = value;
+            }
+            else
+            {
+                this.fields[name] = value;
+                this.fieldNames.Add(name);
+            }
         }
 
         public TinymoeObject GetField(string name)
@@ -42,6 +54,12 @@ namespace TinymoeDotNet
             }
 
             throw new ArgumentOutOfRangeException("name");
+        }
+
+        public TinymoeObject FinishConstruction()
+        {
+            this.finishedConstruction = true;
+            return this;
         }
 
         public TinymoeObject SetFields(TinymoeObject[] values)
