@@ -252,7 +252,7 @@ block (body) named block (argument handle)
 	untrap
 	if field flag of state = exiting block and field argument of state = handle
 		reset continuation state state to null
-	else
+	else if field flag of state <> null
 		fall into the previous trap
 	end
 end

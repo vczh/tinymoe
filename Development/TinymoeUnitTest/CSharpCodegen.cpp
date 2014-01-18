@@ -652,7 +652,7 @@ public:
 
 	void Visit(AstSymbolDeclaration* node)override
 	{
-		o << prefix << "public readonly TinymoeObject " << resolver.Resolve(node) << " = new TinymoeString(\"" << resolver.Resolve(node) << "\");" << endl << endl;
+		o << prefix << "public readonly TinymoeObject " << resolver.Resolve(node) << " = new TinymoeSymbol(\"" << resolver.Resolve(node) << "\");" << endl << endl;
 	}
 
 	void Visit(AstTypeDeclaration* node)override

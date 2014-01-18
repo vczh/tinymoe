@@ -166,7 +166,6 @@ cps (state) (continuation)
 sentence move (enumerator) to the next
 	named block moving to the next
 		set field current value of enumerator to null
-		set state to new continuation state of ()
 		if field body of enumerator <> null
 			trap field body of enumerator of ()
 			untrap

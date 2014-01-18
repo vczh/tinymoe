@@ -688,11 +688,16 @@ $procedure standard_library::named_block_$argument(state, body, $continuation)
                                 ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
                                 $lambda ($state_10, $result_11)
                                     {
-                                        standard_library::else(
+                                        standard_library::else_if_$expression(
                                             $state_10, 
                                             $result_11, 
                                             standard_library::fall_into_the_previous_trap, 
-                                            $lambda ($state_16, $result_17)
+                                            $lambda ($state_16, $continuation_17)
+                                                $continuation_17(
+                                                    $state_16, 
+                                                    (state.flag != $null)
+                                                    );, 
+                                            $lambda ($state_18, $result_19)
                                                 {
                                                     $continuation(
                                                         state, 

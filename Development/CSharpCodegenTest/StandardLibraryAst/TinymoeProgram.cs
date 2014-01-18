@@ -6,15 +6,15 @@ namespace TinymoeProgramNamespace
 {
 	public class TinymoeProgram : TinymoeOperations
 	{
-		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeString("standard_library__breaking_repeating");
+		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
 
-		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeString("standard_library__continuing_repeating");
+		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeSymbol("standard_library__continuing_repeating");
 
-		public readonly TinymoeObject standard_library__raising_exception = new TinymoeString("standard_library__raising_exception");
+		public readonly TinymoeObject standard_library__raising_exception = new TinymoeSymbol("standard_library__raising_exception");
 
-		public readonly TinymoeObject standard_library__exiting_program = new TinymoeString("standard_library__exiting_program");
+		public readonly TinymoeObject standard_library__exiting_program = new TinymoeSymbol("standard_library__exiting_program");
 
-		public readonly TinymoeObject standard_library__exiting_block = new TinymoeString("standard_library__exiting_block");
+		public readonly TinymoeObject standard_library__exiting_block = new TinymoeSymbol("standard_library__exiting_block");
 
 		public class standard_library__continuation_trap : TinymoeObject
 		{
@@ -856,14 +856,23 @@ namespace TinymoeProgramNamespace
 								{
 									TinymoeObject _state_10 = __args___x6[0];
 									TinymoeObject _result_11 = __args___x6[1];
-									standard_library__else(
+									standard_library__else_if__expression(
 										_state_10,
 										_result_11,
 										new TinymoeFunction(__args___x7 => standard_library__fall_into_the_previous_trap(__args___x7[0], __args___x7[1])),
 										new TinymoeFunction(__args___x8 => 
 										{
 											TinymoeObject _state_16 = __args___x8[0];
-											TinymoeObject _result_17 = __args___x8[1];
+											TinymoeObject _continuation_17 = __args___x8[1];
+											Invoke(_continuation_17, new TinymoeObject[] {
+												_state_16,
+												NE(state.GetField("flag"), null)
+												});
+										}),
+										new TinymoeFunction(__args___x9 => 
+										{
+											TinymoeObject _state_18 = __args___x9[0];
+											TinymoeObject _result_19 = __args___x9[1];
 											Invoke(_continuation, new TinymoeObject[] {
 												state,
 												_the_result

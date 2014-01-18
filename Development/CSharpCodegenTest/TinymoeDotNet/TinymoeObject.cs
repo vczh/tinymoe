@@ -7,8 +7,10 @@ namespace TinymoeDotNet
     public class TinymoeObject
     {
         private static readonly Dictionary<Tuple<Type, string>, TinymoeObject> extensions = new Dictionary<Tuple<Type, string>, TinymoeObject>();
+        private static UInt64 counter = 0;
         private Dictionary<string, TinymoeObject> fields = new Dictionary<string, TinymoeObject>();
         private List<string> fieldNames = new List<string>();
+        private UInt64 id = counter++;
 
         public static void SetExtension(Type type, string name, TinymoeObject value)
         {
@@ -17,14 +19,14 @@ namespace TinymoeDotNet
 
         public void SetField(string name, TinymoeObject value)
         {
-            fields[name] = value;
-            fieldNames.Add(name);
+            this.fields[name] = value;
+            this.fieldNames.Add(name);
         }
 
         public TinymoeObject GetField(string name)
         {
             TinymoeObject value = null;
-            if (fields.TryGetValue(name, out value))
+            if (this.fields.TryGetValue(name, out value))
             {
                 return value;
             }
@@ -44,11 +46,19 @@ namespace TinymoeDotNet
 
         public TinymoeObject SetFields(TinymoeObject[] values)
         {
-            foreach (var x in fieldNames.Zip(values, Tuple.Create))
+            foreach (var x in this.fieldNames.Zip(values, Tuple.Create))
             {
-                fields[x.Item1] = x.Item2;
+                this.fields[x.Item1] = x.Item2;
             }
             return this;
+        }
+
+        public UInt64 Id
+        {
+            get
+            {
+                return this.id;
+            }
         }
     }
 
@@ -240,6 +250,12 @@ namespace TinymoeDotNet
                 var vb = (TinymoeBoolean)b;
                 return va.Value ? vb.Value ? 0 : 1 : vb.Value ? -1 : 0;
             }
+            if (a is TinymoeSymbol && b is TinymoeSymbol)
+            {
+                var sa = (TinymoeSymbol)a;
+                var sb = (TinymoeSymbol)b;
+                return string.Compare(sa.Value, sb.Value);
+            }
             if (a is TinymoeInteger)
             {
                 var va = (TinymoeInteger)a;
@@ -288,9 +304,18 @@ namespace TinymoeDotNet
                 }
                 else
                 {
-                    var sa = CastToString(a);
-                    var sb = CastToString(b);
-                    return string.Compare(sa.Value, sb.Value);
+                    try
+                    {
+                        var sa = CastToString(a);
+                        var sb = CastToString(b);
+                        return string.Compare(sa.Value, sb.Value);
+                    }
+                    catch (Exception)
+                    {
+                        var ida = a.Id;
+                        var idb = b.Id;
+                        return ida < idb ? -1 : ida > idb ? 1 : 0;
+                    }
                 }
             }
         }
@@ -415,20 +440,27 @@ namespace TinymoeDotNet
                 switch (realName)
                 {
                     case "CastToBoolean":
-                        return BuildExternalFunction(__args__ => CastToBoolean(__args__[0]));
+                        function = BuildExternalFunction(__args__ => CastToBoolean(__args__[0]));
+                        break;
                     case "CastToInteger":
-                        return BuildExternalFunction(__args__ => CastToInteger(__args__[0]));
+                        function = BuildExternalFunction(__args__ => CastToInteger(__args__[0]));
+                        break;
                     case "CastToFloat":
-                        return BuildExternalFunction(__args__ => CastToFloat(__args__[0]));
+                        function = BuildExternalFunction(__args__ => CastToFloat(__args__[0]));
+                        break;
                     case "CastToString":
-                        return BuildExternalFunction(__args__ => CastToString(__args__[0]));
+                        function = BuildExternalFunction(__args__ => CastToString(__args__[0]));
+                        break;
                     case "Print":
-                        return BuildExternalFunction(__args__ => Print(__args__[0]));
+                        function = BuildExternalFunction(__args__ => Print(__args__[0]));
+                        break;
                     case "Sqrt":
-                        return BuildExternalFunction(__args__ => Sqrt(__args__[0]));
+                        function = BuildExternalFunction(__args__ => Sqrt(__args__[0]));
+                        break;
                     default:
                         throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", realName));
                 }
+                externalFunctions.Add(realName, function);
             }
             return function;
         }
