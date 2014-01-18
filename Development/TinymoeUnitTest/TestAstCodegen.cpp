@@ -203,16 +203,52 @@ sentence set fall back counter of (state)
 end
 
 cps (state) (continuation)
+sentence trap (expression value) with fall back enabled internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back enabled
+	trap value with fall back enabled internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
+end
+
+phrase restored trap (trap) with fall back (fall back trap) and counter (counter)
+	select counter
+		case 0
+			set the result to trap
+		case else
+			set previous trap to restored trap trap with fall back (field previous trap of fall back trap) and counter (counter - 1)
+			set the result to new continuation trap of (field continuation of fall back trap, previous trap)
+	end
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set new trap to restored trap (the current trap) with fall back (field trap of fall back) and counter (field fall back counter of fall back)
+	set field trap of state to new trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored
+	trap value with fall back (fall back) restored internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
+end
+
+cps (state) (continuation)
 sentence move (enumerator) to the next
 	named block moving to the next
-		set field current yielding result of enumerator to null
 		if field body of enumerator <> null
-			trap field body of enumerator of ()
-			set fall back counter of state
+			trap field body of enumerator of () with fall back enabled
 			set field body of enumerator to null
 		else if field continuation of enumerator <> null
-			trap continuation field continuation of enumerator of (null)
-			set fall back counter of state
+			trap continuation field continuation of enumerator of (null) with fall back field current yielding result of enumerator restored
 		else
 			exit block moving to the next
 		end
@@ -223,9 +259,11 @@ sentence move (enumerator) to the next
 				set field continuation of enumerator to field continuation of state
 				reset continuation state state to null
 			case yielding break
+				set field current yielding result of enumerator to null
 				set field continuation of enumerator to null
 				reset continuation state state to null
 			case null
+				set field current yielding result of enumerator to null
 				set field continuation of enumerator to null
 			case else
 				fall into the previous trap
@@ -235,6 +273,15 @@ end
  
 phrase (enumerator) reaches the end
     set the result to field body of enumerator = null and field continuation of enumerator = null
+end
+
+phrase current value of (enumerator)
+	select enumerator reaches the end
+		case true
+			set the result to null
+		case false
+			set the result to field value of (field current yielding result of enumerator)
+	end
 end
  
 cps (state)
@@ -250,7 +297,7 @@ block (sentence deal with (item)) repeat with (argument item) in (items : enumer
     set enumerator to new enumerator from items
     repeat
         move enumerator to the next
-        deal with field value of (field current yielding result of enumerator)
+        deal with current value of enumerator
     end
 end
 

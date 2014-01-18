@@ -39,7 +39,7 @@ sentence call (value)
 end
 
 cps (state) (continuation)
-sentence trap (expression value) without modifying trap
+sentence trap (expression value) internal
 	set the current trap to new continuation trap of (continuation, field trap of state)
 	set field trap of state to the current trap
 	set the result to value
@@ -47,7 +47,7 @@ end
 
 cps (state) (continuation)
 sentence trap (expression value)
-	trap value without modifying trap
+	trap value internal
 	set field trap of state to field previous trap of (field trap of state)
 end
 

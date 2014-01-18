@@ -43,7 +43,7 @@ $procedure standard_library::call_$expression($state, value, $continuation)
         );
 }
 
-$procedure standard_library::trap_$expression_without_modifying_trap(state, value, continuation)
+$procedure standard_library::trap_$expression_internal(state, value, continuation)
 {
     $symbol $the_result;
     $symbol the_current_trap;
@@ -67,7 +67,7 @@ $procedure standard_library::trap_$expression_without_modifying_trap(state, valu
 $procedure standard_library::trap_$expression(state, value, continuation)
 {
     $symbol $the_result;
-    standard_library::trap_$expression_without_modifying_trap(
+    standard_library::trap_$expression_internal(
         state, 
         value, 
         $lambda ($state_0, $result_1)

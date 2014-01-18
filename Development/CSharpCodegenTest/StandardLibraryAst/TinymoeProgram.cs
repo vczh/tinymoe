@@ -57,7 +57,7 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void standard_library__trap__expression_without_modifying_trap(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
+		public void standard_library__trap__expression_internal(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject the_current_trap = null;
@@ -83,7 +83,7 @@ namespace TinymoeProgramNamespace
 		public void standard_library__trap__expression(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
-			standard_library__trap__expression_without_modifying_trap(
+			standard_library__trap__expression_internal(
 				state,
 				value,
 				new TinymoeFunction(__args__ => 
