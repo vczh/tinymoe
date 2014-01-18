@@ -14,6 +14,13 @@ $type standard_library::continuation_trap
     $symbol previous_trap;
 }
 
+$type standard_library::continuation_fall_back_argument
+{
+    $symbol value;
+    $symbol trap;
+    $symbol fall_back_counter;
+}
+
 $type standard_library::continuation_state
 {
     $symbol flag;
@@ -32,6 +39,130 @@ $procedure standard_library::reset_continuation_state_$expression_to_$expression
         $state, 
         $the_result
         );
+}
+
+$procedure standard_library::enable_fall_back_to_$expression_with_$expression_and_$expression($state, state, continuation, value, $continuation)
+{
+    $symbol $the_result;
+    state.continuation = continuation;
+    state.argument = new standard_library::continuation_fall_back_argument(value, state.trap);
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::fall_back_counter_between_$expression_and_$expression_from_$primitive($state, top_trap, current_trap, counter, $continuation)
+{
+    $symbol $the_result;
+    $symbol $select_continuation_2;
+    $symbol $select_value_3;
+    $select_continuation_2 = $lambda ($state_0, $result_1)
+        {
+            $continuation(
+                $state, 
+                $the_result
+                );
+        };
+    $select_value_3 = (top_trap != current_trap);
+    if (($select_value_3 == $true)
+        standard_library::fall_back_counter_between_$expression_and_$expression_from_$primitive(
+            $state, 
+            top_trap.previous_trap, 
+            current_trap, 
+            (counter + 1), 
+            $lambda ($state_4, $result_5)
+                {
+                    $the_result = $result_5;
+                    $select_continuation_2(
+                        $state_4, 
+                        $result_5
+                        );
+                }
+            );
+    else
+        if (($select_value_3 == $false)
+            {
+                $the_result = counter;
+                $select_continuation_2(
+                    $state, 
+                    $null
+                    );
+            }
+        else
+            $select_continuation_2(
+                $state, 
+                $null
+                );
+}
+
+$procedure standard_library::set_fall_back_counter_of_$expression($state, state, $continuation)
+{
+    $symbol $the_result;
+    $symbol top_trap;
+    top_trap = state.argument.trap;
+    $symbol $state_0;
+    $state_0 = $state;
+    $symbol current_trap;
+    current_trap = state.trap;
+    $symbol $state_2;
+    $state_2 = $state_0;
+    standard_library::fall_back_counter_between_$expression_and_$expression_from_$primitive(
+        $state_2, 
+        top_trap, 
+        current_trap, 
+        -1, 
+        $lambda ($state_4, $result_5)
+            {
+                $symbol counter;
+                counter = $result_5;
+                state.argument.fall_back_counter = counter;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive($state, trap, fall_back_trap, counter, $continuation)
+{
+    $symbol $the_result;
+    $symbol $select_continuation_2;
+    $symbol $select_value_3;
+    $select_continuation_2 = $lambda ($state_0, $result_1)
+        {
+            $continuation(
+                $state, 
+                $the_result
+                );
+        };
+    $select_value_3 = counter;
+    if (($select_value_3 == 0)
+        {
+            $the_result = trap;
+            $select_continuation_2(
+                $state, 
+                $null
+                );
+        }
+    else
+        standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
+            $state, 
+            trap, 
+            fall_back_trap.previous_trap, 
+            (counter - 1), 
+            $lambda ($state_4, $result_5)
+                {
+                    $symbol previous_trap;
+                    previous_trap = $result_5;
+                    $the_result = new standard_library::continuation_trap(fall_back_trap.continuation, previous_trap);
+                    $select_continuation_2(
+                        $state_4, 
+                        $result_5
+                        );
+                }
+            );
 }
 
 $procedure standard_library::call_$expression($state, value, $continuation)
@@ -76,6 +207,108 @@ $procedure standard_library::trap_$expression(state, value, continuation)
                 continuation(
                     state, 
                     $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::trap_$expression_with_fall_back_enabled_internal(state, value, continuation)
+{
+    $symbol $the_result;
+    $symbol the_current_trap;
+    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
+    $symbol $state_0;
+    $state_0 = state;
+    state.trap = the_current_trap;
+    value(
+        $state_0, 
+        $lambda ($state_2, $result_3)
+            {
+                $the_result = $result_3;
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::trap_$expression_with_fall_back_enabled(state, value, continuation)
+{
+    $symbol $the_result;
+    standard_library::trap_$expression_with_fall_back_enabled_internal(
+        state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                state.trap = state.trap.previous_trap;
+                standard_library::set_fall_back_counter_of_$expression(
+                    $state_0, 
+                    state, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::trap_$expression_with_fall_back_$expression_restored_internal(state, value, fall_back, continuation)
+{
+    $symbol $the_result;
+    $symbol the_current_trap;
+    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
+    $symbol $state_0;
+    $state_0 = state;
+    standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
+        $state_0, 
+        the_current_trap, 
+        fall_back.trap, 
+        fall_back.fall_back_counter, 
+        $lambda ($state_2, $result_3)
+            {
+                $symbol new_trap;
+                new_trap = $result_3;
+                state.trap = new_trap;
+                value(
+                    $state_2, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::trap_$expression_with_fall_back_$expression_restored(state, value, fall_back, continuation)
+{
+    $symbol $the_result;
+    standard_library::trap_$expression_with_fall_back_$expression_restored_internal(
+        state, 
+        value, 
+        fall_back, 
+        $lambda ($state_0, $result_1)
+            {
+                state.trap = state.trap.previous_trap;
+                standard_library::set_fall_back_counter_of_$expression(
+                    $state_0, 
+                    state, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
                     );
             }
         );

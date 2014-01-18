@@ -22,6 +22,12 @@ type continuation trap
 	previous trap
 end
 
+type continuation fall back argument
+	value
+	trap
+	fall back counter
+end
+
 type continuation state
 	flag
 	argument
@@ -33,6 +39,37 @@ sentence reset continuation state (state) to (flag)
 	set field flag of state to flag
 	set field argument of state to null
 	set field continuation of state to null
+end
+
+sentence enable fall back to (state) with (continuation) and (value)
+    set field continuation of state to continuation
+    set field argument of state to new continuation fall back argument of (value, field trap of state)
+end
+
+phrase fall back counter between (top trap) and (current trap) from (counter)
+	select top trap <> current trap
+		case true
+			set the result to fall back counter between (field previous trap of top trap) and current trap from (counter + 1)
+		case false
+			set the result to counter
+	end
+end
+
+sentence set fall back counter of (state)
+	set top trap to field trap of (field argument of state)
+	set current trap to field trap of state
+	set counter to (fall back counter between top trap and current trap from -1)
+	set field fall back counter of (field argument of state) to counter
+end
+
+phrase restored trap (trap) with fall back (fall back trap) and counter (counter)
+	select counter
+		case 0
+			set the result to trap
+		case else
+			set previous trap to restored trap trap with fall back (field previous trap of fall back trap) and counter (counter - 1)
+			set the result to new continuation trap of (field continuation of fall back trap, previous trap)
+	end
 end
 
 sentence call (value)
@@ -49,6 +86,35 @@ cps (state) (continuation)
 sentence trap (expression value)
 	trap value internal
 	set field trap of state to field previous trap of (field trap of state)
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back enabled internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back enabled
+	trap value with fall back enabled internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set new trap to restored trap (the current trap) with fall back (field trap of fall back) and counter (field fall back counter of fall back)
+	set field trap of state to new trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored
+	trap value with fall back (fall back) restored internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
 end
 
 cps (state) (continuation)

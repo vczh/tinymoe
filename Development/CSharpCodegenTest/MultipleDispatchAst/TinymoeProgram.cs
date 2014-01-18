@@ -25,6 +25,16 @@ namespace TinymoeProgramNamespace
 			}
 		}
 
+		public class standard_library__continuation_fall_back_argument : TinymoeObject
+		{
+			public standard_library__continuation_fall_back_argument()
+			{
+				SetField("value", null);
+				SetField("trap", null);
+				SetField("fall_back_counter", null);
+			}
+		}
+
 		public class standard_library__continuation_state : TinymoeObject
 		{
 			public standard_library__continuation_state()
@@ -46,6 +56,145 @@ namespace TinymoeProgramNamespace
 				_state,
 				_the_result
 				});
+		}
+
+		public void standard_library__enable_fall_back_to__expression_with__expression_and__expression(TinymoeObject _state, TinymoeObject state, TinymoeObject continuation, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			state.SetField("continuation", continuation);
+			state.SetField("argument", new standard_library__continuation_fall_back_argument().SetFields(new TinymoeObject[] {value, state.GetField("trap")}).FinishConstruction());
+			Invoke(_continuation, new TinymoeObject[] {
+				_state,
+				_the_result
+				});
+		}
+
+		public void standard_library__fall_back_counter_between__expression_and__expression_from__primitive(TinymoeObject _state, TinymoeObject top_trap, TinymoeObject current_trap, TinymoeObject counter, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _select_continuation_2 = null;
+			TinymoeObject _select_value_3 = null;
+			_select_continuation_2 = new TinymoeFunction(__args__ => 
+			{
+				TinymoeObject _state_0 = __args__[0];
+				TinymoeObject _result_1 = __args__[1];
+				Invoke(_continuation, new TinymoeObject[] {
+					_state,
+					_the_result
+					});
+			});
+			_select_value_3 = NE(top_trap, current_trap);
+			if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_3, new TinymoeBoolean(true)))).Value)
+			{
+				standard_library__fall_back_counter_between__expression_and__expression_from__primitive(
+					_state,
+					top_trap.GetField("previous_trap"),
+					current_trap,
+					Add(counter, new TinymoeInteger(1)),
+					new TinymoeFunction(__args___x2 => 
+					{
+						TinymoeObject _state_4 = __args___x2[0];
+						TinymoeObject _result_5 = __args___x2[1];
+						_the_result = _result_5;
+						Invoke(_select_continuation_2, new TinymoeObject[] {
+							_state_4,
+							_result_5
+							});
+					})
+					);
+			}
+			else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_3, new TinymoeBoolean(false)))).Value)
+			{
+				_the_result = counter;
+				Invoke(_select_continuation_2, new TinymoeObject[] {
+					_state,
+					null
+					});
+			}
+			else
+			{
+				Invoke(_select_continuation_2, new TinymoeObject[] {
+					_state,
+					null
+					});
+			}
+		}
+
+		public void standard_library__set_fall_back_counter_of__expression(TinymoeObject _state, TinymoeObject state, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject top_trap = null;
+			top_trap = state.GetField("argument").GetField("trap");
+			TinymoeObject _state_0 = null;
+			_state_0 = _state;
+			TinymoeObject current_trap = null;
+			current_trap = state.GetField("trap");
+			TinymoeObject _state_2 = null;
+			_state_2 = _state_0;
+			standard_library__fall_back_counter_between__expression_and__expression_from__primitive(
+				_state_2,
+				top_trap,
+				current_trap,
+				Negative(new TinymoeInteger(1)),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_4 = __args__[0];
+					TinymoeObject _result_5 = __args__[1];
+					TinymoeObject counter = null;
+					counter = _result_5;
+					state.GetField("argument").SetField("fall_back_counter", counter);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__restored_trap__expression_with_fall_back__expression_and_counter__primitive(TinymoeObject _state, TinymoeObject trap, TinymoeObject fall_back_trap, TinymoeObject counter, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _select_continuation_2 = null;
+			TinymoeObject _select_value_3 = null;
+			_select_continuation_2 = new TinymoeFunction(__args__ => 
+			{
+				TinymoeObject _state_0 = __args__[0];
+				TinymoeObject _result_1 = __args__[1];
+				Invoke(_continuation, new TinymoeObject[] {
+					_state,
+					_the_result
+					});
+			});
+			_select_value_3 = counter;
+			if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_3, new TinymoeInteger(0)))).Value)
+			{
+				_the_result = trap;
+				Invoke(_select_continuation_2, new TinymoeObject[] {
+					_state,
+					null
+					});
+			}
+			else
+			{
+				standard_library__restored_trap__expression_with_fall_back__expression_and_counter__primitive(
+					_state,
+					trap,
+					fall_back_trap.GetField("previous_trap"),
+					Sub(counter, new TinymoeInteger(1)),
+					new TinymoeFunction(__args___x2 => 
+					{
+						TinymoeObject _state_4 = __args___x2[0];
+						TinymoeObject _result_5 = __args___x2[1];
+						TinymoeObject previous_trap = null;
+						previous_trap = _result_5;
+						_the_result = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {fall_back_trap.GetField("continuation"), previous_trap}).FinishConstruction();
+						Invoke(_select_continuation_2, new TinymoeObject[] {
+							_state_4,
+							_result_5
+							});
+					})
+					);
+			}
 		}
 
 		public void standard_library__call__expression(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
@@ -95,6 +244,122 @@ namespace TinymoeProgramNamespace
 						state,
 						_the_result
 						});
+				})
+				);
+		}
+
+		public void standard_library__trap__expression_with_fall_back_enabled_internal(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject the_current_trap = null;
+			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
+			TinymoeObject _state_0 = null;
+			_state_0 = state;
+			state.SetField("trap", the_current_trap);
+			Invoke(value, new TinymoeObject[] {
+				_state_0,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _result_3 = __args__[1];
+					_the_result = _result_3;
+					Invoke(continuation, new TinymoeObject[] {
+						state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__trap__expression_with_fall_back_enabled(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__trap__expression_with_fall_back_enabled_internal(
+				state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					state.SetField("trap", state.GetField("trap").GetField("previous_trap"));
+					standard_library__set_fall_back_counter_of__expression(
+						_state_0,
+						state,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							Invoke(continuation, new TinymoeObject[] {
+								state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void standard_library__trap__expression_with_fall_back__expression_restored_internal(TinymoeObject state, TinymoeObject value, TinymoeObject fall_back, TinymoeObject continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject the_current_trap = null;
+			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
+			TinymoeObject _state_0 = null;
+			_state_0 = state;
+			standard_library__restored_trap__expression_with_fall_back__expression_and_counter__primitive(
+				_state_0,
+				the_current_trap,
+				fall_back.GetField("trap"),
+				fall_back.GetField("fall_back_counter"),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _result_3 = __args__[1];
+					TinymoeObject new_trap = null;
+					new_trap = _result_3;
+					state.SetField("trap", new_trap);
+					Invoke(value, new TinymoeObject[] {
+						_state_2,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_4 = __args___x2[0];
+							TinymoeObject _result_5 = __args___x2[1];
+							_the_result = _result_5;
+							Invoke(continuation, new TinymoeObject[] {
+								state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__trap__expression_with_fall_back__expression_restored(TinymoeObject state, TinymoeObject value, TinymoeObject fall_back, TinymoeObject continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__trap__expression_with_fall_back__expression_restored_internal(
+				state,
+				value,
+				fall_back,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					state.SetField("trap", state.GetField("trap").GetField("previous_trap"));
+					standard_library__set_fall_back_counter_of__expression(
+						_state_0,
+						state,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							Invoke(continuation, new TinymoeObject[] {
+								state,
+								_the_result
+								});
+						})
+						);
 				})
 				);
 		}

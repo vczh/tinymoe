@@ -157,20 +157,13 @@ type collection enumerator
 	body
     continuation
 end
-
-type yielding result
-	value
-	trap
-	fall back counter
-end
  
 cps (state) (continuation)
 category
     inside ENUMERATING
 sentence yield return (value)
-    set field flag of state to yielding return
-    set field continuation of state to continuation
-    set field argument of state to new yielding result of (value, field trap of state)
+	reset continuation state state to yielding return
+	enable fall back to state with continuation and value
 	fall into the previous trap
 end
  
@@ -186,61 +179,6 @@ phrase new enumerator from (enumerable)
     set the result to new collection enumerator of (null, field body of enumerable, null)
 end
 
-phrase fall back counter between (top trap) and (current trap) from (counter)
-	select top trap <> current trap
-		case true
-			set the result to fall back counter between (field previous trap of top trap) and current trap from (counter + 1)
-		case false
-			set the result to counter
-	end
-end
-
-sentence set fall back counter of (state)
-	set top trap to field trap of (field argument of state)
-	set current trap to field trap of state
-	set counter to (fall back counter between top trap and current trap from -1)
-	set field fall back counter of (field argument of state) to counter
-end
-
-cps (state) (continuation)
-sentence trap (expression value) with fall back enabled internal
-	set the current trap to new continuation trap of (continuation, field trap of state)
-	set field trap of state to the current trap
-	set the result to value
-end
-
-cps (state) (continuation)
-sentence trap (expression value) with fall back enabled
-	trap value with fall back enabled internal
-	set field trap of state to field previous trap of (field trap of state)
-	set fall back counter of state
-end
-
-phrase restored trap (trap) with fall back (fall back trap) and counter (counter)
-	select counter
-		case 0
-			set the result to trap
-		case else
-			set previous trap to restored trap trap with fall back (field previous trap of fall back trap) and counter (counter - 1)
-			set the result to new continuation trap of (field continuation of fall back trap, previous trap)
-	end
-end
-
-cps (state) (continuation)
-sentence trap (expression value) with fall back (fall back) restored internal
-	set the current trap to new continuation trap of (continuation, field trap of state)
-	set new trap to restored trap (the current trap) with fall back (field trap of fall back) and counter (field fall back counter of fall back)
-	set field trap of state to new trap
-	set the result to value
-end
-
-cps (state) (continuation)
-sentence trap (expression value) with fall back (fall back) restored
-	trap value with fall back (fall back) restored internal
-	set field trap of state to field previous trap of (field trap of state)
-	set fall back counter of state
-end
-
 cps (state) (continuation)
 sentence move (enumerator) to the next
 	named block moving to the next
@@ -248,7 +186,7 @@ sentence move (enumerator) to the next
 			trap field body of enumerator of () with fall back enabled
 			set field body of enumerator to null
 		else if field continuation of enumerator <> null
-			trap continuation field continuation of enumerator of (null) with fall back field current yielding result of enumerator restored
+			trap continuation field continuation of enumerator of (null) with fall back (field current yielding result of enumerator) restored
 		else
 			exit block moving to the next
 		end
