@@ -153,9 +153,14 @@ type enumerable collection
 end
  
 type collection enumerator
-    current value
+    current yielding result
 	body
     continuation
+end
+
+type yielding result
+	value
+	trap
 end
  
 phrase new enumerator from (enumerable)
@@ -165,21 +170,19 @@ end
 cps (state) (continuation)
 sentence move (enumerator) to the next
 	named block moving to the next
-		set field current value of enumerator to null
+		set field current yielding result of enumerator to null
 		if field body of enumerator <> null
 			trap field body of enumerator of ()
-			untrap
 			set field body of enumerator to null
 		else if field continuation of enumerator <> null
 			trap continuation field continuation of enumerator of (null)
-			untrap
 		else
 			exit block moving to the next
 		end
 
 		select field flag of state
 			case yielding return
-				set field current value of enumerator to field argument of state
+				set field current yielding result of enumerator to field argument of state
 				set field continuation of enumerator to field continuation of state
 				reset continuation state state to null
 			case yielding break
@@ -203,7 +206,7 @@ category
 sentence yield return (value)
     set field flag of state to yielding return
     set field continuation of state to continuation
-    set field argument of state to value
+    set field argument of state to new yielding result of (value, field trap of state)
 	fall into the previous trap
 end
  
@@ -228,7 +231,7 @@ block (sentence deal with (item)) repeat with (argument item) in (items : enumer
     set enumerator to new enumerator from items
     repeat
         move enumerator to the next
-        deal with field current value of enumerator
+        deal with field value of (field current yielding result of enumerator)
     end
 end
 

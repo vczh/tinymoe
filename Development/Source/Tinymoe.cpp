@@ -39,14 +39,15 @@ sentence call (value)
 end
 
 cps (state) (continuation)
-sentence trap (expression value)
+sentence trap (expression value) without modifying trap
 	set the current trap to new continuation trap of (continuation, field trap of state)
 	set field trap of state to the current trap
 	set the result to value
 end
 
 cps (state) (continuation)
-sentence untrap
+sentence trap (expression value)
+	trap value without modifying trap
 	set field trap of state to field previous trap of (field trap of state)
 end
 
@@ -100,7 +101,6 @@ category
 	closable
 block (body) repeat : repeat statement
 	trap body of ()
-	untrap
 	select field flag of state
 		case breaking repeating
 			reset continuation state state to null
@@ -193,7 +193,6 @@ category
 	start SEH try
 block (body) try
 	trap body of ()
-	untrap
 	select field flag of state
 		case raising exception
 			set the result to field argument of state
@@ -211,7 +210,6 @@ category (signal)
 block (body) else try
 	if signal <> null
 		trap body of ()
-		untrap
 		select field flag of state
 			case raising exception
 				set the result to field argument of state
@@ -249,7 +247,6 @@ category
 block (body) named block (argument handle)
 	set handle to new object of ()
 	trap body of (handle)
-	untrap
 	if field flag of state = exiting block and field argument of state = handle
 		reset continuation state state to null
 	else if field flag of state <> null

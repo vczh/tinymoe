@@ -57,7 +57,7 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void standard_library__trap__expression(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
+		public void standard_library__trap__expression_without_modifying_trap(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject the_current_trap = null;
@@ -80,14 +80,23 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void standard_library__untrap(TinymoeObject state, TinymoeObject continuation)
+		public void standard_library__trap__expression(TinymoeObject state, TinymoeObject value, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
-			state.SetField("trap", state.GetField("trap").GetField("previous_trap"));
-			Invoke(continuation, new TinymoeObject[] {
+			standard_library__trap__expression_without_modifying_trap(
 				state,
-				_the_result
-				});
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					state.SetField("trap", state.GetField("trap").GetField("previous_trap"));
+					Invoke(continuation, new TinymoeObject[] {
+						state,
+						_the_result
+						});
+				})
+				);
 		}
 
 		public void standard_library__fall_into_the_previous_trap(TinymoeObject state, TinymoeObject continuation)
@@ -265,86 +274,78 @@ namespace TinymoeProgramNamespace
 				{
 					TinymoeObject _state_4 = __args___x3[0];
 					TinymoeObject _result_5 = __args___x3[1];
-					standard_library__untrap(
-						_state_4,
-						new TinymoeFunction(__args___x4 => 
-						{
-							TinymoeObject _state_6 = __args___x4[0];
-							TinymoeObject _result_7 = __args___x4[1];
-							TinymoeObject _select_continuation_10 = null;
-							TinymoeObject _select_value_11 = null;
-							_select_continuation_10 = new TinymoeFunction(__args___x5 => 
-							{
-								TinymoeObject _state_8 = __args___x5[0];
-								TinymoeObject _result_9 = __args___x5[1];
-								Invoke(_continuation, new TinymoeObject[] {
-									state,
-									_the_result
-									});
+					TinymoeObject _select_continuation_8 = null;
+					TinymoeObject _select_value_9 = null;
+					_select_continuation_8 = new TinymoeFunction(__args___x4 => 
+					{
+						TinymoeObject _state_6 = __args___x4[0];
+						TinymoeObject _result_7 = __args___x4[1];
+						Invoke(_continuation, new TinymoeObject[] {
+							state,
+							_the_result
 							});
-							_select_value_11 = state.GetField("flag");
-							if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_11, standard_library__breaking_repeating))).Value)
+					});
+					_select_value_9 = state.GetField("flag");
+					if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, standard_library__breaking_repeating))).Value)
+					{
+						standard_library__reset_continuation_state__expression_to__expression(
+							_state_4,
+							state,
+							null,
+							_select_continuation_8
+							);
+					}
+					else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, standard_library__continuing_repeating))).Value)
+					{
+						standard_library__reset_continuation_state__expression_to__expression(
+							_state_4,
+							state,
+							null,
+							new TinymoeFunction(__args___x5 => 
 							{
-								standard_library__reset_continuation_state__expression_to__expression(
-									_state_6,
-									state,
-									null,
-									_select_continuation_10
-									);
-							}
-							else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_11, standard_library__continuing_repeating))).Value)
-							{
-								standard_library__reset_continuation_state__expression_to__expression(
-									_state_6,
-									state,
-									null,
+								TinymoeObject _state_12 = __args___x5[0];
+								TinymoeObject _result_13 = __args___x5[1];
+								standard_library__repeat(
+									_state_12,
+									body,
 									new TinymoeFunction(__args___x6 => 
 									{
 										TinymoeObject _state_14 = __args___x6[0];
 										TinymoeObject _result_15 = __args___x6[1];
-										standard_library__repeat(
-											_state_14,
-											body,
-											new TinymoeFunction(__args___x7 => 
-											{
-												TinymoeObject _state_16 = __args___x7[0];
-												TinymoeObject _result_17 = __args___x7[1];
-												standard_library__call__expression(
-													_state_16,
-													_result_17,
-													_select_continuation_10
-													);
-											})
-											);
-									})
-									);
-							}
-							else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_11, null))).Value)
-							{
-								standard_library__repeat(
-									_state_6,
-									body,
-									new TinymoeFunction(__args___x8 => 
-									{
-										TinymoeObject _state_20 = __args___x8[0];
-										TinymoeObject _result_21 = __args___x8[1];
 										standard_library__call__expression(
-											_state_20,
-											_result_21,
-											_select_continuation_10
+											_state_14,
+											_result_15,
+											_select_continuation_8
 											);
 									})
 									);
-							}
-							else
+							})
+							);
+					}
+					else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, null))).Value)
+					{
+						standard_library__repeat(
+							_state_4,
+							body,
+							new TinymoeFunction(__args___x7 => 
 							{
-								standard_library__fall_into_the_previous_trap(
-									_state_6,
-									_select_continuation_10
+								TinymoeObject _state_18 = __args___x7[0];
+								TinymoeObject _result_19 = __args___x7[1];
+								standard_library__call__expression(
+									_state_18,
+									_result_19,
+									_select_continuation_8
 									);
-							}
-						})
-						);
+							})
+							);
+					}
+					else
+					{
+						standard_library__fall_into_the_previous_trap(
+							_state_4,
+							_select_continuation_8
+							);
+					}
 				})
 				);
 		}
@@ -647,43 +648,35 @@ namespace TinymoeProgramNamespace
 				{
 					TinymoeObject _state_4 = __args___x3[0];
 					TinymoeObject _result_5 = __args___x3[1];
-					standard_library__untrap(
-						_state_4,
-						new TinymoeFunction(__args___x4 => 
-						{
-							TinymoeObject _state_6 = __args___x4[0];
-							TinymoeObject _result_7 = __args___x4[1];
-							TinymoeObject _select_continuation_10 = null;
-							TinymoeObject _select_value_11 = null;
-							_select_continuation_10 = new TinymoeFunction(__args___x5 => 
-							{
-								TinymoeObject _state_8 = __args___x5[0];
-								TinymoeObject _result_9 = __args___x5[1];
-								Invoke(_continuation, new TinymoeObject[] {
-									state,
-									_the_result
-									});
+					TinymoeObject _select_continuation_8 = null;
+					TinymoeObject _select_value_9 = null;
+					_select_continuation_8 = new TinymoeFunction(__args___x4 => 
+					{
+						TinymoeObject _state_6 = __args___x4[0];
+						TinymoeObject _result_7 = __args___x4[1];
+						Invoke(_continuation, new TinymoeObject[] {
+							state,
+							_the_result
 							});
-							_select_value_11 = state.GetField("flag");
-							if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_11, standard_library__raising_exception))).Value)
-							{
-								_the_result = state.GetField("argument");
-								standard_library__reset_continuation_state__expression_to__expression(
-									_state_6,
-									state,
-									null,
-									_select_continuation_10
-									);
-							}
-							else
-							{
-								standard_library__fall_into_the_previous_trap(
-									_state_6,
-									_select_continuation_10
-									);
-							}
-						})
-						);
+					});
+					_select_value_9 = state.GetField("flag");
+					if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, standard_library__raising_exception))).Value)
+					{
+						_the_result = state.GetField("argument");
+						standard_library__reset_continuation_state__expression_to__expression(
+							_state_4,
+							state,
+							null,
+							_select_continuation_8
+							);
+					}
+					else
+					{
+						standard_library__fall_into_the_previous_trap(
+							_state_4,
+							_select_continuation_8
+							);
+					}
 				})
 				);
 		}
@@ -720,43 +713,35 @@ namespace TinymoeProgramNamespace
 						{
 							TinymoeObject _state_8 = __args___x4[0];
 							TinymoeObject _result_9 = __args___x4[1];
-							standard_library__untrap(
-								_state_8,
-								new TinymoeFunction(__args___x5 => 
-								{
-									TinymoeObject _state_10 = __args___x5[0];
-									TinymoeObject _result_11 = __args___x5[1];
-									TinymoeObject _select_continuation_14 = null;
-									TinymoeObject _select_value_15 = null;
-									_select_continuation_14 = _continuation_3;
-									_select_value_15 = state.GetField("flag");
-									if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_15, standard_library__raising_exception))).Value)
-									{
-										_the_result = state.GetField("argument");
-										standard_library__reset_continuation_state__expression_to__expression(
-											_state_10,
-											state,
-											null,
-											_select_continuation_14
-											);
-									}
-									else
-									{
-										standard_library__fall_into_the_previous_trap(
-											_state_10,
-											_select_continuation_14
-											);
-									}
-								})
-								);
+							TinymoeObject _select_continuation_12 = null;
+							TinymoeObject _select_value_13 = null;
+							_select_continuation_12 = _continuation_3;
+							_select_value_13 = state.GetField("flag");
+							if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_13, standard_library__raising_exception))).Value)
+							{
+								_the_result = state.GetField("argument");
+								standard_library__reset_continuation_state__expression_to__expression(
+									_state_8,
+									state,
+									null,
+									_select_continuation_12
+									);
+							}
+							else
+							{
+								standard_library__fall_into_the_previous_trap(
+									_state_8,
+									_select_continuation_12
+									);
+							}
 						})
 						);
 				}),
 				NE(signal, null),
-				new TinymoeFunction(__args___x6 => 
+				new TinymoeFunction(__args___x5 => 
 				{
-					TinymoeObject _state_0 = __args___x6[0];
-					TinymoeObject _result_1 = __args___x6[1];
+					TinymoeObject _state_0 = __args___x5[0];
+					TinymoeObject _result_1 = __args___x5[1];
 					Invoke(_continuation, new TinymoeObject[] {
 						state,
 						_the_result
@@ -832,53 +817,45 @@ namespace TinymoeProgramNamespace
 				{
 					TinymoeObject _state_6 = __args___x3[0];
 					TinymoeObject _result_7 = __args___x3[1];
-					standard_library__untrap(
+					standard_library__if__expression(
 						_state_6,
 						new TinymoeFunction(__args___x4 => 
 						{
-							TinymoeObject _state_8 = __args___x4[0];
-							TinymoeObject _result_9 = __args___x4[1];
-							standard_library__if__expression(
+							TinymoeObject _state_10 = __args___x4[0];
+							TinymoeObject _continuation_11 = __args___x4[1];
+							standard_library__reset_continuation_state__expression_to__expression(
+								_state_10,
+								state,
+								null,
+								_continuation_11
+								);
+						}),
+						And(EQ(state.GetField("flag"), standard_library__exiting_block), EQ(state.GetField("argument"), handle)),
+						new TinymoeFunction(__args___x5 => 
+						{
+							TinymoeObject _state_8 = __args___x5[0];
+							TinymoeObject _result_9 = __args___x5[1];
+							standard_library__else_if__expression(
 								_state_8,
-								new TinymoeFunction(__args___x5 => 
+								_result_9,
+								new TinymoeFunction(__args___x6 => standard_library__fall_into_the_previous_trap(__args___x6[0], __args___x6[1])),
+								new TinymoeFunction(__args___x7 => 
 								{
-									TinymoeObject _state_12 = __args___x5[0];
-									TinymoeObject _continuation_13 = __args___x5[1];
-									standard_library__reset_continuation_state__expression_to__expression(
-										_state_12,
-										state,
-										null,
-										_continuation_13
-										);
+									TinymoeObject _state_14 = __args___x7[0];
+									TinymoeObject _continuation_15 = __args___x7[1];
+									Invoke(_continuation_15, new TinymoeObject[] {
+										_state_14,
+										NE(state.GetField("flag"), null)
+										});
 								}),
-								And(EQ(state.GetField("flag"), standard_library__exiting_block), EQ(state.GetField("argument"), handle)),
-								new TinymoeFunction(__args___x6 => 
+								new TinymoeFunction(__args___x8 => 
 								{
-									TinymoeObject _state_10 = __args___x6[0];
-									TinymoeObject _result_11 = __args___x6[1];
-									standard_library__else_if__expression(
-										_state_10,
-										_result_11,
-										new TinymoeFunction(__args___x7 => standard_library__fall_into_the_previous_trap(__args___x7[0], __args___x7[1])),
-										new TinymoeFunction(__args___x8 => 
-										{
-											TinymoeObject _state_16 = __args___x8[0];
-											TinymoeObject _continuation_17 = __args___x8[1];
-											Invoke(_continuation_17, new TinymoeObject[] {
-												_state_16,
-												NE(state.GetField("flag"), null)
-												});
-										}),
-										new TinymoeFunction(__args___x9 => 
-										{
-											TinymoeObject _state_18 = __args___x9[0];
-											TinymoeObject _result_19 = __args___x9[1];
-											Invoke(_continuation, new TinymoeObject[] {
-												state,
-												_the_result
-												});
-										})
-										);
+									TinymoeObject _state_16 = __args___x8[0];
+									TinymoeObject _result_17 = __args___x8[1];
+									Invoke(_continuation, new TinymoeObject[] {
+										state,
+										_the_result
+										});
 								})
 								);
 						})
@@ -1027,9 +1004,18 @@ namespace TinymoeProgramNamespace
 		{
 			public enumerable__collection_enumerator()
 			{
-				SetField("current_value", null);
+				SetField("current_yielding_result", null);
 				SetField("body", null);
 				SetField("continuation", null);
+			}
+		}
+
+		public class enumerable__yielding_result : TinymoeObject
+		{
+			public enumerable__yielding_result()
+			{
+				SetField("value", null);
+				SetField("trap", null);
 			}
 		}
 
@@ -1053,7 +1039,7 @@ namespace TinymoeProgramNamespace
 					TinymoeObject _state_2 = __args__[0];
 					TinymoeObject moving_to_the_next = __args__[1];
 					TinymoeObject _continuation_3 = __args__[2];
-					enumerator.SetField("current_value", null);
+					enumerator.SetField("current_yielding_result", null);
 					standard_library__if__expression(
 						_state_2,
 						new TinymoeFunction(__args___x2 => 
@@ -1083,124 +1069,108 @@ namespace TinymoeProgramNamespace
 								{
 									TinymoeObject _state_12 = __args___x5[0];
 									TinymoeObject _result_13 = __args___x5[1];
-									standard_library__untrap(
+									enumerator.SetField("body", null);
+									Invoke(_continuation_7, new TinymoeObject[] {
 										_state_12,
-										new TinymoeFunction(__args___x6 => 
-										{
-											TinymoeObject _state_14 = __args___x6[0];
-											TinymoeObject _result_15 = __args___x6[1];
-											enumerator.SetField("body", null);
-											Invoke(_continuation_7, new TinymoeObject[] {
-												_state_14,
-												_result_15
-												});
-										})
-										);
+										_result_13
+										});
 								})
 								);
 						}),
 						NE(enumerator.GetField("body"), null),
-						new TinymoeFunction(__args___x7 => 
+						new TinymoeFunction(__args___x6 => 
 						{
-							TinymoeObject _state_4 = __args___x7[0];
-							TinymoeObject _result_5 = __args___x7[1];
+							TinymoeObject _state_4 = __args___x6[0];
+							TinymoeObject _result_5 = __args___x6[1];
 							standard_library__else_if__expression(
 								_state_4,
 								_result_5,
-								new TinymoeFunction(__args___x8 => 
+								new TinymoeFunction(__args___x7 => 
 								{
-									TinymoeObject _state_20 = __args___x8[0];
-									TinymoeObject _continuation_21 = __args___x8[1];
+									TinymoeObject _state_18 = __args___x7[0];
+									TinymoeObject _continuation_19 = __args___x7[1];
 									standard_library__trap__expression(
-										_state_20,
-										new TinymoeFunction(__args___x9 => 
+										_state_18,
+										new TinymoeFunction(__args___x8 => 
 										{
-											TinymoeObject _state_22 = __args___x9[0];
-											TinymoeObject _continuation_23 = __args___x9[1];
+											TinymoeObject _state_20 = __args___x8[0];
+											TinymoeObject _continuation_21 = __args___x8[1];
 											Invoke(enumerator.GetField("continuation"), new TinymoeObject[] {
-												_state_22,
+												_state_20,
 												null
 												});
 										}),
-										new TinymoeFunction(__args___x10 => 
-										{
-											TinymoeObject _state_26 = __args___x10[0];
-											TinymoeObject _result_27 = __args___x10[1];
-											standard_library__untrap(
-												_state_26,
-												_continuation_21
-												);
-										})
+										_continuation_19
 										);
 								}),
-								new TinymoeFunction(__args___x11 => 
+								new TinymoeFunction(__args___x9 => 
 								{
-									TinymoeObject _state_16 = __args___x11[0];
-									TinymoeObject _continuation_17 = __args___x11[1];
-									Invoke(_continuation_17, new TinymoeObject[] {
-										_state_16,
+									TinymoeObject _state_14 = __args___x9[0];
+									TinymoeObject _continuation_15 = __args___x9[1];
+									Invoke(_continuation_15, new TinymoeObject[] {
+										_state_14,
 										NE(enumerator.GetField("continuation"), null)
 										});
 								}),
-								new TinymoeFunction(__args___x12 => 
+								new TinymoeFunction(__args___x10 => 
 								{
-									TinymoeObject _state_18 = __args___x12[0];
-									TinymoeObject _result_19 = __args___x12[1];
+									TinymoeObject _state_16 = __args___x10[0];
+									TinymoeObject _result_17 = __args___x10[1];
 									standard_library__else(
-										_state_18,
-										_result_19,
-										new TinymoeFunction(__args___x13 => 
+										_state_16,
+										_result_17,
+										new TinymoeFunction(__args___x11 => 
 										{
-											TinymoeObject _state_32 = __args___x13[0];
-											TinymoeObject _continuation_33 = __args___x13[1];
+											TinymoeObject _state_28 = __args___x11[0];
+											TinymoeObject _continuation_29 = __args___x11[1];
 											standard_library__exit_block__expression(
-												_state_32,
+												_state_28,
 												moving_to_the_next,
-												_continuation_33
+												_continuation_29
 												);
 										}),
-										new TinymoeFunction(__args___x14 => 
+										new TinymoeFunction(__args___x12 => 
 										{
-											TinymoeObject _state_30 = __args___x14[0];
-											TinymoeObject _result_31 = __args___x14[1];
-											TinymoeObject _select_continuation_38 = null;
-											TinymoeObject _select_value_39 = null;
-											_select_continuation_38 = _continuation_3;
-											_select_value_39 = state.GetField("flag");
-											if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_39, enumerable__yielding_return))).Value)
+											TinymoeObject _state_26 = __args___x12[0];
+											TinymoeObject _result_27 = __args___x12[1];
+											TinymoeObject _select_continuation_34 = null;
+											TinymoeObject _select_value_35 = null;
+											_select_continuation_34 = _continuation_3;
+											_select_value_35 = state.GetField("flag");
+											if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_35, enumerable__yielding_return))).Value)
 											{
-												enumerator.SetField("current_value", state.GetField("argument"));
+												enumerator.SetField("current_yielding_result", state.GetField("argument"));
 												enumerator.SetField("continuation", state.GetField("continuation"));
 												standard_library__reset_continuation_state__expression_to__expression(
-													_state_30,
+													_state_26,
 													state,
 													null,
-													_select_continuation_38
+													_select_continuation_34
 													);
 											}
-											else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_39, enumerable__yielding_break))).Value)
+											else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_35, enumerable__yielding_break))).Value)
 											{
 												enumerator.SetField("continuation", null);
 												standard_library__reset_continuation_state__expression_to__expression(
-													_state_30,
+													_state_26,
 													state,
 													null,
-													_select_continuation_38
+													_select_continuation_34
 													);
 											}
-											else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_39, null))).Value)
+											else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_35, null))).Value)
 											{
 												enumerator.SetField("continuation", null);
-												Invoke(_select_continuation_38, new TinymoeObject[] {
-													_state_30,
+												Invoke(_select_continuation_34, new TinymoeObject[] {
+													_state_26,
 													null
 													});
 											}
 											else
 											{
 												standard_library__fall_into_the_previous_trap(
-													_state_30,
-													_select_continuation_38
+													_state_26,
+													_select_continuation_34
 													);
 											}
 										})
@@ -1210,10 +1180,10 @@ namespace TinymoeProgramNamespace
 						})
 						);
 				}),
-				new TinymoeFunction(__args___x15 => 
+				new TinymoeFunction(__args___x13 => 
 				{
-					TinymoeObject _state_0 = __args___x15[0];
-					TinymoeObject _result_1 = __args___x15[1];
+					TinymoeObject _state_0 = __args___x13[0];
+					TinymoeObject _result_1 = __args___x13[1];
 					Invoke(continuation, new TinymoeObject[] {
 						state,
 						_the_result
@@ -1237,7 +1207,7 @@ namespace TinymoeProgramNamespace
 			TinymoeObject _the_result = null;
 			state.SetField("flag", enumerable__yielding_return);
 			state.SetField("continuation", continuation);
-			state.SetField("argument", value);
+			state.SetField("argument", new enumerable__yielding_result().SetFields(new TinymoeObject[] {value, state.GetField("trap")}).FinishConstruction());
 			standard_library__fall_into_the_previous_trap(
 				state,
 				new TinymoeFunction(__args__ => 
@@ -1333,7 +1303,7 @@ namespace TinymoeProgramNamespace
 									TinymoeObject _result_7 = __args___x3[1];
 									Invoke(deal_with__expression, new TinymoeObject[] {
 										_state_6,
-										enumerator.GetField("current_value"),
+										enumerator.GetField("current_yielding_result").GetField("value"),
 										_continuation_5
 										});
 								})

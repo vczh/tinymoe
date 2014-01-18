@@ -43,7 +43,7 @@ $procedure standard_library::call_$expression($state, value, $continuation)
         );
 }
 
-$procedure standard_library::trap_$expression(state, value, continuation)
+$procedure standard_library::trap_$expression_without_modifying_trap(state, value, continuation)
 {
     $symbol $the_result;
     $symbol the_current_trap;
@@ -64,13 +64,20 @@ $procedure standard_library::trap_$expression(state, value, continuation)
         );
 }
 
-$procedure standard_library::untrap(state, continuation)
+$procedure standard_library::trap_$expression(state, value, continuation)
 {
     $symbol $the_result;
-    state.trap = state.trap.previous_trap;
-    continuation(
+    standard_library::trap_$expression_without_modifying_trap(
         state, 
-        $the_result
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                state.trap = state.trap.previous_trap;
+                continuation(
+                    state, 
+                    $the_result
+                    );
+            }
         );
 }
 
@@ -221,72 +228,66 @@ $procedure standard_library::repeat(state, body, $continuation)
                 );, 
         $lambda ($state_4, $result_5)
             {
-                standard_library::untrap(
-                    $state_4, 
-                    $lambda ($state_6, $result_7)
-                        {
-                            $symbol $select_continuation_10;
-                            $symbol $select_value_11;
-                            $select_continuation_10 = $lambda ($state_8, $result_9)
+                $symbol $select_continuation_8;
+                $symbol $select_value_9;
+                $select_continuation_8 = $lambda ($state_6, $result_7)
+                    {
+                        $continuation(
+                            state, 
+                            $the_result
+                            );
+                    };
+                $select_value_9 = state.flag;
+                if (($select_value_9 == standard_library::breaking_repeating)
+                    standard_library::reset_continuation_state_$expression_to_$expression(
+                        $state_4, 
+                        state, 
+                        $null, 
+                        $select_continuation_8
+                        );
+                else
+                    if (($select_value_9 == standard_library::continuing_repeating)
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_4, 
+                            state, 
+                            $null, 
+                            $lambda ($state_12, $result_13)
                                 {
-                                    $continuation(
-                                        state, 
-                                        $the_result
-                                        );
-                                };
-                            $select_value_11 = state.flag;
-                            if (($select_value_11 == standard_library::breaking_repeating)
-                                standard_library::reset_continuation_state_$expression_to_$expression(
-                                    $state_6, 
-                                    state, 
-                                    $null, 
-                                    $select_continuation_10
-                                    );
-                            else
-                                if (($select_value_11 == standard_library::continuing_repeating)
-                                    standard_library::reset_continuation_state_$expression_to_$expression(
-                                        $state_6, 
-                                        state, 
-                                        $null, 
+                                    standard_library::repeat(
+                                        $state_12, 
+                                        body, 
                                         $lambda ($state_14, $result_15)
                                             {
-                                                standard_library::repeat(
+                                                standard_library::call_$expression(
                                                     $state_14, 
-                                                    body, 
-                                                    $lambda ($state_16, $result_17)
-                                                        {
-                                                            standard_library::call_$expression(
-                                                                $state_16, 
-                                                                $result_17, 
-                                                                $select_continuation_10
-                                                                );
-                                                        }
+                                                    $result_15, 
+                                                    $select_continuation_8
                                                     );
                                             }
                                         );
-                                else
-                                    if (($select_value_11 == $null)
+                                }
+                            );
+                    else
+                        if (($select_value_9 == $null)
+                            {
+                                standard_library::repeat(
+                                    $state_4, 
+                                    body, 
+                                    $lambda ($state_18, $result_19)
                                         {
-                                            standard_library::repeat(
-                                                $state_6, 
-                                                body, 
-                                                $lambda ($state_20, $result_21)
-                                                    {
-                                                        standard_library::call_$expression(
-                                                            $state_20, 
-                                                            $result_21, 
-                                                            $select_continuation_10
-                                                            );
-                                                    }
+                                            standard_library::call_$expression(
+                                                $state_18, 
+                                                $result_19, 
+                                                $select_continuation_8
                                                 );
                                         }
-                                    else
-                                        standard_library::fall_into_the_previous_trap(
-                                            $state_6, 
-                                            $select_continuation_10
-                                            );
-                        }
-                    );
+                                    );
+                            }
+                        else
+                            standard_library::fall_into_the_previous_trap(
+                                $state_4, 
+                                $select_continuation_8
+                                );
             }
         );
 }
@@ -523,37 +524,31 @@ $procedure standard_library::try(state, body, $continuation)
                 );, 
         $lambda ($state_4, $result_5)
             {
-                standard_library::untrap(
-                    $state_4, 
-                    $lambda ($state_6, $result_7)
-                        {
-                            $symbol $select_continuation_10;
-                            $symbol $select_value_11;
-                            $select_continuation_10 = $lambda ($state_8, $result_9)
-                                {
-                                    $continuation(
-                                        state, 
-                                        $the_result
-                                        );
-                                };
-                            $select_value_11 = state.flag;
-                            if (($select_value_11 == standard_library::raising_exception)
-                                {
-                                    $the_result = state.argument;
-                                    standard_library::reset_continuation_state_$expression_to_$expression(
-                                        $state_6, 
-                                        state, 
-                                        $null, 
-                                        $select_continuation_10
-                                        );
-                                }
-                            else
-                                standard_library::fall_into_the_previous_trap(
-                                    $state_6, 
-                                    $select_continuation_10
-                                    );
-                        }
-                    );
+                $symbol $select_continuation_8;
+                $symbol $select_value_9;
+                $select_continuation_8 = $lambda ($state_6, $result_7)
+                    {
+                        $continuation(
+                            state, 
+                            $the_result
+                            );
+                    };
+                $select_value_9 = state.flag;
+                if (($select_value_9 == standard_library::raising_exception)
+                    {
+                        $the_result = state.argument;
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_4, 
+                            state, 
+                            $null, 
+                            $select_continuation_8
+                            );
+                    }
+                else
+                    standard_library::fall_into_the_previous_trap(
+                        $state_4, 
+                        $select_continuation_8
+                        );
             }
         );
 }
@@ -579,31 +574,25 @@ $procedure standard_library::else_try(state, signal, body, $continuation)
                         );, 
                 $lambda ($state_8, $result_9)
                     {
-                        standard_library::untrap(
-                            $state_8, 
-                            $lambda ($state_10, $result_11)
-                                {
-                                    $symbol $select_continuation_14;
-                                    $symbol $select_value_15;
-                                    $select_continuation_14 = $continuation_3;
-                                    $select_value_15 = state.flag;
-                                    if (($select_value_15 == standard_library::raising_exception)
-                                        {
-                                            $the_result = state.argument;
-                                            standard_library::reset_continuation_state_$expression_to_$expression(
-                                                $state_10, 
-                                                state, 
-                                                $null, 
-                                                $select_continuation_14
-                                                );
-                                        }
-                                    else
-                                        standard_library::fall_into_the_previous_trap(
-                                            $state_10, 
-                                            $select_continuation_14
-                                            );
-                                }
-                            );
+                        $symbol $select_continuation_12;
+                        $symbol $select_value_13;
+                        $select_continuation_12 = $continuation_3;
+                        $select_value_13 = state.flag;
+                        if (($select_value_13 == standard_library::raising_exception)
+                            {
+                                $the_result = state.argument;
+                                standard_library::reset_continuation_state_$expression_to_$expression(
+                                    $state_8, 
+                                    state, 
+                                    $null, 
+                                    $select_continuation_12
+                                    );
+                            }
+                        else
+                            standard_library::fall_into_the_previous_trap(
+                                $state_8, 
+                                $select_continuation_12
+                                );
                     }
                 );, 
         (signal != $null), 
@@ -672,38 +661,32 @@ $procedure standard_library::named_block_$argument(state, body, $continuation)
                 );, 
         $lambda ($state_6, $result_7)
             {
-                standard_library::untrap(
+                standard_library::if_$expression(
                     $state_6, 
+                    $lambda ($state_10, $continuation_11)
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_10, 
+                            state, 
+                            $null, 
+                            $continuation_11
+                            );, 
+                    ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
                     $lambda ($state_8, $result_9)
                         {
-                            standard_library::if_$expression(
+                            standard_library::else_if_$expression(
                                 $state_8, 
-                                $lambda ($state_12, $continuation_13)
-                                    standard_library::reset_continuation_state_$expression_to_$expression(
-                                        $state_12, 
-                                        state, 
-                                        $null, 
-                                        $continuation_13
+                                $result_9, 
+                                standard_library::fall_into_the_previous_trap, 
+                                $lambda ($state_14, $continuation_15)
+                                    $continuation_15(
+                                        $state_14, 
+                                        (state.flag != $null)
                                         );, 
-                                ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
-                                $lambda ($state_10, $result_11)
+                                $lambda ($state_16, $result_17)
                                     {
-                                        standard_library::else_if_$expression(
-                                            $state_10, 
-                                            $result_11, 
-                                            standard_library::fall_into_the_previous_trap, 
-                                            $lambda ($state_16, $continuation_17)
-                                                $continuation_17(
-                                                    $state_16, 
-                                                    (state.flag != $null)
-                                                    );, 
-                                            $lambda ($state_18, $result_19)
-                                                {
-                                                    $continuation(
-                                                        state, 
-                                                        $the_result
-                                                        );
-                                                }
+                                        $continuation(
+                                            state, 
+                                            $the_result
                                             );
                                     }
                                 );
@@ -832,9 +815,15 @@ $type enumerable::enumerable_collection
 
 $type enumerable::collection_enumerator
 {
-    $symbol current_value;
+    $symbol current_yielding_result;
     $symbol body;
     $symbol continuation;
+}
+
+$type enumerable::yielding_result
+{
+    $symbol value;
+    $symbol trap;
 }
 
 $procedure enumerable::new_enumerator_from_$primitive($state, enumerable, $continuation)
@@ -854,7 +843,7 @@ $procedure enumerable::move_$expression_to_the_next(state, enumerator, continuat
         state, 
         $lambda ($state_2, moving_to_the_next, $continuation_3)
             {
-                enumerator.current_value = $null;
+                enumerator.current_yielding_result = $null;
                 standard_library::if_$expression(
                     $state_2, 
                     $lambda ($state_6, $continuation_7)
@@ -873,16 +862,10 @@ $procedure enumerable::move_$expression_to_the_next(state, enumerator, continuat
                                     );, 
                             $lambda ($state_12, $result_13)
                                 {
-                                    standard_library::untrap(
+                                    enumerator.body = $null;
+                                    $continuation_7(
                                         $state_12, 
-                                        $lambda ($state_14, $result_15)
-                                            {
-                                                enumerator.body = $null;
-                                                $continuation_7(
-                                                    $state_14, 
-                                                    $result_15
-                                                    );
-                                            }
+                                        $result_13
                                         );
                                 }
                             );, 
@@ -892,81 +875,75 @@ $procedure enumerable::move_$expression_to_the_next(state, enumerator, continuat
                             standard_library::else_if_$expression(
                                 $state_4, 
                                 $result_5, 
-                                $lambda ($state_20, $continuation_21)
+                                $lambda ($state_18, $continuation_19)
                                     standard_library::trap_$expression(
-                                        $state_20, 
-                                        $lambda ($state_22, $continuation_23)
+                                        $state_18, 
+                                        $lambda ($state_20, $continuation_21)
                                             {
                                                 enumerator.continuation(
-                                                    $state_22, 
+                                                    $state_20, 
                                                     $null
                                                     );
                                             }, 
-                                        $lambda ($state_26, $result_27)
-                                            {
-                                                standard_library::untrap(
-                                                    $state_26, 
-                                                    $continuation_21
-                                                    );
-                                            }
+                                        $continuation_19
                                         );, 
-                                $lambda ($state_16, $continuation_17)
-                                    $continuation_17(
-                                        $state_16, 
+                                $lambda ($state_14, $continuation_15)
+                                    $continuation_15(
+                                        $state_14, 
                                         (enumerator.continuation != $null)
                                         );, 
-                                $lambda ($state_18, $result_19)
+                                $lambda ($state_16, $result_17)
                                     {
                                         standard_library::else(
-                                            $state_18, 
-                                            $result_19, 
-                                            $lambda ($state_32, $continuation_33)
+                                            $state_16, 
+                                            $result_17, 
+                                            $lambda ($state_28, $continuation_29)
                                                 standard_library::exit_block_$expression(
-                                                    $state_32, 
+                                                    $state_28, 
                                                     moving_to_the_next, 
-                                                    $continuation_33
+                                                    $continuation_29
                                                     );, 
-                                            $lambda ($state_30, $result_31)
+                                            $lambda ($state_26, $result_27)
                                                 {
-                                                    $symbol $select_continuation_38;
-                                                    $symbol $select_value_39;
-                                                    $select_continuation_38 = $continuation_3;
-                                                    $select_value_39 = state.flag;
-                                                    if (($select_value_39 == enumerable::yielding_return)
+                                                    $symbol $select_continuation_34;
+                                                    $symbol $select_value_35;
+                                                    $select_continuation_34 = $continuation_3;
+                                                    $select_value_35 = state.flag;
+                                                    if (($select_value_35 == enumerable::yielding_return)
                                                         {
-                                                            enumerator.current_value = state.argument;
+                                                            enumerator.current_yielding_result = state.argument;
                                                             enumerator.continuation = state.continuation;
                                                             standard_library::reset_continuation_state_$expression_to_$expression(
-                                                                $state_30, 
+                                                                $state_26, 
                                                                 state, 
                                                                 $null, 
-                                                                $select_continuation_38
+                                                                $select_continuation_34
                                                                 );
                                                         }
                                                     else
-                                                        if (($select_value_39 == enumerable::yielding_break)
+                                                        if (($select_value_35 == enumerable::yielding_break)
                                                             {
                                                                 enumerator.continuation = $null;
                                                                 standard_library::reset_continuation_state_$expression_to_$expression(
-                                                                    $state_30, 
+                                                                    $state_26, 
                                                                     state, 
                                                                     $null, 
-                                                                    $select_continuation_38
+                                                                    $select_continuation_34
                                                                     );
                                                             }
                                                         else
-                                                            if (($select_value_39 == $null)
+                                                            if (($select_value_35 == $null)
                                                                 {
                                                                     enumerator.continuation = $null;
-                                                                    $select_continuation_38(
-                                                                        $state_30, 
+                                                                    $select_continuation_34(
+                                                                        $state_26, 
                                                                         $null
                                                                         );
                                                                 }
                                                             else
                                                                 standard_library::fall_into_the_previous_trap(
-                                                                    $state_30, 
-                                                                    $select_continuation_38
+                                                                    $state_26, 
+                                                                    $select_continuation_34
                                                                     );
                                                 }
                                             );
@@ -1000,7 +977,7 @@ $procedure enumerable::yield_return_$expression(state, value, continuation)
     $symbol $the_result;
     state.flag = enumerable::yielding_return;
     state.continuation = continuation;
-    state.argument = value;
+    state.argument = new enumerable::yielding_result(value, state.trap);
     standard_library::fall_into_the_previous_trap(
         state, 
         $lambda ($state_0, $result_1)
@@ -1079,7 +1056,7 @@ $procedure enumerable::repeat_with_$argument_in_$expression<enumerable_collectio
                                 {
                                     deal_with_$expression(
                                         $state_6, 
-                                        enumerator.current_value, 
+                                        enumerator.current_yielding_result.value, 
                                         $continuation_5
                                         );
                                 }
