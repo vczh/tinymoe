@@ -78,6 +78,11 @@ namespace TinymoeDotNet
                 return this.id;
             }
         }
+
+        public override string ToString()
+        {
+            return "(" + this.GetType().Name + ")" + id.ToString();
+        }
     }
 
     public class TinymoeBoolean : TinymoeObject

@@ -161,10 +161,45 @@ end
 type yielding result
 	value
 	trap
+	fall back counter
+end
+ 
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield return (value)
+    set field flag of state to yielding return
+    set field continuation of state to continuation
+    set field argument of state to new yielding result of (value, field trap of state)
+	fall into the previous trap
+end
+ 
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield break
+    reset continuation state state to yielding break
+	fall into the previous trap
 end
  
 phrase new enumerator from (enumerable)
     set the result to new collection enumerator of (null, field body of enumerable, null)
+end
+
+phrase fall back counter between (top trap) and (current trap) from (counter)
+	select top trap <> current trap
+		case true
+			set the result to fall back counter between (field previous trap of top trap) and current trap from (counter + 1)
+		case false
+			set the result to counter
+	end
+end
+
+sentence set fall back counter of (state)
+	set top trap to field trap of (field argument of state)
+	set current trap to field trap of state
+	set counter to (fall back counter between top trap and current trap from -1)
+	set field fall back counter of (field argument of state) to counter
 end
 
 cps (state) (continuation)
@@ -173,9 +208,11 @@ sentence move (enumerator) to the next
 		set field current yielding result of enumerator to null
 		if field body of enumerator <> null
 			trap field body of enumerator of ()
+			set fall back counter of state
 			set field body of enumerator to null
 		else if field continuation of enumerator <> null
 			trap continuation field continuation of enumerator of (null)
+			set fall back counter of state
 		else
 			exit block moving to the next
 		end
@@ -198,24 +235,6 @@ end
  
 phrase (enumerator) reaches the end
     set the result to field body of enumerator = null and field continuation of enumerator = null
-end
- 
-cps (state) (continuation)
-category
-    inside ENUMERATING
-sentence yield return (value)
-    set field flag of state to yielding return
-    set field continuation of state to continuation
-    set field argument of state to new yielding result of (value, field trap of state)
-	fall into the previous trap
-end
- 
-cps (state) (continuation)
-category
-    inside ENUMERATING
-sentence yield break
-    reset continuation state state to yielding break
-	fall into the previous trap
 end
  
 cps (state)
