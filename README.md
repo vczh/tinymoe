@@ -114,9 +114,26 @@ Here are several samples to introduce this language:
 	end
  
 	type collection enumerator
-		current value
+		current yielding result
 		body
 		continuation
+	end
+ 
+	cps (state) (continuation)
+	category
+		inside ENUMERATING
+	sentence yield return (value)
+		reset continuation state state to yielding return
+		enable fall back to state with continuation and value
+		fall into the previous trap
+	end
+ 
+	cps (state) (continuation)
+	category
+		inside ENUMERATING
+	sentence yield break
+		reset continuation state state to yielding break
+		fall into the previous trap
 	end
  
 	phrase new enumerator from (enumerable)
@@ -126,28 +143,26 @@ Here are several samples to introduce this language:
 	cps (state) (continuation)
 	sentence move (enumerator) to the next
 		named block moving to the next
-			set field current value of enumerator to null
-			set state to new continuation state of ()
 			if field body of enumerator <> null
-				trap field body of enumerator of ()
-				untrap
+				trap field body of enumerator of () with fall back enabled
 				set field body of enumerator to null
 			else if field continuation of enumerator <> null
-				trap continuation field continuation of enumerator of (null)
-				untrap
+				trap continuation field continuation of enumerator of (null) with fall back (field current yielding result of enumerator) restored
 			else
 				exit block moving to the next
 			end
 
 			select field flag of state
 				case yielding return
-					set field current value of enumerator to field argument of state
+					set field current yielding result of enumerator to field argument of state
 					set field continuation of enumerator to field continuation of state
 					reset continuation state state to null
 				case yielding break
+					set field current yielding result of enumerator to null
 					set field continuation of enumerator to null
 					reset continuation state state to null
 				case null
+					set field current yielding result of enumerator to null
 					set field continuation of enumerator to null
 				case else
 					fall into the previous trap
@@ -158,23 +173,14 @@ Here are several samples to introduce this language:
 	phrase (enumerator) reaches the end
 		set the result to field body of enumerator = null and field continuation of enumerator = null
 	end
- 
-	cps (state) (continuation)
-	category
-		inside ENUMERATING
-	sentence yield return (value)
-		set field flag of state to yielding return
-		set field continuation of state to continuation
-		set field argument of state to value
-		fall into the previous trap
-	end
- 
-	cps (state) (continuation)
-	category
-		inside ENUMERATING
-	sentence yield break
-		reset continuation state state to yielding break
-		fall into the previous trap
+
+	phrase current value of (enumerator)
+		select enumerator reaches the end
+			case true
+				set the result to null
+			case false
+				set the result to field value of (field current yielding result of enumerator)
+		end
 	end
  
 	cps (state)
@@ -190,7 +196,7 @@ Here are several samples to introduce this language:
 		set enumerator to new enumerator from items
 		repeat
 			move enumerator to the next
-			deal with field current value of enumerator
+			deal with current value of enumerator
 		end
 	end
 
