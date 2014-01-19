@@ -1015,17 +1015,26 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void standard_library__catch__argument(TinymoeObject state, TinymoeObject signal, TinymoeObject body, TinymoeObject _continuation)
+		public void standard_library__catch__argument(TinymoeObject state, TinymoeObject signal, TinymoeObject deal_with__expression, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			standard_library__if__expression(
 				state,
-				body,
-				NE(signal, null),
 				new TinymoeFunction(__args__ => 
 				{
-					TinymoeObject _state_0 = __args__[0];
-					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _continuation_3 = __args__[1];
+					Invoke(deal_with__expression, new TinymoeObject[] {
+						_state_2,
+						state.GetField("argument"),
+						_continuation_3
+						});
+				}),
+				NE(signal, null),
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
 					Invoke(_continuation, new TinymoeObject[] {
 						state,
 						_the_result
@@ -1342,10 +1351,113 @@ namespace TinymoeProgramNamespace
 						{
 							TinymoeObject _state_3 = __args___x2[0];
 							TinymoeObject _result_4 = __args___x2[1];
-							Invoke(_continuation, new TinymoeObject[] {
-								_state,
-								_the_result
-								});
+							standard_library__try(
+								_state_3,
+								new TinymoeFunction(__args___x3 => 
+								{
+									TinymoeObject _state_7 = __args___x3[0];
+									TinymoeObject _continuation_8 = __args___x3[1];
+									hello_world__print__expression(
+										_state_7,
+										new TinymoeString("I will raise an exception."),
+										new TinymoeFunction(__args___x4 => 
+										{
+											TinymoeObject _state_9 = __args___x4[0];
+											TinymoeObject _result_10 = __args___x4[1];
+											standard_library__raise__expression(
+												_state_9,
+												new TinymoeString("exception"),
+												new TinymoeFunction(__args___x5 => 
+												{
+													TinymoeObject _state_11 = __args___x5[0];
+													TinymoeObject _result_12 = __args___x5[1];
+													hello_world__print__expression(
+														_state_11,
+														new TinymoeString("The world is mad!"),
+														_continuation_8
+														);
+												})
+												);
+										})
+										);
+								}),
+								new TinymoeFunction(__args___x6 => 
+								{
+									TinymoeObject _state_5 = __args___x6[0];
+									TinymoeObject _result_6 = __args___x6[1];
+									standard_library__catch__argument(
+										_state_5,
+										_result_6,
+										new TinymoeFunction(__args___x7 => 
+										{
+											TinymoeObject _state_17 = __args___x7[0];
+											TinymoeObject exception = __args___x7[1];
+											TinymoeObject _continuation_18 = __args___x7[2];
+											hello_world__print__expression(
+												_state_17,
+												new TinymoeString("So the exception will be caught"),
+												_continuation_18
+												);
+										}),
+										new TinymoeFunction(__args___x8 => 
+										{
+											TinymoeObject _state_15 = __args___x8[0];
+											TinymoeObject _result_16 = __args___x8[1];
+											standard_library__try(
+												_state_15,
+												new TinymoeFunction(__args___x9 => 
+												{
+													TinymoeObject _state_23 = __args___x9[0];
+													TinymoeObject _continuation_24 = __args___x9[1];
+													hello_world__print__expression(
+														_state_23,
+														new TinymoeString("I will not raise an exception."),
+														new TinymoeFunction(__args___x10 => 
+														{
+															TinymoeObject _state_25 = __args___x10[0];
+															TinymoeObject _result_26 = __args___x10[1];
+															hello_world__print__expression(
+																_state_25,
+																new TinymoeString("So there is no exception to catch"),
+																_continuation_24
+																);
+														})
+														);
+												}),
+												new TinymoeFunction(__args___x11 => 
+												{
+													TinymoeObject _state_21 = __args___x11[0];
+													TinymoeObject _result_22 = __args___x11[1];
+													standard_library__catch__argument(
+														_state_21,
+														_result_22,
+														new TinymoeFunction(__args___x12 => 
+														{
+															TinymoeObject _state_31 = __args___x12[0];
+															TinymoeObject exception_x2 = __args___x12[1];
+															TinymoeObject _continuation_32 = __args___x12[2];
+															hello_world__print__expression(
+																_state_31,
+																new TinymoeString("The world is mad!"),
+																_continuation_32
+																);
+														}),
+														new TinymoeFunction(__args___x13 => 
+														{
+															TinymoeObject _state_29 = __args___x13[0];
+															TinymoeObject _result_30 = __args___x13[1];
+															Invoke(_continuation, new TinymoeObject[] {
+																_state,
+																_the_result
+																});
+														})
+														);
+												})
+												);
+										})
+										);
+								})
+								);
 						})
 						);
 				})

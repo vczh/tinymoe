@@ -839,12 +839,17 @@ $procedure standard_library::else_try(state, signal, body, $continuation)
         );
 }
 
-$procedure standard_library::catch_$argument(state, signal, body, $continuation)
+$procedure standard_library::catch_$argument(state, signal, deal_with_$expression, $continuation)
 {
     $symbol $the_result;
     standard_library::if_$expression(
         state, 
-        body, 
+        $lambda ($state_2, $continuation_3)
+            deal_with_$expression(
+                $state_2, 
+                state.argument, 
+                $continuation_3
+                );, 
         (signal != $null), 
         $lambda ($state_0, $result_1)
             {
@@ -1106,9 +1111,80 @@ $procedure hello_world::main($state, $continuation)
                     ($var_2 & $result_1), 
                     $lambda ($state_3, $result_4)
                         {
-                            $continuation(
-                                $state, 
-                                $the_result
+                            standard_library::try(
+                                $state_3, 
+                                $lambda ($state_7, $continuation_8)
+                                    hello_world::print_$expression(
+                                        $state_7, 
+                                        "I will raise an exception.", 
+                                        $lambda ($state_9, $result_10)
+                                            {
+                                                standard_library::raise_$expression(
+                                                    $state_9, 
+                                                    "exception", 
+                                                    $lambda ($state_11, $result_12)
+                                                        {
+                                                            hello_world::print_$expression(
+                                                                $state_11, 
+                                                                "The world is mad!", 
+                                                                $continuation_8
+                                                                );
+                                                        }
+                                                    );
+                                            }
+                                        );, 
+                                $lambda ($state_5, $result_6)
+                                    {
+                                        standard_library::catch_$argument(
+                                            $state_5, 
+                                            $result_6, 
+                                            $lambda ($state_17, exception, $continuation_18)
+                                                hello_world::print_$expression(
+                                                    $state_17, 
+                                                    "So the exception will be caught", 
+                                                    $continuation_18
+                                                    );, 
+                                            $lambda ($state_15, $result_16)
+                                                {
+                                                    standard_library::try(
+                                                        $state_15, 
+                                                        $lambda ($state_23, $continuation_24)
+                                                            hello_world::print_$expression(
+                                                                $state_23, 
+                                                                "I will not raise an exception.", 
+                                                                $lambda ($state_25, $result_26)
+                                                                    {
+                                                                        hello_world::print_$expression(
+                                                                            $state_25, 
+                                                                            "So there is no exception to catch", 
+                                                                            $continuation_24
+                                                                            );
+                                                                    }
+                                                                );, 
+                                                        $lambda ($state_21, $result_22)
+                                                            {
+                                                                standard_library::catch_$argument(
+                                                                    $state_21, 
+                                                                    $result_22, 
+                                                                    $lambda ($state_31, exception, $continuation_32)
+                                                                        hello_world::print_$expression(
+                                                                            $state_31, 
+                                                                            "The world is mad!", 
+                                                                            $continuation_32
+                                                                            );, 
+                                                                    $lambda ($state_29, $result_30)
+                                                                        {
+                                                                            $continuation(
+                                                                                $state, 
+                                                                                $the_result
+                                                                                );
+                                                                        }
+                                                                    );
+                                                            }
+                                                        );
+                                                }
+                                            );
+                                    }
                                 );
                         }
                     );

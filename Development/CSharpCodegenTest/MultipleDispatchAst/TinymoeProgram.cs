@@ -1015,17 +1015,26 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void standard_library__catch__argument(TinymoeObject state, TinymoeObject signal, TinymoeObject body, TinymoeObject _continuation)
+		public void standard_library__catch__argument(TinymoeObject state, TinymoeObject signal, TinymoeObject deal_with__expression, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			standard_library__if__expression(
 				state,
-				body,
-				NE(signal, null),
 				new TinymoeFunction(__args__ => 
 				{
-					TinymoeObject _state_0 = __args__[0];
-					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _continuation_3 = __args__[1];
+					Invoke(deal_with__expression, new TinymoeObject[] {
+						_state_2,
+						state.GetField("argument"),
+						_continuation_3
+						});
+				}),
+				NE(signal, null),
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
 					Invoke(_continuation, new TinymoeObject[] {
 						state,
 						_the_result

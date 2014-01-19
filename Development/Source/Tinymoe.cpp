@@ -291,9 +291,9 @@ category (signal)
 	follow SEH try
 	start SEH catch
 	closable
-block (sentence body) catch (argument exception)
+block (sentence deal with (exception)) catch (argument exception)
 	if signal <> null
-		body
+		deal with field argument of state
 	end	
 end
 

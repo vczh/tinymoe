@@ -46,6 +46,21 @@ end
 
 phrase main
     print "1+ ... +10 = " & sum from 1 to 10
+
+	try
+		print "I will raise an exception."
+		raise "exception"
+		print "The world is mad!"
+	catch exception
+		print "So the exception will be caught"
+	end
+
+	try
+		print "I will not raise an exception."
+		print "So there is no exception to catch"
+	catch exception
+		print "The world is mad!"
+	end
 end
 
 )tinymoe");

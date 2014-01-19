@@ -839,12 +839,17 @@ $procedure standard_library::else_try(state, signal, body, $continuation)
         );
 }
 
-$procedure standard_library::catch_$argument(state, signal, body, $continuation)
+$procedure standard_library::catch_$argument(state, signal, deal_with_$expression, $continuation)
 {
     $symbol $the_result;
     standard_library::if_$expression(
         state, 
-        body, 
+        $lambda ($state_2, $continuation_3)
+            deal_with_$expression(
+                $state_2, 
+                state.argument, 
+                $continuation_3
+                );, 
         (signal != $null), 
         $lambda ($state_0, $result_1)
             {
