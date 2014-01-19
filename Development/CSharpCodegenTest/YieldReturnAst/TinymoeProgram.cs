@@ -6,6 +6,42 @@ namespace TinymoeProgramNamespace
 {
 	public class TinymoeProgram : TinymoeOperations
 	{
+		public void standard_library__trap__expression_with_fall_back__expression_restored_internal(TinymoeObject state, TinymoeObject value, TinymoeObject fall_back, TinymoeObject continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject the_current_trap = null;
+			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
+			TinymoeObject _state_0 = null;
+			_state_0 = state;
+			standard_library__restored_trap__expression_with_fall_back__expression_and_counter__primitive(
+				_state_0,
+				the_current_trap,
+				fall_back.GetField("trap"),
+				fall_back.GetField("fall_back_counter"),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_2 = __args__[0];
+					TinymoeObject _result_3 = __args__[1];
+					TinymoeObject new_trap = null;
+					new_trap = _result_3;
+					state.SetField("trap", new_trap);
+					Invoke(value, new TinymoeObject[] {
+						_state_2,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_4 = __args___x2[0];
+							TinymoeObject _result_5 = __args___x2[1];
+							_the_result = _result_5;
+							Invoke(continuation, new TinymoeObject[] {
+								state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
 		public void standard_library__trap__expression_with_fall_back__expression_restored(TinymoeObject state, TinymoeObject value, TinymoeObject fall_back, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
@@ -1213,42 +1249,6 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void standard_library__trap__expression_with_fall_back__expression_restored_internal(TinymoeObject state, TinymoeObject value, TinymoeObject fall_back, TinymoeObject continuation)
-		{
-			TinymoeObject _the_result = null;
-			TinymoeObject the_current_trap = null;
-			the_current_trap = new standard_library__continuation_trap().SetFields(new TinymoeObject[] {continuation, state.GetField("trap")}).FinishConstruction();
-			TinymoeObject _state_0 = null;
-			_state_0 = state;
-			standard_library__restored_trap__expression_with_fall_back__expression_and_counter__primitive(
-				_state_0,
-				the_current_trap,
-				fall_back.GetField("trap"),
-				fall_back.GetField("fall_back_counter"),
-				new TinymoeFunction(__args__ => 
-				{
-					TinymoeObject _state_2 = __args__[0];
-					TinymoeObject _result_3 = __args__[1];
-					TinymoeObject new_trap = null;
-					new_trap = _result_3;
-					state.SetField("trap", new_trap);
-					Invoke(value, new TinymoeObject[] {
-						_state_2,
-						new TinymoeFunction(__args___x2 => 
-						{
-							TinymoeObject _state_4 = __args___x2[0];
-							TinymoeObject _result_5 = __args___x2[1];
-							_the_result = _result_5;
-							Invoke(continuation, new TinymoeObject[] {
-								state,
-								_the_result
-								});
-						})
-						});
-				})
-				);
-		}
-
 		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
 
 		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeSymbol("standard_library__continuing_repeating");
@@ -1613,30 +1613,30 @@ namespace TinymoeProgramNamespace
 					TinymoeObject _result_1 = __args__[1];
 					TinymoeObject enumerator = null;
 					enumerator = _result_1;
-					standard_library__repeat(
+					standard_library__repeat_while__expression(
 						_state_0,
 						new TinymoeFunction(__args___x2 => 
 						{
-							TinymoeObject _state_4 = __args___x2[0];
-							TinymoeObject _continuation_5 = __args___x2[1];
+							TinymoeObject _state_8 = __args___x2[0];
+							TinymoeObject _continuation_9 = __args___x2[1];
 							enumerable__move__expression_to_the_next(
-								_state_4,
+								_state_8,
 								enumerator,
 								new TinymoeFunction(__args___x3 => 
 								{
-									TinymoeObject _state_6 = __args___x3[0];
-									TinymoeObject _result_7 = __args___x3[1];
+									TinymoeObject _state_10 = __args___x3[0];
+									TinymoeObject _result_11 = __args___x3[1];
 									enumerable__current_value_of__primitive(
-										_state_6,
+										_state_10,
 										enumerator,
 										new TinymoeFunction(__args___x4 => 
 										{
-											TinymoeObject _state_8 = __args___x4[0];
-											TinymoeObject _result_9 = __args___x4[1];
+											TinymoeObject _state_12 = __args___x4[0];
+											TinymoeObject _result_13 = __args___x4[1];
 											Invoke(deal_with__expression, new TinymoeObject[] {
-												_state_8,
-												_result_9,
-												_continuation_5
+												_state_12,
+												_result_13,
+												_continuation_9
 												});
 										})
 										);
@@ -1646,7 +1646,25 @@ namespace TinymoeProgramNamespace
 						new TinymoeFunction(__args___x5 => 
 						{
 							TinymoeObject _state_2 = __args___x5[0];
-							TinymoeObject _result_3 = __args___x5[1];
+							TinymoeObject _continuation_3 = __args___x5[1];
+							enumerable___primitive_reaches_the_end(
+								_state_2,
+								enumerator,
+								new TinymoeFunction(__args___x6 => 
+								{
+									TinymoeObject _state_4 = __args___x6[0];
+									TinymoeObject _result_5 = __args___x6[1];
+									Invoke(_continuation_3, new TinymoeObject[] {
+										_state_2,
+										Not(_result_5)
+										});
+								})
+								);
+						}),
+						new TinymoeFunction(__args___x7 => 
+						{
+							TinymoeObject _state_6 = __args___x7[0];
+							TinymoeObject _result_7 = __args___x7[1];
 							Invoke(_continuation, new TinymoeObject[] {
 								_state,
 								_the_result

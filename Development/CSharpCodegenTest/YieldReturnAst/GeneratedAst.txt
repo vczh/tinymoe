@@ -1,3 +1,35 @@
+$procedure standard_library::trap_$expression_with_fall_back_$expression_restored_internal(state, value, fall_back, continuation)
+{
+    $symbol $the_result;
+    $symbol the_current_trap;
+    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
+    $symbol $state_0;
+    $state_0 = state;
+    standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
+        $state_0, 
+        the_current_trap, 
+        fall_back.trap, 
+        fall_back.fall_back_counter, 
+        $lambda ($state_2, $result_3)
+            {
+                $symbol new_trap;
+                new_trap = $result_3;
+                state.trap = new_trap;
+                value(
+                    $state_2, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
 $procedure standard_library::trap_$expression_with_fall_back_$expression_restored(state, value, fall_back, continuation)
 {
     $symbol $the_result;
@@ -1001,38 +1033,6 @@ $procedure standard_library::trap_$expression_with_fall_back_enabled(state, valu
         );
 }
 
-$procedure standard_library::trap_$expression_with_fall_back_$expression_restored_internal(state, value, fall_back, continuation)
-{
-    $symbol $the_result;
-    $symbol the_current_trap;
-    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
-    $symbol $state_0;
-    $state_0 = state;
-    standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
-        $state_0, 
-        the_current_trap, 
-        fall_back.trap, 
-        fall_back.fall_back_counter, 
-        $lambda ($state_2, $result_3)
-            {
-                $symbol new_trap;
-                new_trap = $result_3;
-                state.trap = new_trap;
-                value(
-                    $state_2, 
-                    $lambda ($state_4, $result_5)
-                        {
-                            $the_result = $result_5;
-                            continuation(
-                                state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
-}
-
 $symbol standard_library::breaking_repeating;
 
 $symbol standard_library::continuing_repeating;
@@ -1331,29 +1331,43 @@ $procedure enumerable::repeat_with_$argument_in_$expression<enumerable_collectio
             {
                 $symbol enumerator;
                 enumerator = $result_1;
-                standard_library::repeat(
+                standard_library::repeat_while_$expression(
                     $state_0, 
-                    $lambda ($state_4, $continuation_5)
+                    $lambda ($state_8, $continuation_9)
                         enumerable::move_$expression_to_the_next(
-                            $state_4, 
+                            $state_8, 
                             enumerator, 
-                            $lambda ($state_6, $result_7)
+                            $lambda ($state_10, $result_11)
                                 {
                                     enumerable::current_value_of_$primitive(
-                                        $state_6, 
+                                        $state_10, 
                                         enumerator, 
-                                        $lambda ($state_8, $result_9)
+                                        $lambda ($state_12, $result_13)
                                             {
                                                 deal_with_$expression(
-                                                    $state_8, 
-                                                    $result_9, 
-                                                    $continuation_5
+                                                    $state_12, 
+                                                    $result_13, 
+                                                    $continuation_9
                                                     );
                                             }
                                         );
                                 }
                             );, 
-                    $lambda ($state_2, $result_3)
+                    $lambda ($state_2, $continuation_3)
+                        {
+                            enumerable::$primitive_reaches_the_end(
+                                $state_2, 
+                                enumerator, 
+                                $lambda ($state_4, $result_5)
+                                    {
+                                        $continuation_3(
+                                            $state_2, 
+                                            !$result_5
+                                            );
+                                    }
+                                );
+                        }, 
+                    $lambda ($state_6, $result_7)
                         {
                             $continuation(
                                 $state, 

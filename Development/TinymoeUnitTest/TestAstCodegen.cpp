@@ -233,7 +233,7 @@ end
 
 block (sentence deal with (item)) repeat with (argument item) in (items : enumerable collection)
     set enumerator to new enumerator from items
-    repeat
+    repeat while not (enumerator reaches the end)
         move enumerator to the next
         deal with current value of enumerator
     end
