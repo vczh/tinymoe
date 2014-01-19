@@ -1,35 +1,3 @@
-$procedure standard_library::trap_$expression_with_fall_back_$expression_restored_internal(state, value, fall_back, continuation)
-{
-    $symbol $the_result;
-    $symbol the_current_trap;
-    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
-    $symbol $state_0;
-    $state_0 = state;
-    standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
-        $state_0, 
-        the_current_trap, 
-        fall_back.trap, 
-        fall_back.fall_back_counter, 
-        $lambda ($state_2, $result_3)
-            {
-                $symbol new_trap;
-                new_trap = $result_3;
-                state.trap = new_trap;
-                value(
-                    $state_2, 
-                    $lambda ($state_4, $result_5)
-                        {
-                            $the_result = $result_5;
-                            continuation(
-                                state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
-}
-
 $procedure standard_library::trap_$expression_with_fall_back_$expression_restored(state, value, fall_back, continuation)
 {
     $symbol $the_result;
@@ -306,33 +274,33 @@ $procedure standard_library::repeat_with_$argument_from_$expression_to_$expressi
 {
     $symbol $the_result;
     $symbol the_current_number;
-    the_current_number = lower_bound;
+    the_current_number = (lower_bound - 1);
     $symbol $state_0;
     $state_0 = $state;
     standard_library::repeat_while_$expression(
         $state_0, 
         $lambda ($state_6, $continuation_7)
-            deal_with_$expression(
+            standard_library::add_$expression_to_assignable(
                 $state_6, 
-                the_current_number, 
-                $lambda ($state_8, $result_9)
+                1, 
+                $lambda ($state_8, $continuation_9)
+                    $continuation_9(
+                        $state_8, 
+                        the_current_number
+                        );, 
+                $lambda ($state_10, $input_11, $continuation_12)
                     {
-                        standard_library::add_$expression_to_assignable(
-                            $state_8, 
-                            1, 
-                            $lambda ($state_10, $continuation_11)
-                                $continuation_11(
-                                    $state_10, 
-                                    the_current_number
-                                    );, 
-                            $lambda ($state_12, $input_13, $continuation_14)
-                                {
-                                    the_current_number = $input_13;
-                                    $continuation_14(
-                                        $state_12, 
-                                        $null
-                                        );
-                                }, 
+                        the_current_number = $input_11;
+                        $continuation_12(
+                            $state_10, 
+                            $null
+                            );
+                    }, 
+                $lambda ($state_13, $result_14)
+                    {
+                        deal_with_$expression(
+                            $state_13, 
+                            the_current_number, 
                             $continuation_7
                             );
                     }
@@ -340,7 +308,7 @@ $procedure standard_library::repeat_with_$argument_from_$expression_to_$expressi
         $lambda ($state_2, $continuation_3)
             $continuation_3(
                 $state_2, 
-                (the_current_number <= upper_bound)
+                (the_current_number < upper_bound)
                 );, 
         $lambda ($state_4, $result_5)
             {
@@ -1023,6 +991,38 @@ $procedure standard_library::trap_$expression_with_fall_back_enabled(state, valu
                     state, 
                     $lambda ($state_2, $result_3)
                         {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::trap_$expression_with_fall_back_$expression_restored_internal(state, value, fall_back, continuation)
+{
+    $symbol $the_result;
+    $symbol the_current_trap;
+    the_current_trap = new standard_library::continuation_trap(continuation, state.trap);
+    $symbol $state_0;
+    $state_0 = state;
+    standard_library::restored_trap_$expression_with_fall_back_$expression_and_counter_$primitive(
+        $state_0, 
+        the_current_trap, 
+        fall_back.trap, 
+        fall_back.fall_back_counter, 
+        $lambda ($state_2, $result_3)
+            {
+                $symbol new_trap;
+                new_trap = $result_3;
+                state.trap = new_trap;
+                value(
+                    $state_2, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
                             continuation(
                                 state, 
                                 $the_result

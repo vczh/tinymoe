@@ -663,7 +663,7 @@ namespace TinymoeProgramNamespace
 		{
 			TinymoeObject _the_result = null;
 			TinymoeObject the_current_number = null;
-			the_current_number = lower_bound;
+			the_current_number = Sub(lower_bound, new TinymoeInteger(1));
 			TinymoeObject _state_0 = null;
 			_state_0 = _state;
 			standard_library__repeat_while__expression(
@@ -672,40 +672,40 @@ namespace TinymoeProgramNamespace
 				{
 					TinymoeObject _state_6 = __args__[0];
 					TinymoeObject _continuation_7 = __args__[1];
-					Invoke(deal_with__expression, new TinymoeObject[] {
+					standard_library__add__expression_to_assignable(
 						_state_6,
-						the_current_number,
+						new TinymoeInteger(1),
 						new TinymoeFunction(__args___x2 => 
 						{
 							TinymoeObject _state_8 = __args___x2[0];
-							TinymoeObject _result_9 = __args___x2[1];
-							standard_library__add__expression_to_assignable(
+							TinymoeObject _continuation_9 = __args___x2[1];
+							Invoke(_continuation_9, new TinymoeObject[] {
 								_state_8,
-								new TinymoeInteger(1),
-								new TinymoeFunction(__args___x3 => 
-								{
-									TinymoeObject _state_10 = __args___x3[0];
-									TinymoeObject _continuation_11 = __args___x3[1];
-									Invoke(_continuation_11, new TinymoeObject[] {
-										_state_10,
-										the_current_number
-										});
-								}),
-								new TinymoeFunction(__args___x4 => 
-								{
-									TinymoeObject _state_12 = __args___x4[0];
-									TinymoeObject _input_13 = __args___x4[1];
-									TinymoeObject _continuation_14 = __args___x4[2];
-									the_current_number = _input_13;
-									Invoke(_continuation_14, new TinymoeObject[] {
-										_state_12,
-										null
-										});
-								}),
+								the_current_number
+								});
+						}),
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_10 = __args___x3[0];
+							TinymoeObject _input_11 = __args___x3[1];
+							TinymoeObject _continuation_12 = __args___x3[2];
+							the_current_number = _input_11;
+							Invoke(_continuation_12, new TinymoeObject[] {
+								_state_10,
+								null
+								});
+						}),
+						new TinymoeFunction(__args___x4 => 
+						{
+							TinymoeObject _state_13 = __args___x4[0];
+							TinymoeObject _result_14 = __args___x4[1];
+							Invoke(deal_with__expression, new TinymoeObject[] {
+								_state_13,
+								the_current_number,
 								_continuation_7
-								);
+								});
 						})
-						});
+						);
 				}),
 				new TinymoeFunction(__args___x5 => 
 				{
@@ -713,7 +713,7 @@ namespace TinymoeProgramNamespace
 					TinymoeObject _continuation_3 = __args___x5[1];
 					Invoke(_continuation_3, new TinymoeObject[] {
 						_state_2,
-						LE(the_current_number, upper_bound)
+						LT(the_current_number, upper_bound)
 						});
 				}),
 				new TinymoeFunction(__args___x6 => 

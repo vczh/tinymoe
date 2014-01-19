@@ -196,10 +196,10 @@ category
 	start REPEAT
 	closable
 block (sentence deal with (item)) repeat with (argument item) from (lower bound) to (upper bound)
-	set the current number to lower bound
-	repeat while the current number <= upper bound
-		deal with the current number
+	set the current number to (lower bound - 1)
+	repeat while the current number < upper bound
 		add 1 to the current number
+		deal with the current number
 	end
 end
 
