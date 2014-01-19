@@ -219,3 +219,42 @@ Here are several samples to introduce this language:
 			print "Printing " & number
 		end
 	end
+
+####Make your tinymoe-unit (Unit test and assertion)
+
+	module unit test
+	using standard library
+
+	sentence print (message)
+		redirect to "Print"
+	end
+
+	block (sentence run the test case) test case (name)
+		try
+			run the test case
+			print "PASS: " & name
+		catch exception
+			select exception
+				case "AssertionFailure"
+					print "FAIL: " & name
+				case else
+					print "HALT: " & name
+			end
+		end
+	end
+
+	sentence assert (actual value) should be (expected value)
+		if actual value <> expected value
+			assert fail
+		end
+	end
+
+	sentence assert fail
+		raise "AssertionFailure"
+	end
+
+	phrase main
+		test case "1+1=2"
+			assert (1 + 1) should be 2
+		end
+	end

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleDispatchAst", "CSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YieldReturnAst", "CSharpCodegenTest\YieldReturnAst\YieldReturnAst.csproj", "{850F7E6F-7C55-4242-832E-F677E1224B56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestAst", "CSharpCodegenTest\UnitTestAst\UnitTestAst.csproj", "{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{850F7E6F-7C55-4242-832E-F677E1224B56}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{850F7E6F-7C55-4242-832E-F677E1224B56}.Release|Win32.ActiveCfg = Release|Any CPU
 		{850F7E6F-7C55-4242-832E-F677E1224B56}.Release|Win32.Build.0 = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Debug|Win32.Build.0 = Debug|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,5 +106,6 @@ Global
 		{9FB5DEF7-F5BB-4C2D-9515-7C6A07C40E1E} = {F8034BE6-E11C-4C94-A095-F01E28AA6E4D}
 		{F6EF18A5-F9FE-4144-8B9D-71B2E29F79F6} = {F8034BE6-E11C-4C94-A095-F01E28AA6E4D}
 		{850F7E6F-7C55-4242-832E-F677E1224B56} = {F8034BE6-E11C-4C94-A095-F01E28AA6E4D}
+		{4601BB55-CE51-4DC7-8D0B-EABA0AC71678} = {F8034BE6-E11C-4C94-A095-F01E28AA6E4D}
 	EndGlobalSection
 EndGlobal

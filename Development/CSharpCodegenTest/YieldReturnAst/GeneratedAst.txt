@@ -1,7 +1,3 @@
-$symbol standard_library::breaking_repeating;
-
-$symbol standard_library::continuing_repeating;
-
 $symbol standard_library::raising_exception;
 
 $symbol standard_library::exiting_program;
@@ -1041,6 +1037,10 @@ $procedure standard_library::string_of_$primitive($state, value, $continuation)
             }
         );
 }
+
+$symbol standard_library::breaking_repeating;
+
+$symbol standard_library::continuing_repeating;
 
 $symbol enumerable::yielding_return;
 
