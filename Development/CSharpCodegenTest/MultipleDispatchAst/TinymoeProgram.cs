@@ -1178,6 +1178,13 @@ namespace TinymoeProgramNamespace
 							_select_continuation_8
 							);
 					}
+					else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, null))).Value)
+					{
+						Invoke(_select_continuation_8, new TinymoeObject[] {
+							_state_4,
+							null
+							});
+					}
 					else
 					{
 						standard_library__fall_into_the_previous_trap(
@@ -1235,6 +1242,13 @@ namespace TinymoeProgramNamespace
 									_select_continuation_12
 									);
 							}
+							else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_13, null))).Value)
+							{
+								Invoke(_select_continuation_12, new TinymoeObject[] {
+									_state_8,
+									null
+									});
+							}
 							else
 							{
 								standard_library__fall_into_the_previous_trap(
@@ -1269,7 +1283,7 @@ namespace TinymoeProgramNamespace
 					TinymoeObject _continuation_3 = __args__[1];
 					Invoke(deal_with__expression, new TinymoeObject[] {
 						_state_2,
-						state.GetField("argument"),
+						signal,
 						_continuation_3
 						});
 				}),

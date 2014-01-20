@@ -319,6 +319,157 @@ phrase main
 	test case "1+1=2"
 		assert (1 + 1) should be 2
 	end
+
+	test case "Break should stop the repeating (1)"
+		set sum to 0
+		repeat with i from 1 to 100
+			if i > 10
+				break
+			end
+			add i to sum
+		end
+		assert sum should be 55
+	end
+
+	test case "Break should stop the repeating (2)"
+		set sum to 0
+		repeat with i from 1 to 100
+			add i to sum
+			if i >= 10
+				break
+			end
+		end
+		assert sum should be 55
+	end
+
+	test case "Continue should restart the next repeating"
+		set sum to 0
+		repeat with i from 1 to 100
+			if i > 10
+				continue
+			end
+			add i to sum
+		end
+		assert sum should be 55
+	end
+
+	test case "Only one branch of the if-else statement will be executed"
+		set a to 0
+		set b to 0
+		set c to 0
+
+		if true
+			set a to 1
+		else if true
+			set a to 2
+		else
+			set a to 3
+		end
+
+		if false
+			set b to 1
+		else if true
+			set b to 2
+		else
+			set b to 3
+		end
+
+		if false
+			set c to 1
+		else if false
+			set c to 2
+		else
+			set c to 3
+		end
+
+		assert a should be 1
+		assert b should be 2
+		assert c should be 3
+	end
+
+	test case "A raised exception should be able to catch"
+		set e to 0
+		try
+			raise "exception"
+			set e to 0
+		catch exception
+			set e to exception
+		end
+
+		assert e should be "exception"
+	end
+
+	test case "Finally should always be executed"
+		set e to 0
+		try
+			add 1 to e
+			raise "exception"
+			add 2 to e
+		catch exception
+			add 4 to e
+		finally
+			add 8 to e
+		end
+
+		assert e should be 13
+	end
+
+	test case "Only one branch of the try-else statement will be executed"
+		set a to 0
+		set b to 0
+		set c to 0
+
+		try
+			set a to 1
+		else try
+			set a to 2
+		catch exception
+			set a to 3
+		end
+
+		try
+			set b to 1
+			raise "exception"
+		else try
+			set b to 2
+		catch exception
+			set b to 3
+		end
+
+		try
+			set c to 1
+			raise "exception"
+		else try
+			set c to 2
+			raise "exception"
+		catch exception
+			set c to 3
+		end
+
+		assert a should be 1
+		assert b should be 2
+		assert c should be 3
+	end
+
+	test case "Exit block should jump out of the correct box"
+		set e to 0
+		named block one
+			add 1 to e
+			named block two
+				add 2 to e
+				named block three
+					add 4 to e
+					exit block two
+					add 8 to e
+				end
+				add 16 to e
+			end
+			add 32 to e
+		end
+		add 64 to e
+
+		assert e should be 103
+	end
 end
 
 )tinymoe");

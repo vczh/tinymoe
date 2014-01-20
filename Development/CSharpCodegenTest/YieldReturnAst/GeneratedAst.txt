@@ -728,7 +728,7 @@ $procedure standard_library::repeat_while_$expression($state, body, condition, $
         $state, 
         $lambda ($state_2, $continuation_3)
             {
-                condition(
+                body(
                     $state_2, 
                     $lambda ($state_4, $result_5)
                         {
@@ -738,7 +738,7 @@ $procedure standard_library::repeat_while_$expression($state, body, condition, $
                                 !$result_5, 
                                 $lambda ($state_6, $result_7)
                                     {
-                                        body(
+                                        condition(
                                             $state_6, 
                                             $continuation_3
                                             );
@@ -974,10 +974,16 @@ $procedure standard_library::try(state, body, $continuation)
                             );
                     }
                 else
-                    standard_library::fall_into_the_previous_trap(
-                        $state_4, 
-                        $select_continuation_8
-                        );
+                    if (($select_value_9 == $null)
+                        $select_continuation_8(
+                            $state_4, 
+                            $null
+                            );
+                    else
+                        standard_library::fall_into_the_previous_trap(
+                            $state_4, 
+                            $select_continuation_8
+                            );
             }
         );
 }
@@ -1018,10 +1024,16 @@ $procedure standard_library::else_try(state, signal, body, $continuation)
                                     );
                             }
                         else
-                            standard_library::fall_into_the_previous_trap(
-                                $state_8, 
-                                $select_continuation_12
-                                );
+                            if (($select_value_13 == $null)
+                                $select_continuation_12(
+                                    $state_8, 
+                                    $null
+                                    );
+                            else
+                                standard_library::fall_into_the_previous_trap(
+                                    $state_8, 
+                                    $select_continuation_12
+                                    );
                     }
                 );, 
         (signal != $null), 
@@ -1043,7 +1055,7 @@ $procedure standard_library::catch_$argument(state, signal, deal_with_$expressio
         $lambda ($state_2, $continuation_3)
             deal_with_$expression(
                 $state_2, 
-                state.argument, 
+                signal, 
                 $continuation_3
                 );, 
         (signal != $null), 

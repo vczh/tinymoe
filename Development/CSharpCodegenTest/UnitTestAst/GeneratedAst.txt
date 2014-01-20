@@ -823,13 +823,13 @@ $procedure standard_library::repeat_with_$argument_in_$expression<array>($state,
     standard_library::repeat_with_$argument_from_$expression_to_$expression(
         $state, 
         $lambda ($state_2, index, $continuation_3)
-            deal_with_$expression(
+            items(
                 $state_2, 
-                items[index], 
+                deal_with_$expression[index], 
                 $continuation_3
                 );, 
         1, 
-        $ArrayLength(items), 
+        $ArrayLength(deal_with_$expression), 
         $lambda ($state_0, $result_1)
             {
                 $continuation(
@@ -974,10 +974,16 @@ $procedure standard_library::try(state, body, $continuation)
                             );
                     }
                 else
-                    standard_library::fall_into_the_previous_trap(
-                        $state_4, 
-                        $select_continuation_8
-                        );
+                    if (($select_value_9 == $null)
+                        $select_continuation_8(
+                            $state_4, 
+                            $null
+                            );
+                    else
+                        standard_library::fall_into_the_previous_trap(
+                            $state_4, 
+                            $select_continuation_8
+                            );
             }
         );
 }
@@ -1018,10 +1024,16 @@ $procedure standard_library::else_try(state, signal, body, $continuation)
                                     );
                             }
                         else
-                            standard_library::fall_into_the_previous_trap(
-                                $state_8, 
-                                $select_continuation_12
-                                );
+                            if (($select_value_13 == $null)
+                                $select_continuation_12(
+                                    $state_8, 
+                                    $null
+                                    );
+                            else
+                                standard_library::fall_into_the_previous_trap(
+                                    $state_8, 
+                                    $select_continuation_12
+                                    );
                     }
                 );, 
         (signal != $null), 
@@ -1043,7 +1055,7 @@ $procedure standard_library::catch_$argument(state, signal, deal_with_$expressio
         $lambda ($state_2, $continuation_3)
             deal_with_$expression(
                 $state_2, 
-                state.argument, 
+                signal, 
                 $continuation_3
                 );, 
         (signal != $null), 
@@ -1355,9 +1367,907 @@ $procedure unit_test::main($state, $continuation)
         "1+1=2", 
         $lambda ($state_0, $result_1)
             {
-                $continuation(
-                    $state, 
-                    $the_result
+                unit_test::test_case_$expression(
+                    $state_0, 
+                    $lambda ($state_8, $continuation_9)
+                        {
+                            $symbol sum;
+                            sum = 0;
+                            $symbol $state_10;
+                            $state_10 = $state_8;
+                            standard_library::repeat_with_$argument_from_$expression_to_$expression(
+                                $state_10, 
+                                $lambda ($state_14, i, $continuation_15)
+                                    standard_library::if_$expression(
+                                        $state_14, 
+                                        standard_library::break, 
+                                        (i > 10), 
+                                        $lambda ($state_16, $result_17)
+                                            {
+                                                standard_library::add_$expression_to_assignable(
+                                                    $state_16, 
+                                                    i, 
+                                                    $lambda ($state_22, $continuation_23)
+                                                        $continuation_23(
+                                                            $state_22, 
+                                                            sum
+                                                            );, 
+                                                    $lambda ($state_24, $input_25, $continuation_26)
+                                                        {
+                                                            sum = $input_25;
+                                                            $continuation_26(
+                                                                $state_24, 
+                                                                $null
+                                                                );
+                                                        }, 
+                                                    $continuation_15
+                                                    );
+                                            }
+                                        );, 
+                                1, 
+                                100, 
+                                $lambda ($state_12, $result_13)
+                                    {
+                                        unit_test::assert_$expression_should_be_$expression(
+                                            $state_12, 
+                                            sum, 
+                                            55, 
+                                            $continuation_9
+                                            );
+                                    }
+                                );
+                        }, 
+                    "Break should stop the repeating (1)", 
+                    $lambda ($state_6, $result_7)
+                        {
+                            unit_test::test_case_$expression(
+                                $state_6, 
+                                $lambda ($state_33, $continuation_34)
+                                    {
+                                        $symbol sum;
+                                        sum = 0;
+                                        $symbol $state_35;
+                                        $state_35 = $state_33;
+                                        standard_library::repeat_with_$argument_from_$expression_to_$expression(
+                                            $state_35, 
+                                            $lambda ($state_39, i, $continuation_40)
+                                                standard_library::add_$expression_to_assignable(
+                                                    $state_39, 
+                                                    i, 
+                                                    $lambda ($state_41, $continuation_42)
+                                                        $continuation_42(
+                                                            $state_41, 
+                                                            sum
+                                                            );, 
+                                                    $lambda ($state_43, $input_44, $continuation_45)
+                                                        {
+                                                            sum = $input_44;
+                                                            $continuation_45(
+                                                                $state_43, 
+                                                                $null
+                                                                );
+                                                        }, 
+                                                    $lambda ($state_46, $result_47)
+                                                        {
+                                                            standard_library::if_$expression(
+                                                                $state_46, 
+                                                                standard_library::break, 
+                                                                (i >= 10), 
+                                                                $continuation_40
+                                                                );
+                                                        }
+                                                    );, 
+                                            1, 
+                                            100, 
+                                            $lambda ($state_37, $result_38)
+                                                {
+                                                    unit_test::assert_$expression_should_be_$expression(
+                                                        $state_37, 
+                                                        sum, 
+                                                        55, 
+                                                        $continuation_34
+                                                        );
+                                                }
+                                            );
+                                    }, 
+                                "Break should stop the repeating (2)", 
+                                $lambda ($state_31, $result_32)
+                                    {
+                                        unit_test::test_case_$expression(
+                                            $state_31, 
+                                            $lambda ($state_58, $continuation_59)
+                                                {
+                                                    $symbol sum;
+                                                    sum = 0;
+                                                    $symbol $state_60;
+                                                    $state_60 = $state_58;
+                                                    standard_library::repeat_with_$argument_from_$expression_to_$expression(
+                                                        $state_60, 
+                                                        $lambda ($state_64, i, $continuation_65)
+                                                            standard_library::if_$expression(
+                                                                $state_64, 
+                                                                standard_library::continue, 
+                                                                (i > 10), 
+                                                                $lambda ($state_66, $result_67)
+                                                                    {
+                                                                        standard_library::add_$expression_to_assignable(
+                                                                            $state_66, 
+                                                                            i, 
+                                                                            $lambda ($state_72, $continuation_73)
+                                                                                $continuation_73(
+                                                                                    $state_72, 
+                                                                                    sum
+                                                                                    );, 
+                                                                            $lambda ($state_74, $input_75, $continuation_76)
+                                                                                {
+                                                                                    sum = $input_75;
+                                                                                    $continuation_76(
+                                                                                        $state_74, 
+                                                                                        $null
+                                                                                        );
+                                                                                }, 
+                                                                            $continuation_65
+                                                                            );
+                                                                    }
+                                                                );, 
+                                                        1, 
+                                                        100, 
+                                                        $lambda ($state_62, $result_63)
+                                                            {
+                                                                unit_test::assert_$expression_should_be_$expression(
+                                                                    $state_62, 
+                                                                    sum, 
+                                                                    55, 
+                                                                    $continuation_59
+                                                                    );
+                                                            }
+                                                        );
+                                                }, 
+                                            "Continue should restart the next repeating", 
+                                            $lambda ($state_56, $result_57)
+                                                {
+                                                    unit_test::test_case_$expression(
+                                                        $state_56, 
+                                                        $lambda ($state_83, $continuation_84)
+                                                            {
+                                                                $symbol a;
+                                                                a = 0;
+                                                                $symbol $state_85;
+                                                                $state_85 = $state_83;
+                                                                $symbol b;
+                                                                b = 0;
+                                                                $symbol $state_87;
+                                                                $state_87 = $state_85;
+                                                                $symbol c;
+                                                                c = 0;
+                                                                $symbol $state_89;
+                                                                $state_89 = $state_87;
+                                                                standard_library::if_$expression(
+                                                                    $state_89, 
+                                                                    $lambda ($state_93, $continuation_94)
+                                                                        {
+                                                                            a = 1;
+                                                                            $continuation_94(
+                                                                                $state_93, 
+                                                                                $null
+                                                                                );
+                                                                        }, 
+                                                                    $true, 
+                                                                    $lambda ($state_91, $result_92)
+                                                                        {
+                                                                            standard_library::else_if_$expression(
+                                                                                $state_91, 
+                                                                                $result_92, 
+                                                                                $lambda ($state_99, $continuation_100)
+                                                                                    {
+                                                                                        a = 2;
+                                                                                        $continuation_100(
+                                                                                            $state_99, 
+                                                                                            $null
+                                                                                            );
+                                                                                    }, 
+                                                                                $lambda ($state_95, $continuation_96)
+                                                                                    $continuation_96(
+                                                                                        $state_95, 
+                                                                                        $true
+                                                                                        );, 
+                                                                                $lambda ($state_97, $result_98)
+                                                                                    {
+                                                                                        standard_library::else(
+                                                                                            $state_97, 
+                                                                                            $result_98, 
+                                                                                            $lambda ($state_103, $continuation_104)
+                                                                                                {
+                                                                                                    a = 3;
+                                                                                                    $continuation_104(
+                                                                                                        $state_103, 
+                                                                                                        $null
+                                                                                                        );
+                                                                                                }, 
+                                                                                            $lambda ($state_101, $result_102)
+                                                                                                {
+                                                                                                    standard_library::if_$expression(
+                                                                                                        $state_101, 
+                                                                                                        $lambda ($state_107, $continuation_108)
+                                                                                                            {
+                                                                                                                b = 1;
+                                                                                                                $continuation_108(
+                                                                                                                    $state_107, 
+                                                                                                                    $null
+                                                                                                                    );
+                                                                                                            }, 
+                                                                                                        $false, 
+                                                                                                        $lambda ($state_105, $result_106)
+                                                                                                            {
+                                                                                                                standard_library::else_if_$expression(
+                                                                                                                    $state_105, 
+                                                                                                                    $result_106, 
+                                                                                                                    $lambda ($state_113, $continuation_114)
+                                                                                                                        {
+                                                                                                                            b = 2;
+                                                                                                                            $continuation_114(
+                                                                                                                                $state_113, 
+                                                                                                                                $null
+                                                                                                                                );
+                                                                                                                        }, 
+                                                                                                                    $lambda ($state_109, $continuation_110)
+                                                                                                                        $continuation_110(
+                                                                                                                            $state_109, 
+                                                                                                                            $true
+                                                                                                                            );, 
+                                                                                                                    $lambda ($state_111, $result_112)
+                                                                                                                        {
+                                                                                                                            standard_library::else(
+                                                                                                                                $state_111, 
+                                                                                                                                $result_112, 
+                                                                                                                                $lambda ($state_117, $continuation_118)
+                                                                                                                                    {
+                                                                                                                                        b = 3;
+                                                                                                                                        $continuation_118(
+                                                                                                                                            $state_117, 
+                                                                                                                                            $null
+                                                                                                                                            );
+                                                                                                                                    }, 
+                                                                                                                                $lambda ($state_115, $result_116)
+                                                                                                                                    {
+                                                                                                                                        standard_library::if_$expression(
+                                                                                                                                            $state_115, 
+                                                                                                                                            $lambda ($state_121, $continuation_122)
+                                                                                                                                                {
+                                                                                                                                                    c = 1;
+                                                                                                                                                    $continuation_122(
+                                                                                                                                                        $state_121, 
+                                                                                                                                                        $null
+                                                                                                                                                        );
+                                                                                                                                                }, 
+                                                                                                                                            $false, 
+                                                                                                                                            $lambda ($state_119, $result_120)
+                                                                                                                                                {
+                                                                                                                                                    standard_library::else_if_$expression(
+                                                                                                                                                        $state_119, 
+                                                                                                                                                        $result_120, 
+                                                                                                                                                        $lambda ($state_127, $continuation_128)
+                                                                                                                                                            {
+                                                                                                                                                                c = 2;
+                                                                                                                                                                $continuation_128(
+                                                                                                                                                                    $state_127, 
+                                                                                                                                                                    $null
+                                                                                                                                                                    );
+                                                                                                                                                            }, 
+                                                                                                                                                        $lambda ($state_123, $continuation_124)
+                                                                                                                                                            $continuation_124(
+                                                                                                                                                                $state_123, 
+                                                                                                                                                                $false
+                                                                                                                                                                );, 
+                                                                                                                                                        $lambda ($state_125, $result_126)
+                                                                                                                                                            {
+                                                                                                                                                                standard_library::else(
+                                                                                                                                                                    $state_125, 
+                                                                                                                                                                    $result_126, 
+                                                                                                                                                                    $lambda ($state_131, $continuation_132)
+                                                                                                                                                                        {
+                                                                                                                                                                            c = 3;
+                                                                                                                                                                            $continuation_132(
+                                                                                                                                                                                $state_131, 
+                                                                                                                                                                                $null
+                                                                                                                                                                                );
+                                                                                                                                                                        }, 
+                                                                                                                                                                    $lambda ($state_129, $result_130)
+                                                                                                                                                                        {
+                                                                                                                                                                            unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                $state_129, 
+                                                                                                                                                                                a, 
+                                                                                                                                                                                1, 
+                                                                                                                                                                                $lambda ($state_133, $result_134)
+                                                                                                                                                                                    {
+                                                                                                                                                                                        unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                            $state_133, 
+                                                                                                                                                                                            b, 
+                                                                                                                                                                                            2, 
+                                                                                                                                                                                            $lambda ($state_135, $result_136)
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                                        $state_135, 
+                                                                                                                                                                                                        c, 
+                                                                                                                                                                                                        3, 
+                                                                                                                                                                                                        $continuation_84
+                                                                                                                                                                                                        );
+                                                                                                                                                                                                }
+                                                                                                                                                                                            );
+                                                                                                                                                                                    }
+                                                                                                                                                                                );
+                                                                                                                                                                        }
+                                                                                                                                                                    );
+                                                                                                                                                            }
+                                                                                                                                                        );
+                                                                                                                                                }
+                                                                                                                                            );
+                                                                                                                                    }
+                                                                                                                                );
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                            }
+                                                                                                        );
+                                                                                                }
+                                                                                            );
+                                                                                    }
+                                                                                );
+                                                                        }
+                                                                    );
+                                                            }, 
+                                                        "Only one branch of the if-else statement will be executed", 
+                                                        $lambda ($state_81, $result_82)
+                                                            {
+                                                                unit_test::test_case_$expression(
+                                                                    $state_81, 
+                                                                    $lambda ($state_141, $continuation_142)
+                                                                        {
+                                                                            $symbol e;
+                                                                            e = 0;
+                                                                            $symbol $state_143;
+                                                                            $state_143 = $state_141;
+                                                                            standard_library::try(
+                                                                                $state_143, 
+                                                                                $lambda ($state_147, $continuation_148)
+                                                                                    standard_library::raise_$expression(
+                                                                                        $state_147, 
+                                                                                        "exception", 
+                                                                                        $lambda ($state_149, $result_150)
+                                                                                            {
+                                                                                                e = 0;
+                                                                                                $continuation_148(
+                                                                                                    $state_149, 
+                                                                                                    $result_150
+                                                                                                    );
+                                                                                            }
+                                                                                        );, 
+                                                                                $lambda ($state_145, $result_146)
+                                                                                    {
+                                                                                        standard_library::catch_$argument(
+                                                                                            $state_145, 
+                                                                                            $result_146, 
+                                                                                            $lambda ($state_153, exception, $continuation_154)
+                                                                                                {
+                                                                                                    e = exception;
+                                                                                                    $continuation_154(
+                                                                                                        $state_153, 
+                                                                                                        $null
+                                                                                                        );
+                                                                                                }, 
+                                                                                            $lambda ($state_151, $result_152)
+                                                                                                {
+                                                                                                    unit_test::assert_$expression_should_be_$expression(
+                                                                                                        $state_151, 
+                                                                                                        e, 
+                                                                                                        "exception", 
+                                                                                                        $continuation_142
+                                                                                                        );
+                                                                                                }
+                                                                                            );
+                                                                                    }
+                                                                                );
+                                                                        }, 
+                                                                    "A raised exception should be able to catch", 
+                                                                    $lambda ($state_139, $result_140)
+                                                                        {
+                                                                            unit_test::test_case_$expression(
+                                                                                $state_139, 
+                                                                                $lambda ($state_159, $continuation_160)
+                                                                                    {
+                                                                                        $symbol e;
+                                                                                        e = 0;
+                                                                                        $symbol $state_161;
+                                                                                        $state_161 = $state_159;
+                                                                                        standard_library::try(
+                                                                                            $state_161, 
+                                                                                            $lambda ($state_165, $continuation_166)
+                                                                                                standard_library::add_$expression_to_assignable(
+                                                                                                    $state_165, 
+                                                                                                    1, 
+                                                                                                    $lambda ($state_167, $continuation_168)
+                                                                                                        $continuation_168(
+                                                                                                            $state_167, 
+                                                                                                            e
+                                                                                                            );, 
+                                                                                                    $lambda ($state_169, $input_170, $continuation_171)
+                                                                                                        {
+                                                                                                            e = $input_170;
+                                                                                                            $continuation_171(
+                                                                                                                $state_169, 
+                                                                                                                $null
+                                                                                                                );
+                                                                                                        }, 
+                                                                                                    $lambda ($state_172, $result_173)
+                                                                                                        {
+                                                                                                            standard_library::raise_$expression(
+                                                                                                                $state_172, 
+                                                                                                                "exception", 
+                                                                                                                $lambda ($state_174, $result_175)
+                                                                                                                    {
+                                                                                                                        standard_library::add_$expression_to_assignable(
+                                                                                                                            $state_174, 
+                                                                                                                            2, 
+                                                                                                                            $lambda ($state_176, $continuation_177)
+                                                                                                                                $continuation_177(
+                                                                                                                                    $state_176, 
+                                                                                                                                    e
+                                                                                                                                    );, 
+                                                                                                                            $lambda ($state_178, $input_179, $continuation_180)
+                                                                                                                                {
+                                                                                                                                    e = $input_179;
+                                                                                                                                    $continuation_180(
+                                                                                                                                        $state_178, 
+                                                                                                                                        $null
+                                                                                                                                        );
+                                                                                                                                }, 
+                                                                                                                            $continuation_166
+                                                                                                                            );
+                                                                                                                    }
+                                                                                                                );
+                                                                                                        }
+                                                                                                    );, 
+                                                                                            $lambda ($state_163, $result_164)
+                                                                                                {
+                                                                                                    standard_library::catch_$argument(
+                                                                                                        $state_163, 
+                                                                                                        $result_164, 
+                                                                                                        $lambda ($state_185, exception, $continuation_186)
+                                                                                                            standard_library::add_$expression_to_assignable(
+                                                                                                                $state_185, 
+                                                                                                                4, 
+                                                                                                                $lambda ($state_187, $continuation_188)
+                                                                                                                    $continuation_188(
+                                                                                                                        $state_187, 
+                                                                                                                        e
+                                                                                                                        );, 
+                                                                                                                $lambda ($state_189, $input_190, $continuation_191)
+                                                                                                                    {
+                                                                                                                        e = $input_190;
+                                                                                                                        $continuation_191(
+                                                                                                                            $state_189, 
+                                                                                                                            $null
+                                                                                                                            );
+                                                                                                                    }, 
+                                                                                                                $continuation_186
+                                                                                                                );, 
+                                                                                                        $lambda ($state_183, $result_184)
+                                                                                                            {
+                                                                                                                standard_library::finally(
+                                                                                                                    $state_183, 
+                                                                                                                    $result_184, 
+                                                                                                                    $lambda ($state_196, $continuation_197)
+                                                                                                                        standard_library::add_$expression_to_assignable(
+                                                                                                                            $state_196, 
+                                                                                                                            8, 
+                                                                                                                            $lambda ($state_198, $continuation_199)
+                                                                                                                                $continuation_199(
+                                                                                                                                    $state_198, 
+                                                                                                                                    e
+                                                                                                                                    );, 
+                                                                                                                            $lambda ($state_200, $input_201, $continuation_202)
+                                                                                                                                {
+                                                                                                                                    e = $input_201;
+                                                                                                                                    $continuation_202(
+                                                                                                                                        $state_200, 
+                                                                                                                                        $null
+                                                                                                                                        );
+                                                                                                                                }, 
+                                                                                                                            $continuation_197
+                                                                                                                            );, 
+                                                                                                                    $lambda ($state_194, $result_195)
+                                                                                                                        {
+                                                                                                                            unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                $state_194, 
+                                                                                                                                e, 
+                                                                                                                                13, 
+                                                                                                                                $continuation_160
+                                                                                                                                );
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                            }
+                                                                                                        );
+                                                                                                }
+                                                                                            );
+                                                                                    }, 
+                                                                                "Finally should always be executed", 
+                                                                                $lambda ($state_157, $result_158)
+                                                                                    {
+                                                                                        unit_test::test_case_$expression(
+                                                                                            $state_157, 
+                                                                                            $lambda ($state_209, $continuation_210)
+                                                                                                {
+                                                                                                    $symbol a;
+                                                                                                    a = 0;
+                                                                                                    $symbol $state_211;
+                                                                                                    $state_211 = $state_209;
+                                                                                                    $symbol b;
+                                                                                                    b = 0;
+                                                                                                    $symbol $state_213;
+                                                                                                    $state_213 = $state_211;
+                                                                                                    $symbol c;
+                                                                                                    c = 0;
+                                                                                                    $symbol $state_215;
+                                                                                                    $state_215 = $state_213;
+                                                                                                    standard_library::try(
+                                                                                                        $state_215, 
+                                                                                                        $lambda ($state_219, $continuation_220)
+                                                                                                            {
+                                                                                                                a = 1;
+                                                                                                                $continuation_220(
+                                                                                                                    $state_219, 
+                                                                                                                    $null
+                                                                                                                    );
+                                                                                                            }, 
+                                                                                                        $lambda ($state_217, $result_218)
+                                                                                                            {
+                                                                                                                standard_library::else_try(
+                                                                                                                    $state_217, 
+                                                                                                                    $result_218, 
+                                                                                                                    $lambda ($state_223, $continuation_224)
+                                                                                                                        {
+                                                                                                                            a = 2;
+                                                                                                                            $continuation_224(
+                                                                                                                                $state_223, 
+                                                                                                                                $null
+                                                                                                                                );
+                                                                                                                        }, 
+                                                                                                                    $lambda ($state_221, $result_222)
+                                                                                                                        {
+                                                                                                                            standard_library::catch_$argument(
+                                                                                                                                $state_221, 
+                                                                                                                                $result_222, 
+                                                                                                                                $lambda ($state_227, exception, $continuation_228)
+                                                                                                                                    {
+                                                                                                                                        a = 3;
+                                                                                                                                        $continuation_228(
+                                                                                                                                            $state_227, 
+                                                                                                                                            $null
+                                                                                                                                            );
+                                                                                                                                    }, 
+                                                                                                                                $lambda ($state_225, $result_226)
+                                                                                                                                    {
+                                                                                                                                        standard_library::try(
+                                                                                                                                            $state_225, 
+                                                                                                                                            $lambda ($state_231, $continuation_232)
+                                                                                                                                                {
+                                                                                                                                                    b = 1;
+                                                                                                                                                    standard_library::raise_$expression(
+                                                                                                                                                        $state_231, 
+                                                                                                                                                        "exception", 
+                                                                                                                                                        $continuation_232
+                                                                                                                                                        );
+                                                                                                                                                }, 
+                                                                                                                                            $lambda ($state_229, $result_230)
+                                                                                                                                                {
+                                                                                                                                                    standard_library::else_try(
+                                                                                                                                                        $state_229, 
+                                                                                                                                                        $result_230, 
+                                                                                                                                                        $lambda ($state_237, $continuation_238)
+                                                                                                                                                            {
+                                                                                                                                                                b = 2;
+                                                                                                                                                                $continuation_238(
+                                                                                                                                                                    $state_237, 
+                                                                                                                                                                    $null
+                                                                                                                                                                    );
+                                                                                                                                                            }, 
+                                                                                                                                                        $lambda ($state_235, $result_236)
+                                                                                                                                                            {
+                                                                                                                                                                standard_library::catch_$argument(
+                                                                                                                                                                    $state_235, 
+                                                                                                                                                                    $result_236, 
+                                                                                                                                                                    $lambda ($state_241, exception, $continuation_242)
+                                                                                                                                                                        {
+                                                                                                                                                                            b = 3;
+                                                                                                                                                                            $continuation_242(
+                                                                                                                                                                                $state_241, 
+                                                                                                                                                                                $null
+                                                                                                                                                                                );
+                                                                                                                                                                        }, 
+                                                                                                                                                                    $lambda ($state_239, $result_240)
+                                                                                                                                                                        {
+                                                                                                                                                                            standard_library::try(
+                                                                                                                                                                                $state_239, 
+                                                                                                                                                                                $lambda ($state_245, $continuation_246)
+                                                                                                                                                                                    {
+                                                                                                                                                                                        c = 1;
+                                                                                                                                                                                        standard_library::raise_$expression(
+                                                                                                                                                                                            $state_245, 
+                                                                                                                                                                                            "exception", 
+                                                                                                                                                                                            $continuation_246
+                                                                                                                                                                                            );
+                                                                                                                                                                                    }, 
+                                                                                                                                                                                $lambda ($state_243, $result_244)
+                                                                                                                                                                                    {
+                                                                                                                                                                                        standard_library::else_try(
+                                                                                                                                                                                            $state_243, 
+                                                                                                                                                                                            $result_244, 
+                                                                                                                                                                                            $lambda ($state_251, $continuation_252)
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    c = 2;
+                                                                                                                                                                                                    standard_library::raise_$expression(
+                                                                                                                                                                                                        $state_251, 
+                                                                                                                                                                                                        "exception", 
+                                                                                                                                                                                                        $continuation_252
+                                                                                                                                                                                                        );
+                                                                                                                                                                                                }, 
+                                                                                                                                                                                            $lambda ($state_249, $result_250)
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    standard_library::catch_$argument(
+                                                                                                                                                                                                        $state_249, 
+                                                                                                                                                                                                        $result_250, 
+                                                                                                                                                                                                        $lambda ($state_257, exception, $continuation_258)
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                c = 3;
+                                                                                                                                                                                                                $continuation_258(
+                                                                                                                                                                                                                    $state_257, 
+                                                                                                                                                                                                                    $null
+                                                                                                                                                                                                                    );
+                                                                                                                                                                                                            }, 
+                                                                                                                                                                                                        $lambda ($state_255, $result_256)
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                                                    $state_255, 
+                                                                                                                                                                                                                    a, 
+                                                                                                                                                                                                                    1, 
+                                                                                                                                                                                                                    $lambda ($state_259, $result_260)
+                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                            unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                                                                $state_259, 
+                                                                                                                                                                                                                                b, 
+                                                                                                                                                                                                                                2, 
+                                                                                                                                                                                                                                $lambda ($state_261, $result_262)
+                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                        unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                                                                                                                            $state_261, 
+                                                                                                                                                                                                                                            c, 
+                                                                                                                                                                                                                                            3, 
+                                                                                                                                                                                                                                            $continuation_210
+                                                                                                                                                                                                                                            );
+                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                );
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                    );
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                        );
+                                                                                                                                                                                                }
+                                                                                                                                                                                            );
+                                                                                                                                                                                    }
+                                                                                                                                                                                );
+                                                                                                                                                                        }
+                                                                                                                                                                    );
+                                                                                                                                                            }
+                                                                                                                                                        );
+                                                                                                                                                }
+                                                                                                                                            );
+                                                                                                                                    }
+                                                                                                                                );
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                            }
+                                                                                                        );
+                                                                                                }, 
+                                                                                            "Only one branch of the try-else statement will be executed", 
+                                                                                            $lambda ($state_207, $result_208)
+                                                                                                {
+                                                                                                    unit_test::test_case_$expression(
+                                                                                                        $state_207, 
+                                                                                                        $lambda ($state_267, $continuation_268)
+                                                                                                            {
+                                                                                                                $symbol e;
+                                                                                                                e = 0;
+                                                                                                                $symbol $state_269;
+                                                                                                                $state_269 = $state_267;
+                                                                                                                standard_library::named_block_$argument(
+                                                                                                                    $state_269, 
+                                                                                                                    $lambda ($state_273, one, $continuation_274)
+                                                                                                                        standard_library::add_$expression_to_assignable(
+                                                                                                                            $state_273, 
+                                                                                                                            1, 
+                                                                                                                            $lambda ($state_275, $continuation_276)
+                                                                                                                                $continuation_276(
+                                                                                                                                    $state_275, 
+                                                                                                                                    e
+                                                                                                                                    );, 
+                                                                                                                            $lambda ($state_277, $input_278, $continuation_279)
+                                                                                                                                {
+                                                                                                                                    e = $input_278;
+                                                                                                                                    $continuation_279(
+                                                                                                                                        $state_277, 
+                                                                                                                                        $null
+                                                                                                                                        );
+                                                                                                                                }, 
+                                                                                                                            $lambda ($state_280, $result_281)
+                                                                                                                                {
+                                                                                                                                    standard_library::named_block_$argument(
+                                                                                                                                        $state_280, 
+                                                                                                                                        $lambda ($state_284, two, $continuation_285)
+                                                                                                                                            standard_library::add_$expression_to_assignable(
+                                                                                                                                                $state_284, 
+                                                                                                                                                2, 
+                                                                                                                                                $lambda ($state_286, $continuation_287)
+                                                                                                                                                    $continuation_287(
+                                                                                                                                                        $state_286, 
+                                                                                                                                                        e
+                                                                                                                                                        );, 
+                                                                                                                                                $lambda ($state_288, $input_289, $continuation_290)
+                                                                                                                                                    {
+                                                                                                                                                        e = $input_289;
+                                                                                                                                                        $continuation_290(
+                                                                                                                                                            $state_288, 
+                                                                                                                                                            $null
+                                                                                                                                                            );
+                                                                                                                                                    }, 
+                                                                                                                                                $lambda ($state_291, $result_292)
+                                                                                                                                                    {
+                                                                                                                                                        standard_library::named_block_$argument(
+                                                                                                                                                            $state_291, 
+                                                                                                                                                            $lambda ($state_295, three, $continuation_296)
+                                                                                                                                                                standard_library::add_$expression_to_assignable(
+                                                                                                                                                                    $state_295, 
+                                                                                                                                                                    4, 
+                                                                                                                                                                    $lambda ($state_297, $continuation_298)
+                                                                                                                                                                        $continuation_298(
+                                                                                                                                                                            $state_297, 
+                                                                                                                                                                            e
+                                                                                                                                                                            );, 
+                                                                                                                                                                    $lambda ($state_299, $input_300, $continuation_301)
+                                                                                                                                                                        {
+                                                                                                                                                                            e = $input_300;
+                                                                                                                                                                            $continuation_301(
+                                                                                                                                                                                $state_299, 
+                                                                                                                                                                                $null
+                                                                                                                                                                                );
+                                                                                                                                                                        }, 
+                                                                                                                                                                    $lambda ($state_302, $result_303)
+                                                                                                                                                                        {
+                                                                                                                                                                            standard_library::exit_block_$expression(
+                                                                                                                                                                                $state_302, 
+                                                                                                                                                                                two, 
+                                                                                                                                                                                $lambda ($state_304, $result_305)
+                                                                                                                                                                                    {
+                                                                                                                                                                                        standard_library::add_$expression_to_assignable(
+                                                                                                                                                                                            $state_304, 
+                                                                                                                                                                                            8, 
+                                                                                                                                                                                            $lambda ($state_306, $continuation_307)
+                                                                                                                                                                                                $continuation_307(
+                                                                                                                                                                                                    $state_306, 
+                                                                                                                                                                                                    e
+                                                                                                                                                                                                    );, 
+                                                                                                                                                                                            $lambda ($state_308, $input_309, $continuation_310)
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    e = $input_309;
+                                                                                                                                                                                                    $continuation_310(
+                                                                                                                                                                                                        $state_308, 
+                                                                                                                                                                                                        $null
+                                                                                                                                                                                                        );
+                                                                                                                                                                                                }, 
+                                                                                                                                                                                            $continuation_296
+                                                                                                                                                                                            );
+                                                                                                                                                                                    }
+                                                                                                                                                                                );
+                                                                                                                                                                        }
+                                                                                                                                                                    );, 
+                                                                                                                                                            $lambda ($state_293, $result_294)
+                                                                                                                                                                {
+                                                                                                                                                                    standard_library::add_$expression_to_assignable(
+                                                                                                                                                                        $state_293, 
+                                                                                                                                                                        16, 
+                                                                                                                                                                        $lambda ($state_313, $continuation_314)
+                                                                                                                                                                            $continuation_314(
+                                                                                                                                                                                $state_313, 
+                                                                                                                                                                                e
+                                                                                                                                                                                );, 
+                                                                                                                                                                        $lambda ($state_315, $input_316, $continuation_317)
+                                                                                                                                                                            {
+                                                                                                                                                                                e = $input_316;
+                                                                                                                                                                                $continuation_317(
+                                                                                                                                                                                    $state_315, 
+                                                                                                                                                                                    $null
+                                                                                                                                                                                    );
+                                                                                                                                                                            }, 
+                                                                                                                                                                        $continuation_285
+                                                                                                                                                                        );
+                                                                                                                                                                }
+                                                                                                                                                            );
+                                                                                                                                                    }
+                                                                                                                                                );, 
+                                                                                                                                        $lambda ($state_282, $result_283)
+                                                                                                                                            {
+                                                                                                                                                standard_library::add_$expression_to_assignable(
+                                                                                                                                                    $state_282, 
+                                                                                                                                                    32, 
+                                                                                                                                                    $lambda ($state_320, $continuation_321)
+                                                                                                                                                        $continuation_321(
+                                                                                                                                                            $state_320, 
+                                                                                                                                                            e
+                                                                                                                                                            );, 
+                                                                                                                                                    $lambda ($state_322, $input_323, $continuation_324)
+                                                                                                                                                        {
+                                                                                                                                                            e = $input_323;
+                                                                                                                                                            $continuation_324(
+                                                                                                                                                                $state_322, 
+                                                                                                                                                                $null
+                                                                                                                                                                );
+                                                                                                                                                        }, 
+                                                                                                                                                    $continuation_274
+                                                                                                                                                    );
+                                                                                                                                            }
+                                                                                                                                        );
+                                                                                                                                }
+                                                                                                                            );, 
+                                                                                                                    $lambda ($state_271, $result_272)
+                                                                                                                        {
+                                                                                                                            standard_library::add_$expression_to_assignable(
+                                                                                                                                $state_271, 
+                                                                                                                                64, 
+                                                                                                                                $lambda ($state_327, $continuation_328)
+                                                                                                                                    $continuation_328(
+                                                                                                                                        $state_327, 
+                                                                                                                                        e
+                                                                                                                                        );, 
+                                                                                                                                $lambda ($state_329, $input_330, $continuation_331)
+                                                                                                                                    {
+                                                                                                                                        e = $input_330;
+                                                                                                                                        $continuation_331(
+                                                                                                                                            $state_329, 
+                                                                                                                                            $null
+                                                                                                                                            );
+                                                                                                                                    }, 
+                                                                                                                                $lambda ($state_332, $result_333)
+                                                                                                                                    {
+                                                                                                                                        unit_test::assert_$expression_should_be_$expression(
+                                                                                                                                            $state_332, 
+                                                                                                                                            e, 
+                                                                                                                                            103, 
+                                                                                                                                            $continuation_268
+                                                                                                                                            );
+                                                                                                                                    }
+                                                                                                                                );
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                            }, 
+                                                                                                        "Exit block should jump out of the correct box", 
+                                                                                                        $lambda ($state_265, $result_266)
+                                                                                                            {
+                                                                                                                $continuation(
+                                                                                                                    $state, 
+                                                                                                                    $the_result
+                                                                                                                    );
+                                                                                                            }
+                                                                                                        );
+                                                                                                }
+                                                                                            );
+                                                                                    }
+                                                                                );
+                                                                        }
+                                                                    );
+                                                            }
+                                                        );
+                                                }
+                                            );
+                                    }
+                                );
+                        }
                     );
             }
         );

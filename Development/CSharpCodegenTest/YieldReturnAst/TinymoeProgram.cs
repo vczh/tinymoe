@@ -867,7 +867,7 @@ namespace TinymoeProgramNamespace
 				{
 					TinymoeObject _state_2 = __args__[0];
 					TinymoeObject _continuation_3 = __args__[1];
-					Invoke(condition, new TinymoeObject[] {
+					Invoke(body, new TinymoeObject[] {
 						_state_2,
 						new TinymoeFunction(__args___x2 => 
 						{
@@ -881,7 +881,7 @@ namespace TinymoeProgramNamespace
 								{
 									TinymoeObject _state_6 = __args___x4[0];
 									TinymoeObject _result_7 = __args___x4[1];
-									Invoke(body, new TinymoeObject[] {
+									Invoke(condition, new TinymoeObject[] {
 										_state_6,
 										_continuation_3
 										});
@@ -1178,6 +1178,13 @@ namespace TinymoeProgramNamespace
 							_select_continuation_8
 							);
 					}
+					else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_9, null))).Value)
+					{
+						Invoke(_select_continuation_8, new TinymoeObject[] {
+							_state_4,
+							null
+							});
+					}
 					else
 					{
 						standard_library__fall_into_the_previous_trap(
@@ -1235,6 +1242,13 @@ namespace TinymoeProgramNamespace
 									_select_continuation_12
 									);
 							}
+							else if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_13, null))).Value)
+							{
+								Invoke(_select_continuation_12, new TinymoeObject[] {
+									_state_8,
+									null
+									});
+							}
 							else
 							{
 								standard_library__fall_into_the_previous_trap(
@@ -1269,7 +1283,7 @@ namespace TinymoeProgramNamespace
 					TinymoeObject _continuation_3 = __args__[1];
 					Invoke(deal_with__expression, new TinymoeObject[] {
 						_state_2,
-						state.GetField("argument"),
+						signal,
 						_continuation_3
 						});
 				}),

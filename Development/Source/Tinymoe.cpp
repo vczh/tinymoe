@@ -315,6 +315,7 @@ block (body) try
 		case raising exception
 			set the result to field argument of state
 			reset continuation state state to null
+		case null
 		case else
 			fall into the previous trap
 	end
@@ -332,6 +333,7 @@ block (body) else try
 			case raising exception
 				set the result to field argument of state
 				reset continuation state state to null
+			case null
 			case else
 				fall into the previous trap
 		end
@@ -345,7 +347,7 @@ category (signal)
 	closable
 block (sentence deal with (exception)) catch (argument exception)
 	if signal <> null
-		deal with field argument of state
+		deal with signal
 	end	
 end
 
