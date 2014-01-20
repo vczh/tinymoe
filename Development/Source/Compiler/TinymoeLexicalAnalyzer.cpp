@@ -114,6 +114,8 @@ namespace tinymoe
 			enum class State
 			{
 				Begin,
+				InPreComment,
+				InComment,
 				InInteger,
 				InFloat,
 				InString,
@@ -128,6 +130,10 @@ namespace tinymoe
 
 			auto AddToken = [&](int length, CodeTokenType type)
 			{
+				if (type == CodeTokenType::Comment)
+				{
+					return;
+				}
 				auto tokenBegin = begin ? begin : reading;
 				string value(tokenBegin, tokenBegin + length);
 
@@ -222,7 +228,8 @@ namespace tinymoe
 						AddToken(1, CodeTokenType::Add);
 						break;
 					case '-':
-						AddToken(1, CodeTokenType::Sub);
+						begin = reading;
+						state = State::InPreComment;
 						break;
 					case '*':
 						AddToken(1, CodeTokenType::Mul);
@@ -290,6 +297,30 @@ namespace tinymoe
 						{
 							AddError(1, "Unknown character: \"" + string(reading, reading + 1) + "\".");
 						}
+					}
+					break;
+				case State::InPreComment:
+					switch (c)
+					{
+					case '-':
+						state = State::InComment;
+						break;
+					default:
+						AddToken(reading - begin, CodeTokenType::Sub);
+						state = State::Begin;
+						begin = nullptr;
+						reading--;
+					}
+					break;
+				case State::InComment:
+					switch (c)
+					{
+					case '\n':
+						AddToken(reading - begin, CodeTokenType::Comment);
+						state = State::Begin;
+						begin = nullptr;
+						reading--;
+						break;
 					}
 					break;
 				case State::InInteger:

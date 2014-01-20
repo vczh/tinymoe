@@ -52,6 +52,7 @@ namespace tinymoe
 			Or,					// or
 			Not,				// not
 
+			Comment,			// -- xxxx
 			Unknown,
 		};
 

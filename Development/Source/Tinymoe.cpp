@@ -17,6 +17,10 @@ symbol raising exception
 symbol exiting program
 symbol exiting block
 
+-------------------------------------------------------------------------------
+-- Continuation state types
+-------------------------------------------------------------------------------
+
 type continuation trap
 	continuation
 	previous trap
@@ -42,11 +46,49 @@ type continuation coroutine
 	fall back counter
 end
 
+-------------------------------------------------------------------------------
+-- State
+-------------------------------------------------------------------------------
+
 sentence reset continuation state (state) to (flag)
 	set field flag of state to flag
 	set field argument of state to null
 	set field continuation of state to null
 end
+
+-------------------------------------------------------------------------------
+-- Converting expression to sentence
+-------------------------------------------------------------------------------
+
+sentence call (value)
+end
+
+-------------------------------------------------------------------------------
+-- Trap call
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence trap (expression value) internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value)
+	trap value internal
+	set field trap of state to field previous trap of (field trap of state)
+end
+
+cps (state) (continuation)
+sentence fall into the previous trap
+	set the current trap to field continuation of (field trap of state)
+	call continuation the current trap of (null)
+end
+
+-------------------------------------------------------------------------------
+-- Trap link calculation for fall back
+-------------------------------------------------------------------------------
 
 sentence enable fall back to (state) with (continuation) and (value)
     set field continuation of state to continuation
@@ -79,21 +121,9 @@ phrase restored trap (trap) with fall back (fall back trap) and counter (counter
 	end
 end
 
-sentence call (value)
-end
-
-cps (state) (continuation)
-sentence trap (expression value) internal
-	set the current trap to new continuation trap of (continuation, field trap of state)
-	set field trap of state to the current trap
-	set the result to value
-end
-
-cps (state) (continuation)
-sentence trap (expression value)
-	trap value internal
-	set field trap of state to field previous trap of (field trap of state)
-end
+-------------------------------------------------------------------------------
+-- Trap call to start fall back enabled continuation
+-------------------------------------------------------------------------------
 
 cps (state) (continuation)
 sentence trap (expression value) with fall back enabled internal
@@ -108,6 +138,10 @@ sentence trap (expression value) with fall back enabled
 	set field trap of state to field previous trap of (field trap of state)
 	set fall back counter of state
 end
+
+-------------------------------------------------------------------------------
+-- Trap call to continue fall back enabled continuation
+-------------------------------------------------------------------------------
 
 cps (state) (continuation)
 sentence trap (expression value) with fall back (fall back) restored internal
@@ -124,11 +158,9 @@ sentence trap (expression value) with fall back (fall back) restored
 	set fall back counter of state
 end
 
-cps (state) (continuation)
-sentence fall into the previous trap
-	set the current trap to field continuation of (field trap of state)
-	call continuation the current trap of (null)
-end
+-------------------------------------------------------------------------------
+-- Coroutine
+-------------------------------------------------------------------------------
 
 phrase new coroutine from (body)
 	set the result to new continuation coroutine of ()
@@ -175,6 +207,10 @@ sentence pause coroutine to (flag) with (coroutine continuation) and (value)
 	fall into the previous trap
 end
 
+-------------------------------------------------------------------------------
+-- Repeat
+-------------------------------------------------------------------------------
+
 cps (state) (continuation)
 category
 	inside REPEAT
@@ -188,28 +224,6 @@ category
 	inside REPEAT
 sentence continue
 	reset continuation state state to continuing repeating
-	fall into the previous trap
-end
-
-cps (state) (continuation)
-sentence raise (exception)
-	reset continuation state state to raising exception
-	set field argument of state to exception
-	fall into the previous trap
-end
-
-cps (state) (continuation)
-sentence exit program
-	reset continuation state state to exiting program
-	fall into the previous trap
-end
-
-cps (state) (continuation)
-category
-	inside NAMEDBLOCK
-sentence exit block (handle)
-	reset continuation state state to exiting block
-	set field argument of state to handle
 	fall into the previous trap
 end
 
@@ -268,6 +282,10 @@ block (sentence deal with (item)) repeat with (argument item) in (items : array)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- If/Else If/Else
+-------------------------------------------------------------------------------
+
 category
 	start IFELSE if
 	closable
@@ -304,6 +322,17 @@ block (sentence body) else
 		case false
 			body
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Try/Else Try/Catch-Finally
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence raise (exception)
+	reset continuation state state to raising exception
+	set field argument of state to exception
+	fall into the previous trap
 end
 
 cps (state)
@@ -360,6 +389,25 @@ block (sentence body) finally
 	body
 end
 
+-------------------------------------------------------------------------------
+-- Named Block
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence exit program
+	reset continuation state state to exiting program
+	fall into the previous trap
+end
+
+cps (state) (continuation)
+category
+	inside NAMEDBLOCK
+sentence exit block (handle)
+	reset continuation state state to exiting block
+	set field argument of state to handle
+	fall into the previous trap
+end
+
 cps (state)
 category
 	start NAMEDBLOCK
@@ -373,6 +421,10 @@ block (body) named block (argument handle)
 		fall into the previous trap
 	end
 end
+
+-------------------------------------------------------------------------------
+-- Mics
+-------------------------------------------------------------------------------
 
 sentence add (value) to (assignable variable)
 	set variable to variable + value

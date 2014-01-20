@@ -69,13 +69,14 @@ TEST_CASE(TestLexerNumber)
 TEST_CASE(TestLexerOperators)
 {
 	string code = R"tinymoe(
-(),:&+-*/<<=>>==<>
+(),:&+-*/<<=>>==<>--xxx
+- -
 )tinymoe";
 
 	CodeError::List errors;
 	auto codeFile = CodeFile::Parse(code, 0, errors);
 
-	FIRST_LINE(1);
+	FIRST_LINE(2);
 		FIRST_TOKEN(15);
 		TOKEN(2, 1, "(", CodeTokenType::OpenBracket);
 		TOKEN(2, 2, ")", CodeTokenType::CloseBracket);
@@ -92,6 +93,11 @@ TEST_CASE(TestLexerOperators)
 		TOKEN(2, 14, ">=", CodeTokenType::GE);
 		TOKEN(2, 16, "=", CodeTokenType::EQ);
 		TOKEN(2, 17, "<>", CodeTokenType::NE);
+		LAST_TOKEN;
+	NEXT_LINE;
+		FIRST_TOKEN(2);
+		TOKEN(3, 1, "-", CodeTokenType::Sub);
+		TOKEN(3, 3, "-", CodeTokenType::Sub);
 		LAST_TOKEN;
 	LAST_LINE;
 }
