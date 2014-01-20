@@ -316,8 +316,9 @@ public:
 
 	void Visit(AstTestTypeExpression* node)
 	{
+		o << "new TinymoeBoolean(";
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << " is " << CSharpTypeCodegen::ToString(node->type, resolver);
+		o << " is " << CSharpTypeCodegen::ToString(node->type, resolver) << ")";
 	}
 
 	void Visit(AstNewArrayExpression* node)

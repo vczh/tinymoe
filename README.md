@@ -101,7 +101,7 @@ Here are several samples to introduce this language:
 		end
 	end
 
-####Make your own "yield return" (Build-in continuation)
+####Make your own "yield return" (coroutine)
 
 	module enumerable
 	using standard library
@@ -114,56 +114,45 @@ Here are several samples to introduce this language:
 	end
  
 	type collection enumerator
-		current yielding result
-		body
-		continuation
+		value
+		coroutine
 	end
  
 	cps (state) (continuation)
 	category
 		inside ENUMERATING
 	sentence yield return (value)
-		reset continuation state state to yielding return
-		enable fall back to state with continuation and value
-		fall into the previous trap
+		pause coroutine to yielding return with continuation and value
 	end
- 
+
 	cps (state) (continuation)
 	category
 		inside ENUMERATING
 	sentence yield break
-		reset continuation state state to yielding break
-		fall into the previous trap
+		pause coroutine to yielding break with continuation and null
 	end
  
 	phrase new enumerator from (enumerable)
-		set the result to new collection enumerator of (null, field body of enumerable, null)
+		set coroutine to new coroutine from (field body of enumerable)
+		set the result to new collection enumerator of (null, coroutine)
 	end
 
 	cps (state) (continuation)
 	sentence move (enumerator) to the next
-		named block moving to the next
-			if field body of enumerator <> null
-				trap field body of enumerator of () with fall back enabled
-				set field body of enumerator to null
-			else if field continuation of enumerator <> null
-				trap continuation field continuation of enumerator of (null) with fall back (field current yielding result of enumerator) restored
-			else
-				exit block moving to the next
-			end
+		set coroutine to field coroutine of enumerator
+		if not (coroutine coroutine stopped)
+			run coroutine coroutine
 
 			select field flag of state
 				case yielding return
-					set field current yielding result of enumerator to field argument of state
-					set field continuation of enumerator to field continuation of state
-					reset continuation state state to null
+					set field value of enumerator to field argument of state
+					continue coroutine coroutine using state state
 				case yielding break
-					set field current yielding result of enumerator to null
-					set field continuation of enumerator to null
-					reset continuation state state to null
+					set field value of enumerator to null
+					stop coroutine coroutine
 				case null
-					set field current yielding result of enumerator to null
-					set field continuation of enumerator to null
+					set field value of enumerator to null
+					stop coroutine coroutine
 				case else
 					fall into the previous trap
 			end
@@ -171,16 +160,11 @@ Here are several samples to introduce this language:
 	end
  
 	phrase (enumerator) reaches the end
-		set the result to field body of enumerator = null and field continuation of enumerator = null
+		set the result to coroutine field coroutine of enumerator stopped
 	end
 
 	phrase current value of (enumerator)
-		select enumerator reaches the end
-			case true
-				set the result to null
-			case false
-				set the result to field value of (field current yielding result of enumerator)
-		end
+		set the result to field value of (field value of enumerator)
 	end
  
 	cps (state)

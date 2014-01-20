@@ -35,6 +35,13 @@ type continuation state
 	trap
 end
 
+type continuation coroutine
+	body
+	continuation
+	trap
+	fall back counter
+end
+
 sentence reset continuation state (state) to (flag)
 	set field flag of state to flag
 	set field argument of state to null
@@ -121,6 +128,51 @@ cps (state) (continuation)
 sentence fall into the previous trap
 	set the current trap to field continuation of (field trap of state)
 	call continuation the current trap of (null)
+end
+
+phrase new coroutine from (body)
+	set the result to new continuation coroutine of ()
+	set field body of the result to body
+end
+
+phrase coroutine (coroutine) stopped
+	set the result to field body of coroutine = null and field continuation of coroutine = null
+end
+
+cps (state) (continuation)
+sentence run coroutine (coroutine)
+	set need to exit to false
+	if field body of coroutine <> null
+		trap field body of coroutine of () with fall back enabled
+		set field body of coroutine to null
+	else if field continuation of coroutine <> null
+		trap continuation field continuation of coroutine of (null) with fall back (coroutine) restored
+	else
+		set need to exit to true
+	end
+
+	if (not need to exit) and (field argument of state is continuation fall back argument)
+		set field trap of coroutine to field trap of (field argument of state)
+		set field fall back counter of coroutine to field fall back counter of (field argument of state)
+	end
+end
+
+sentence continue coroutine (coroutine) using state (state)
+	set field continuation of coroutine to field continuation of state
+	reset continuation state state to null
+end
+
+cps (state) (continuation)
+sentence stop coroutine (coroutine)
+	set field continuation of coroutine to null
+	reset continuation state state to null
+end
+
+cps (state) (continuation)
+sentence pause coroutine to (flag) with (coroutine continuation) and (value)
+	reset continuation state state to flag
+	enable fall back to state with coroutine continuation and value
+	fall into the previous trap
 end
 
 cps (state) (continuation)
