@@ -6,6 +6,14 @@ namespace TinymoeProgramNamespace
 {
 	public class TinymoeProgram : TinymoeOperations
 	{
+		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
+
+		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeSymbol("standard_library__continuing_repeating");
+
+		public readonly TinymoeObject standard_library__raising_exception = new TinymoeSymbol("standard_library__raising_exception");
+
+		public readonly TinymoeObject standard_library__exiting_program = new TinymoeSymbol("standard_library__exiting_program");
+
 		public readonly TinymoeObject standard_library__exiting_block = new TinymoeSymbol("standard_library__exiting_block");
 
 		public class standard_library__continuation_trap : TinymoeObject
@@ -379,6 +387,24 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
+		public void standard_library__create_closure_to_assignable(TinymoeObject _state, TinymoeObject body, TinymoeObject _read_closure, TinymoeObject _write_closure, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(_write_closure, new TinymoeObject[] {
+				_state,
+				body,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
 		public void standard_library__new_coroutine_from__primitive(TinymoeObject _state, TinymoeObject body, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
@@ -533,20 +559,20 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void standard_library__continue_coroutine__expression_using_state__expression(TinymoeObject _state, TinymoeObject coroutine, TinymoeObject state, TinymoeObject _continuation)
+		public void standard_library__continue_coroutine__expression(TinymoeObject state, TinymoeObject coroutine, TinymoeObject continuation)
 		{
 			TinymoeObject _the_result = null;
 			coroutine.SetField("continuation", state.GetField("continuation"));
 			standard_library__reset_continuation_state__expression_to__expression(
-				_state,
+				state,
 				state,
 				null,
 				new TinymoeFunction(__args__ => 
 				{
 					TinymoeObject _state_0 = __args__[0];
 					TinymoeObject _result_1 = __args__[1];
-					Invoke(_continuation, new TinymoeObject[] {
-						_state,
+					Invoke(continuation, new TinymoeObject[] {
+						state,
 						_the_result
 						});
 				})
@@ -1511,14 +1537,6 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
-
-		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeSymbol("standard_library__continuing_repeating");
-
-		public readonly TinymoeObject standard_library__raising_exception = new TinymoeSymbol("standard_library__raising_exception");
-
-		public readonly TinymoeObject standard_library__exiting_program = new TinymoeSymbol("standard_library__exiting_program");
-
 		public readonly TinymoeObject enumerable__yielding_return = new TinymoeSymbol("enumerable__yielding_return");
 
 		public readonly TinymoeObject enumerable__yielding_break = new TinymoeSymbol("enumerable__yielding_break");
@@ -1635,10 +1653,9 @@ namespace TinymoeProgramNamespace
 									if (((TinymoeBoolean)CastToBoolean(EQ(_select_value_13, enumerable__yielding_return))).Value)
 									{
 										enumerator.SetField("value", state.GetField("argument"));
-										standard_library__continue_coroutine__expression_using_state__expression(
+										standard_library__continue_coroutine__expression(
 											_state_8,
 											coroutine,
-											state,
 											_select_continuation_12
 											);
 									}

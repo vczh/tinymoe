@@ -146,7 +146,7 @@ Here are several samples to introduce this language:
 			select field flag of state
 				case yielding return
 					set field value of enumerator to field argument of state
-					continue coroutine coroutine using state state
+					continue coroutine coroutine
 				case yielding break
 					set field value of enumerator to null
 					stop coroutine coroutine

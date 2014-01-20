@@ -334,6 +334,22 @@ $procedure standard_library::trap_$expression_with_fall_back_$expression_restore
         );
 }
 
+$procedure standard_library::create_closure_to_assignable($state, body, $read_closure, $write_closure, $continuation)
+{
+    $symbol $the_result;
+    $write_closure(
+        $state, 
+        body, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
 $procedure standard_library::new_coroutine_from_$primitive($state, body, $continuation)
 {
     $symbol $the_result;
@@ -454,18 +470,18 @@ $procedure standard_library::run_coroutine_$expression(state, coroutine, continu
         );
 }
 
-$procedure standard_library::continue_coroutine_$expression_using_state_$expression($state, coroutine, state, $continuation)
+$procedure standard_library::continue_coroutine_$expression(state, coroutine, continuation)
 {
     $symbol $the_result;
     coroutine.continuation = state.continuation;
     standard_library::reset_continuation_state_$expression_to_$expression(
-        $state, 
+        state, 
         state, 
         $null, 
         $lambda ($state_0, $result_1)
             {
-                $continuation(
-                    $state, 
+                continuation(
+                    state, 
                     $the_result
                     );
             }

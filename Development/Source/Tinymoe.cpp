@@ -18,7 +18,7 @@ symbol exiting program
 symbol exiting block
 
 -------------------------------------------------------------------------------
--- Continuation state types
+--	Continuation state types
 -------------------------------------------------------------------------------
 
 type continuation trap
@@ -47,7 +47,7 @@ type continuation coroutine
 end
 
 -------------------------------------------------------------------------------
--- State
+--	State
 -------------------------------------------------------------------------------
 
 sentence reset continuation state (state) to (flag)
@@ -57,14 +57,17 @@ sentence reset continuation state (state) to (flag)
 end
 
 -------------------------------------------------------------------------------
--- Converting expression to sentence
+--	Converting expression to sentence
 -------------------------------------------------------------------------------
 
 sentence call (value)
 end
 
 -------------------------------------------------------------------------------
--- Trap call
+--	Trap call
+-------------------------------------------------------------------------------
+--	use (trap (value)) to 
+--	use (fall into the previous trap) to jump to the code after the last call to (trap (value))
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -87,7 +90,18 @@ sentence fall into the previous trap
 end
 
 -------------------------------------------------------------------------------
--- Trap link calculation for fall back
+--	Trap link calculation for fall back
+-------------------------------------------------------------------------------
+--	use (enable fall back ...) to make the paused routine re-entranable
+--	use (set fall back counter ...) to record the number of times
+--		of calling (fall into the previous trap)
+--		from the last (trap (value) ...) until now
+--	use (restored trap ...) to get a new value of (continuation trap)
+--		that is used to restore the context and continue to run a paused routine
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
 -------------------------------------------------------------------------------
 
 sentence enable fall back to (state) with (continuation) and (value)
@@ -122,7 +136,14 @@ phrase restored trap (trap) with fall back (fall back trap) and counter (counter
 end
 
 -------------------------------------------------------------------------------
--- Trap call to start fall back enabled continuation
+--	Trap call to start fall back enabled continuation
+-------------------------------------------------------------------------------
+--	use (trap (value) with ... enabled) to start a continuation
+--		execution of the expression may be paused
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -140,7 +161,15 @@ sentence trap (expression value) with fall back enabled
 end
 
 -------------------------------------------------------------------------------
--- Trap call to continue fall back enabled continuation
+--	Trap call to continue fall back enabled continuation
+-------------------------------------------------------------------------------
+--	use (trap (value) with ... restored) to run the continuation
+--		which is given by a paused evalulation
+--		of (trap (value) with ... enabled)
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -159,8 +188,25 @@ sentence trap (expression value) with fall back (fall back) restored
 end
 
 -------------------------------------------------------------------------------
--- Coroutine
+--	Coroutine
 -------------------------------------------------------------------------------
+--	use (create closure to (variable)) to turn some code into a function with no argument
+--	use (new coroutine from (body)) to turn a function with no argument into a coroutine
+--	use (coroutine (coroutine) stopped) to determine if a coroutine is no longer active
+--	use (run coroutine (coroutine)) to start a new coroutine, or continue a paused coroutine
+--		after a coroutine is paused, a call to (continue coroutine (coroutine)) is required before continue to run this coroutine
+--	use (continue coroutine (coroutine)) to make a coroutine continuable
+--	use (stop coroutine (coroutine)) to make a coroutine no longer active
+--	use (pause coroutine to ...) in the code of a coroutine to pause the current coroutine
+--		the three argument of this routine is important
+--		flag					: the reason why this coroutine needs to pause
+--		coroutine continuation	: the continuation to continue this coroutine
+--		value					: the argument that relating to the flag
+-------------------------------------------------------------------------------
+
+block (body) create closure to (assignable closure)
+	set closure to body
+end
 
 phrase new coroutine from (body)
 	set the result to new continuation coroutine of ()
@@ -189,7 +235,8 @@ sentence run coroutine (coroutine)
 	end
 end
 
-sentence continue coroutine (coroutine) using state (state)
+cps (state) (continuation)
+sentence continue coroutine (coroutine)
 	set field continuation of coroutine to field continuation of state
 	reset continuation state state to null
 end
@@ -208,7 +255,7 @@ sentence pause coroutine to (flag) with (coroutine continuation) and (value)
 end
 
 -------------------------------------------------------------------------------
--- Repeat
+--	Repeat
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -283,7 +330,7 @@ block (sentence deal with (item)) repeat with (argument item) in (items : array)
 end
 
 -------------------------------------------------------------------------------
--- If/Else If/Else
+--	If/Else If/Else
 -------------------------------------------------------------------------------
 
 category
@@ -325,7 +372,7 @@ block (sentence body) else
 end
 
 -------------------------------------------------------------------------------
--- Try/Else Try/Catch-Finally
+--	Try/Else Try/Catch/Finally
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -390,7 +437,7 @@ block (sentence body) finally
 end
 
 -------------------------------------------------------------------------------
--- Named Block
+--	Named Block
 -------------------------------------------------------------------------------
 
 cps (state) (continuation)
@@ -423,7 +470,7 @@ block (body) named block (argument handle)
 end
 
 -------------------------------------------------------------------------------
--- Mics
+--	Mics
 -------------------------------------------------------------------------------
 
 sentence add (value) to (assignable variable)
