@@ -6,8 +6,6 @@ namespace TinymoeProgramNamespace
 {
 	public class TinymoeProgram : TinymoeOperations
 	{
-		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
-
 		public readonly TinymoeObject standard_library__continuing_repeating = new TinymoeSymbol("standard_library__continuing_repeating");
 
 		public readonly TinymoeObject standard_library__raising_exception = new TinymoeSymbol("standard_library__raising_exception");
@@ -1536,6 +1534,8 @@ namespace TinymoeProgramNamespace
 				})
 				});
 		}
+
+		public readonly TinymoeObject standard_library__breaking_repeating = new TinymoeSymbol("standard_library__breaking_repeating");
 
 		public readonly TinymoeObject enumerable__yielding_return = new TinymoeSymbol("enumerable__yielding_return");
 

@@ -1,32 +1,229 @@
-$symbol standard_library::breaking_repeating;
-
-$symbol standard_library::continuing_repeating;
-
-$symbol standard_library::raising_exception;
-
-$symbol standard_library::exiting_program;
-
-$symbol standard_library::exiting_block;
-
-$type standard_library::continuation_trap
+$procedure standard_library::finally(state, signal, body, $continuation)
 {
-    $symbol continuation;
-    $symbol previous_trap;
+    $symbol $the_result;
+    body(
+        state, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    state, 
+                    $the_result
+                    );
+            }
+        );
 }
 
-$type standard_library::continuation_fall_back_argument
+$procedure standard_library::exit_program(state, continuation)
 {
-    $symbol value;
-    $symbol trap;
-    $symbol fall_back_counter;
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::exiting_program, 
+        $lambda ($state_0, $result_1)
+            {
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
 }
 
-$type standard_library::continuation_state
+$procedure standard_library::exit_block_$expression(state, handle, continuation)
 {
-    $symbol flag;
-    $symbol argument;
-    $symbol continuation;
-    $symbol trap;
+    $symbol $the_result;
+    standard_library::reset_continuation_state_$expression_to_$expression(
+        state, 
+        state, 
+        standard_library::exiting_block, 
+        $lambda ($state_0, $result_1)
+            {
+                state.argument = handle;
+                standard_library::fall_into_the_previous_trap(
+                    $state_0, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            continuation(
+                                state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::named_block_$argument(state, body, $continuation)
+{
+    $symbol $the_result;
+    $symbol handle;
+    handle = new $Object();
+    $symbol $state_0;
+    $state_0 = state;
+    standard_library::trap_$expression(
+        $state_0, 
+        $lambda ($state_2, $continuation_3)
+            body(
+                $state_2, 
+                handle, 
+                $lambda ($state_4, $result_5)
+                    {
+                        $continuation_3(
+                            $state_2, 
+                            $result_5
+                            );
+                    }
+                );, 
+        $lambda ($state_6, $result_7)
+            {
+                standard_library::if_$expression(
+                    $state_6, 
+                    $lambda ($state_10, $continuation_11)
+                        standard_library::reset_continuation_state_$expression_to_$expression(
+                            $state_10, 
+                            state, 
+                            $null, 
+                            $continuation_11
+                            );, 
+                    ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
+                    $lambda ($state_8, $result_9)
+                        {
+                            standard_library::else_if_$expression(
+                                $state_8, 
+                                $result_9, 
+                                standard_library::fall_into_the_previous_trap, 
+                                $lambda ($state_14, $continuation_15)
+                                    $continuation_15(
+                                        $state_14, 
+                                        (state.flag != $null)
+                                        );, 
+                                $lambda ($state_16, $result_17)
+                                    {
+                                        $continuation(
+                                            state, 
+                                            $the_result
+                                            );
+                                    }
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::add_$expression_to_assignable($state, value, $read_variable, $write_variable, $continuation)
+{
+    $symbol $the_result;
+    $read_variable(
+        $state, 
+        $lambda ($state_0, $result_1)
+            {
+                $write_variable(
+                    $state_0, 
+                    ($result_1 + value), 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::substract_$expression_from_assignable($state, value, $read_variable, $write_variable, $continuation)
+{
+    $symbol $the_result;
+    $read_variable(
+        $state, 
+        $lambda ($state_0, $result_1)
+            {
+                $write_variable(
+                    $state_0, 
+                    ($result_1 - value), 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::boolean_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToBoolean")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToInteger")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::floating_point_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToFloat")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::string_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("CastToString")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
 }
 
 $type standard_library::continuation_coroutine
@@ -1038,232 +1235,35 @@ $procedure standard_library::catch_$argument(state, signal, deal_with_$expressio
         );
 }
 
-$procedure standard_library::finally(state, signal, body, $continuation)
+$symbol standard_library::breaking_repeating;
+
+$symbol standard_library::continuing_repeating;
+
+$symbol standard_library::raising_exception;
+
+$symbol standard_library::exiting_program;
+
+$symbol standard_library::exiting_block;
+
+$type standard_library::continuation_trap
 {
-    $symbol $the_result;
-    body(
-        state, 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    state, 
-                    $the_result
-                    );
-            }
-        );
+    $symbol continuation;
+    $symbol previous_trap;
 }
 
-$procedure standard_library::exit_program(state, continuation)
+$type standard_library::continuation_fall_back_argument
 {
-    $symbol $the_result;
-    standard_library::reset_continuation_state_$expression_to_$expression(
-        state, 
-        state, 
-        standard_library::exiting_program, 
-        $lambda ($state_0, $result_1)
-            {
-                standard_library::fall_into_the_previous_trap(
-                    $state_0, 
-                    $lambda ($state_2, $result_3)
-                        {
-                            continuation(
-                                state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
+    $symbol value;
+    $symbol trap;
+    $symbol fall_back_counter;
 }
 
-$procedure standard_library::exit_block_$expression(state, handle, continuation)
+$type standard_library::continuation_state
 {
-    $symbol $the_result;
-    standard_library::reset_continuation_state_$expression_to_$expression(
-        state, 
-        state, 
-        standard_library::exiting_block, 
-        $lambda ($state_0, $result_1)
-            {
-                state.argument = handle;
-                standard_library::fall_into_the_previous_trap(
-                    $state_0, 
-                    $lambda ($state_2, $result_3)
-                        {
-                            continuation(
-                                state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
-}
-
-$procedure standard_library::named_block_$argument(state, body, $continuation)
-{
-    $symbol $the_result;
-    $symbol handle;
-    handle = new $Object();
-    $symbol $state_0;
-    $state_0 = state;
-    standard_library::trap_$expression(
-        $state_0, 
-        $lambda ($state_2, $continuation_3)
-            body(
-                $state_2, 
-                handle, 
-                $lambda ($state_4, $result_5)
-                    {
-                        $continuation_3(
-                            $state_2, 
-                            $result_5
-                            );
-                    }
-                );, 
-        $lambda ($state_6, $result_7)
-            {
-                standard_library::if_$expression(
-                    $state_6, 
-                    $lambda ($state_10, $continuation_11)
-                        standard_library::reset_continuation_state_$expression_to_$expression(
-                            $state_10, 
-                            state, 
-                            $null, 
-                            $continuation_11
-                            );, 
-                    ((state.flag == standard_library::exiting_block) && (state.argument == handle)), 
-                    $lambda ($state_8, $result_9)
-                        {
-                            standard_library::else_if_$expression(
-                                $state_8, 
-                                $result_9, 
-                                standard_library::fall_into_the_previous_trap, 
-                                $lambda ($state_14, $continuation_15)
-                                    $continuation_15(
-                                        $state_14, 
-                                        (state.flag != $null)
-                                        );, 
-                                $lambda ($state_16, $result_17)
-                                    {
-                                        $continuation(
-                                            state, 
-                                            $the_result
-                                            );
-                                    }
-                                );
-                        }
-                    );
-            }
-        );
-}
-
-$procedure standard_library::add_$expression_to_assignable($state, value, $read_variable, $write_variable, $continuation)
-{
-    $symbol $the_result;
-    $read_variable(
-        $state, 
-        $lambda ($state_0, $result_1)
-            {
-                $write_variable(
-                    $state_0, 
-                    ($result_1 + value), 
-                    $lambda ($state_2, $result_3)
-                        {
-                            $continuation(
-                                $state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
-}
-
-$procedure standard_library::substract_$expression_from_assignable($state, value, $read_variable, $write_variable, $continuation)
-{
-    $symbol $the_result;
-    $read_variable(
-        $state, 
-        $lambda ($state_0, $result_1)
-            {
-                $write_variable(
-                    $state_0, 
-                    ($result_1 - value), 
-                    $lambda ($state_2, $result_3)
-                        {
-                            $continuation(
-                                $state, 
-                                $the_result
-                                );
-                        }
-                    );
-            }
-        );
-}
-
-$procedure standard_library::boolean_of_$primitive($state, value, $continuation)
-{
-    $symbol $the_result;
-    $external ("CastToBoolean")(
-        $state, 
-        value, 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    $state, 
-                    $the_result
-                    );
-            }
-        );
-}
-
-$procedure standard_library::integer_of_$primitive($state, value, $continuation)
-{
-    $symbol $the_result;
-    $external ("CastToInteger")(
-        $state, 
-        value, 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    $state, 
-                    $the_result
-                    );
-            }
-        );
-}
-
-$procedure standard_library::floating_point_of_$primitive($state, value, $continuation)
-{
-    $symbol $the_result;
-    $external ("CastToFloat")(
-        $state, 
-        value, 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    $state, 
-                    $the_result
-                    );
-            }
-        );
-}
-
-$procedure standard_library::string_of_$primitive($state, value, $continuation)
-{
-    $symbol $the_result;
-    $external ("CastToString")(
-        $state, 
-        value, 
-        $lambda ($state_0, $result_1)
-            {
-                $continuation(
-                    $state, 
-                    $the_result
-                    );
-            }
-        );
+    $symbol flag;
+    $symbol argument;
+    $symbol continuation;
+    $symbol trap;
 }
 
 $procedure unit_test::print_$expression($state, message, $continuation)
