@@ -36,27 +36,27 @@ namespace tinymoe
 			}
 		}
 
-		string CodeToken::EscapeString(string value)
+		string_t CodeToken::EscapeString(string_t value)
 		{
-			stringstream ss;
+			stringstream_t ss;
 			for (auto c : value)
 			{
 				switch (c)
 				{
-				case '\n':
-					ss << "\\n";
+				case T('\n'):
+					ss << T("\\n");
 					break;
-				case '\r':
-					ss << "\\r";
+				case T('\r'):
+					ss << T("\\r");
 					break;
-				case '\t':
-					ss << "\\t";
+				case T('\t'):
+					ss << T("\\t");
 					break;
-				case '\\':
-					ss << "\\\\";
+				case T('\\'):
+					ss << T("\\\\");
 					break;
-				case '\"':
-					ss << "\\\"";
+				case T('\"'):
+					ss << T("\\\"");
 					break;
 				default:
 					ss << c;
@@ -65,9 +65,9 @@ namespace tinymoe
 			return ss.str();
 		}
 
-		string CodeToken::UnescapeString(string str)
+		string_t CodeToken::UnescapeString(string_t str)
 		{
-			stringstream ss;
+			stringstream_t ss;
 			bool escaping = false;
 			for (auto c : str)
 			{
@@ -76,14 +76,14 @@ namespace tinymoe
 					escaping = false;
 					switch (c)
 					{
-					case 'n':
-						ss << '\n';
+					case T('n'):
+						ss << T('\n');
 						break;
-					case 'r':
-						ss << '\r';
+					case T('r'):
+						ss << T('\r');
 						break;
-					case 't':
-						ss << '\t';
+					case T('t'):
+						ss << T('\t');
 						break;
 					default:
 						ss << c;
@@ -91,7 +91,7 @@ namespace tinymoe
 				}
 				else
 				{
-					if (c == '\\')
+					if (c == T('\\'))
 					{
 						escaping = true;
 					}
@@ -108,7 +108,7 @@ namespace tinymoe
 		CodeFile
 		*************************************************************/
 
-		CodeFile::Ptr CodeFile::Parse(const string& code, int codeIndex, CodeError::List& errors)
+		CodeFile::Ptr CodeFile::Parse(const string_t& code, int codeIndex, CodeError::List& errors)
 		{
 			auto codeFile = make_shared<CodeFile>();
 			enum class State
@@ -122,9 +122,9 @@ namespace tinymoe
 				InStringEscaping,
 				InIdentifier,
 			};
-			const char* reading = code.c_str();
-			const char* begin = nullptr;
-			const char* rowBegin = reading;
+			const char_t* reading = code.c_str();
+			const char_t* begin = nullptr;
+			const char_t* rowBegin = reading;
 			int rowNumber = 1;
 			State state = State::Begin;
 
@@ -135,29 +135,29 @@ namespace tinymoe
 					return;
 				}
 				auto tokenBegin = begin ? begin : reading;
-				string value(tokenBegin, tokenBegin + length);
+				string_t value(tokenBegin, tokenBegin + length);
 
 				switch (type)
 				{
 				case CodeTokenType::Identifier:
 					type =
-						value == "module" ? CodeTokenType::Module :
-						value == "using" ? CodeTokenType::Using :
-						value == "phrase" ? CodeTokenType::Phrase :
-						value == "sentence" ? CodeTokenType::Sentence :
-						value == "block" ? CodeTokenType::Block :
-						value == "symbol" ? CodeTokenType::Symbol :
-						value == "type" ? CodeTokenType::Type :
-						value == "cps" ? CodeTokenType::CPS :
-						value == "category" ? CodeTokenType::Category :
-						value == "expression" ? CodeTokenType::Expression :
-						value == "argument" ? CodeTokenType::Argument :
-						value == "assignable" ? CodeTokenType::Assignable :
-						value == "list" ? CodeTokenType::List :
-						value == "end" ? CodeTokenType::End :
-						value == "and" ? CodeTokenType::And :
-						value == "or" ? CodeTokenType::Or :
-						value == "not" ? CodeTokenType::Not :
+						value == T("module") ? CodeTokenType::Module :
+						value == T("using") ? CodeTokenType::Using :
+						value == T("phrase") ? CodeTokenType::Phrase :
+						value == T("sentence") ? CodeTokenType::Sentence :
+						value == T("block") ? CodeTokenType::Block :
+						value == T("symbol") ? CodeTokenType::Symbol :
+						value == T("type") ? CodeTokenType::Type :
+						value == T("cps") ? CodeTokenType::CPS :
+						value == T("category") ? CodeTokenType::Category :
+						value == T("expression") ? CodeTokenType::Expression :
+						value == T("argument") ? CodeTokenType::Argument :
+						value == T("assignable") ? CodeTokenType::Assignable :
+						value == T("list") ? CodeTokenType::List :
+						value == T("end") ? CodeTokenType::End :
+						value == T("and") ? CodeTokenType::And :
+						value == T("or") ? CodeTokenType::Or :
+						value == T("not") ? CodeTokenType::Not :
 						CodeTokenType::Identifier;
 					break;
 				case CodeTokenType::String:
@@ -183,10 +183,10 @@ namespace tinymoe
 				lastLine->tokens.push_back(token);
 			};
 
-			auto AddError = [&](int length, const string& message)
+			auto AddError = [&](int length, const string_t& message)
 			{
 				auto tokenBegin = begin ? begin : reading;
-				string value(tokenBegin, tokenBegin + length);
+				string_t value(tokenBegin, tokenBegin + length);
 				CodeToken token;
 				token.type = CodeTokenType::Unknown;
 				token.row = rowNumber;
@@ -209,48 +209,48 @@ namespace tinymoe
 				case State::Begin:
 					switch (c)
 					{
-					case '(':
+					case T('('):
 						AddToken(1, CodeTokenType::OpenBracket);
 						break;
-					case ')':
+					case T(')'):
 						AddToken(1, CodeTokenType::CloseBracket);
 						break;
-					case ',':
+					case T(','):
 						AddToken(1, CodeTokenType::Comma);
 						break;
-					case ':':
+					case T(':'):
 						AddToken(1, CodeTokenType::Colon);
 						break;
-					case '&':
+					case T('&'):
 						AddToken(1, CodeTokenType::Concat);
 						break;
-					case '+':
+					case T('+'):
 						AddToken(1, CodeTokenType::Add);
 						break;
-					case '-':
+					case T('-'):
 						begin = reading;
 						state = State::InPreComment;
 						break;
-					case '*':
+					case T('*'):
 						AddToken(1, CodeTokenType::Mul);
 						break;
-					case '/':
+					case T('/'):
 						AddToken(1, CodeTokenType::Div);
 						break;
-					case '\\':
+					case T('\\'):
 						AddToken(1, CodeTokenType::IntDiv);
 						break;
-					case '%':
+					case T('%'):
 						AddToken(1, CodeTokenType::Mod);
 						break;
-					case '<':
+					case T('<'):
 						switch (reading[1])
 						{
-						case '=':
+						case T('='):
 							AddToken(2, CodeTokenType::LE);
 							reading++;
 							break;
-						case '>':
+						case T('>'):
 							AddToken(2, CodeTokenType::NE);
 							reading++;
 							break;
@@ -258,10 +258,10 @@ namespace tinymoe
 							AddToken(1, CodeTokenType::LT);
 						}
 						break;
-					case '>':
+					case T('>'):
 						switch (reading[1])
 						{
-						case '=':
+						case T('='):
 							AddToken(2, CodeTokenType::GE);
 							reading++;
 							break;
@@ -269,40 +269,40 @@ namespace tinymoe
 							AddToken(1, CodeTokenType::GT);
 						}
 						break;
-					case '=':
+					case T('='):
 						AddToken(1, CodeTokenType::EQ);
 						break;
-					case ' ':case '\t':case '\r':
+					case T(' '):case T('\t'):case T('\r'):
 						break;
-					case '\n':
+					case T('\n'):
 						rowNumber++;
 						rowBegin = reading + 1;
 						break;
-					case '\"':
+					case T('"'):
 						begin = reading;
 						state = State::InString;
 						break;
 					default:
-						if ('0' <= c && c <= '9')
+						if (T('0') <= c && c <= T('9'))
 						{
 							begin = reading;
 							state = State::InInteger;
 						}
-						else if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_')
+						else if (T('a') <= c && c <= T('z') || T('A') <= c && c <= T('Z') || c == T('_'))
 						{
 							begin = reading;
 							state = State::InIdentifier;
 						}
 						else
 						{
-							AddError(1, "Unknown character: \"" + string(reading, reading + 1) + "\".");
+							AddError(1, T("Unknown character: \"") + string_t(reading, reading + 1) + T("\"."));
 						}
 					}
 					break;
 				case State::InPreComment:
 					switch (c)
 					{
-					case '-':
+					case T('-'):
 						state = State::InComment;
 						break;
 					default:
@@ -315,7 +315,7 @@ namespace tinymoe
 				case State::InComment:
 					switch (c)
 					{
-					case '\n':
+					case T('\n'):
 						AddToken(reading - begin, CodeTokenType::Comment);
 						state = State::Begin;
 						begin = nullptr;
@@ -324,11 +324,11 @@ namespace tinymoe
 					}
 					break;
 				case State::InInteger:
-					if ('0' <= c && c <= '9')
+					if (T('0') <= c && c <= T('9'))
 					{
 						// stay still
 					}
-					else if (c == '.' && '0' <= reading[1] && reading[1] <= '9')
+					else if (c == T('.') && T('0') <= reading[1] && reading[1] <= T('9'))
 					{
 						state = State::InFloat;
 					}
@@ -341,7 +341,7 @@ namespace tinymoe
 					}
 					break;
 				case State::InFloat:
-					if ('0' <= c && c <= '9')
+					if (T('0') <= c && c <= T('9'))
 					{
 						// stay still
 					}
@@ -356,17 +356,17 @@ namespace tinymoe
 				case State::InString:
 					switch (c)
 					{
-					case '\"':
+					case T('\"'):
 						begin++;
 						AddToken(reading - begin, CodeTokenType::String);
 						state = State::Begin;
 						begin = nullptr;
 						break;
-					case '\\':
+					case T('\\'):
 						state = State::InStringEscaping;
 						break;
-					case '\n':
-						AddError(reading - begin, "String literal should be single-lined.");
+					case T('\n'):
+						AddError(reading - begin, T("String literal should be single-lined."));
 						state = State::Begin;
 						begin = nullptr;
 						reading--;
@@ -376,8 +376,8 @@ namespace tinymoe
 				case State::InStringEscaping:
 					switch (c)
 					{
-					case '\n':
-						AddError(reading - begin, "String literal should be single-lined.");
+					case T('\n'):
+						AddError(reading - begin, T("String literal should be single-lined."));
 						state = State::Begin;
 						begin = nullptr;
 						reading--;
@@ -387,7 +387,7 @@ namespace tinymoe
 					}
 					break;
 				case State::InIdentifier:
-					if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_' || c == '.' || c == '-')
+					if (T('a') <= c && c <= T('z') || T('A') <= c && c <= T('Z') || c == T('_') || c == T('.') || c == T('-'))
 					{
 						// stay still
 					}
@@ -416,7 +416,7 @@ namespace tinymoe
 				break;
 			case State::InString:
 			case State::InStringEscaping:
-				AddError(reading - begin, "String literal should be single-lined.");
+				AddError(reading - begin, T("String literal should be single-lined."));
 				break;
 			}
 
@@ -438,42 +438,42 @@ namespace tinymoe
 		SymbolName
 		*************************************************************/
 
-		string SymbolName::GetName()
+		string_t SymbolName::GetName()
 		{
-			string result;
+			string_t result;
 			for (auto it = identifiers.begin(); it != identifiers.end(); it++)
 			{
 				result += it->value;
 				if (it + 1 != identifiers.end())
 				{
-					result += " ";
+					result += T(" ");
 				}
 			}
 			return result;
 		}
 
-		string SymbolName::GetComposedName()
+		string_t SymbolName::GetComposedName()
 		{
-			string result;
+			string_t result;
 			for (auto it = identifiers.begin(); it != identifiers.end(); it++)
 			{
 				result += it->value;
 				if (it + 1 != identifiers.end())
 				{
-					result += "_";
+					result += T("_");
 				}
 			}
 			return result;
 		}
 
-		bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors)
+		bool SymbolName::ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string_t& content, CodeToken ownerToken, CodeError::List& errors)
 		{
 			if (it == end)
 			{
 				CodeError error =
 				{
 					ownerToken,
-					"Incomplete code, \"" + content + "\" expected.",
+					T("Incomplete code, \"") + content + T("\" expected."),
 				};
 				errors.push_back(error);
 				return false;
@@ -484,7 +484,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"\"" + content + "\" expected but \"" + it->value + "\" found.",
+					T("\"") + content + T("\" expected but \"") + it->value + T("\" found."),
 				};
 				errors.push_back(error);
 				return false;
@@ -494,7 +494,7 @@ namespace tinymoe
 			return true;
 		}
 
-		SymbolName::Ptr SymbolName::ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
+		SymbolName::Ptr SymbolName::ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string_t& ownerName, CodeToken ownerToken, CodeError::List& errors)
 		{
 			auto symbolName = make_shared<SymbolName>();
 			while (it != end)
@@ -508,7 +508,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						*it,
-						"Token is not a legal name: \"" + it->value + "\".",
+						T("Token is not a legal name: \"") + it->value + T("\"."),
 					};
 					errors.push_back(error);
 				}
@@ -520,14 +520,14 @@ namespace tinymoe
 				CodeError error =
 				{
 					ownerToken,
-					ownerName + " name should not be empty.",
+					ownerName + T(" name should not be empty."),
 				};
 				errors.push_back(error);
 			}
 			return symbolName;
 		}
 
-		SymbolName::Ptr SymbolName::ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors)
+		SymbolName::Ptr SymbolName::ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string_t& ownerName, CodeToken ownerToken, CodeError::List& errors)
 		{
 			auto symbolName = make_shared<SymbolName>();
 			while (it != end)
@@ -547,7 +547,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					ownerToken,
-					ownerName + " name should not be empty.",
+					ownerName + T(" name should not be empty."),
 				};
 				errors.push_back(error);
 			}

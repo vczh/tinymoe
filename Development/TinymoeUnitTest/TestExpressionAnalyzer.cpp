@@ -1,9 +1,10 @@
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
+using namespace tinymoe;
 using namespace tinymoe::compiler;
 
-void Tokenize(const string& code, CodeToken::List& tokens)
+void Tokenize(const string_t& code, CodeToken::List& tokens)
 {
 	CodeError::List errors;
 	auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -45,34 +46,34 @@ TEST_CASE(TestParseNameExpression)
 	GrammarStack::ResultList result;
 
 	{
-		Tokenize("true", tokens);
+		Tokenize(T("true"), tokens);
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "true");
+		TEST_ASSERT(expr->symbol->uniqueId == T("true"));
 	}
 	{
-		Tokenize("false", tokens);
+		Tokenize(T("false"), tokens);
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "false");
+		TEST_ASSERT(expr->symbol->uniqueId == T("false"));
 	}
 	{
-		Tokenize("null", tokens);
+		Tokenize(T("null"), tokens);
 		result.clear();
 		stack->ParsePrimitive(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "null");
+		TEST_ASSERT(expr->symbol->uniqueId == T("null"));
 	}
 }
 
@@ -87,54 +88,54 @@ TEST_CASE(TestParseTypeExpression)
 	GrammarStack::ResultList result;
 
 	{
-		Tokenize("array", tokens);
+		Tokenize(T("array"), tokens);
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "array");
+		TEST_ASSERT(expr->symbol->uniqueId == T("array"));
 	}
 	{
-		Tokenize("integer", tokens);
+		Tokenize(T("integer"), tokens);
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "integer");
+		TEST_ASSERT(expr->symbol->uniqueId == T("integer"));
 	}
 	{
-		Tokenize("float", tokens);
+		Tokenize(T("float"), tokens);
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "float");
+		TEST_ASSERT(expr->symbol->uniqueId == T("float"));
 	}
 	{
-		Tokenize("string", tokens);
+		Tokenize(T("string"), tokens);
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "string");
+		TEST_ASSERT(expr->symbol->uniqueId == T("string"));
 	}
 	{
-		Tokenize("symbol", tokens);
+		Tokenize(T("symbol"), tokens);
 		result.clear();
 		stack->ParseType(tokens.begin(), tokens.end(), result);
 		TEST_ASSERT(result.size() == 1);
 
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "symbol");
+		TEST_ASSERT(expr->symbol->uniqueId == T("symbol"));
 	}
 }
 
@@ -148,7 +149,7 @@ TEST_CASE(TestParseArgumentExpression)
 	CodeToken::List tokens;
 	GrammarStack::ResultList result;
 
-	Tokenize("true end", tokens);
+	Tokenize(T("true end"), tokens);
 	result.clear();
 	stack->ParseArgument(tokens.begin(), tokens.end(), result);
 	TEST_ASSERT(result.size() == 2);
@@ -156,14 +157,14 @@ TEST_CASE(TestParseArgumentExpression)
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[0].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->name->identifiers.size() == 1);
-		TEST_ASSERT(expr->name->identifiers[0].value == "true");
+		TEST_ASSERT(expr->name->identifiers[0].value == T("true"));
 	}
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->name->identifiers.size() == 2);
-		TEST_ASSERT(expr->name->identifiers[0].value == "true");
-		TEST_ASSERT(expr->name->identifiers[1].value == "end");
+		TEST_ASSERT(expr->name->identifiers[0].value == T("true"));
+		TEST_ASSERT(expr->name->identifiers[1].value == T("end"));
 	}
 }
 
@@ -177,24 +178,24 @@ TEST_CASE(TestParseAssignableExpression)
 	CodeToken::List tokens;
 	GrammarStack::ResultList result;
 
-	Tokenize("true end", tokens);
+	Tokenize(T("true end"), tokens);
 	stack->ParseAssignable(tokens.begin(), tokens.end(), result);
 	TEST_ASSERT(result.size() == 2);
 	{
 		auto expr = dynamic_pointer_cast<ReferenceExpression>(result[0].second);
 		TEST_ASSERT(expr);
-		TEST_ASSERT(expr->symbol->uniqueId == "true");
+		TEST_ASSERT(expr->symbol->uniqueId == T("true"));
 	}
 	{
 		auto expr = dynamic_pointer_cast<ArgumentExpression>(result[1].second);
 		TEST_ASSERT(expr);
 		TEST_ASSERT(expr->name->identifiers.size() == 2);
-		TEST_ASSERT(expr->name->identifiers[0].value == "true");
-		TEST_ASSERT(expr->name->identifiers[1].value == "end");
+		TEST_ASSERT(expr->name->identifiers[0].value == T("true"));
+		TEST_ASSERT(expr->name->identifiers[1].value == T("end"));
 	}
 }
 
-Expression::Ptr ParseNonAmbiguousExpression(const string& code)
+Expression::Ptr ParseNonAmbiguousExpression(const string_t& code)
 {
 	auto item = make_shared<GrammarStackItem>();
 	item->FillPredefinedSymbols();
@@ -222,41 +223,41 @@ Expression::Ptr ParseNonAmbiguousExpression(const string& code)
 
 TEST_CASE(TestParsePrimitiveExpression)
 {
-	auto expr = ParseNonAmbiguousExpression("item 1 of array new array of 10 items is not integer");
+	auto expr = ParseNonAmbiguousExpression(T("item 1 of array new array of 10 items is not integer"));
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "<primitive> is not <type>(item <expression> of array <primitive>(1, new array of <expression> items(10)), integer)");
-	TEST_ASSERT(code == "((item 1 of array (new array of 10 items)) is not (integer))");
+	TEST_ASSERT(log == T("<primitive> is not <type>(item <expression> of array <primitive>(1, new array of <expression> items(10)), integer)"));
+	TEST_ASSERT(code == T("((item 1 of array (new array of 10 items)) is not (integer))"));
 }
 
 TEST_CASE(TestParseUnaryExpression)
 {
-	auto expr = ParseNonAmbiguousExpression("not (-1 is string)");
+	auto expr = ParseNonAmbiguousExpression(T("not (-1 is string)"));
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "not(<primitive> is <type>(-(1), string))");
-	TEST_ASSERT(code == "(not((-1) is (string)))");
+	TEST_ASSERT(log == T("not(<primitive> is <type>(-(1), string))"));
+	TEST_ASSERT(code == T("(not((-1) is (string)))"));
 }
 
 TEST_CASE(TestParseBinaryExpression)
 {
-	auto expr = ParseNonAmbiguousExpression("1+2*3+4");
+	auto expr = ParseNonAmbiguousExpression(T("1+2*3+4"));
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "+(+(1, *(2, 3)), 4)");
-	TEST_ASSERT(code == "((1 + (2 * 3)) + 4)");
+	TEST_ASSERT(log == T("+(+(1, *(2, 3)), 4)"));
+	TEST_ASSERT(code == T("((1 + (2 * 3)) + 4)"));
 }
 
 TEST_CASE(TestParseListExpression)
 {
-	auto expr = ParseNonAmbiguousExpression("new object of (1, 2, 3)");
+	auto expr = ParseNonAmbiguousExpression(T("new object of (1, 2, 3)"));
 	auto log = expr->ToLog();
 	auto code = expr->ToCode();
-	TEST_ASSERT(log == "new <type> of <list>(object, (list: 1, 2, 3))");
-	TEST_ASSERT(code == "(new (object) of (1, 2, 3))");
+	TEST_ASSERT(log == T("new <type> of <list>(object, (list: 1, 2, 3))"));
+	TEST_ASSERT(code == T("(new (object) of (1, 2, 3))"));
 }
 
-Expression::Ptr ParseNonAmbiguousStatement(const string& code, GrammarStack::Ptr stack = nullptr)
+Expression::Ptr ParseNonAmbiguousStatement(const string_t& code, GrammarStack::Ptr stack = nullptr)
 {
 	if (!stack)
 	{
@@ -276,7 +277,7 @@ Expression::Ptr ParseNonAmbiguousStatement(const string& code, GrammarStack::Ptr
 	return result[0].second;
 }
 
-GrammarStack::Ptr ParseAmbiguousStatement(const string& code, Expression::List& expressionResult, GrammarStack::Ptr stack = nullptr)
+GrammarStack::Ptr ParseAmbiguousStatement(const string_t& code, Expression::List& expressionResult, GrammarStack::Ptr stack = nullptr)
 {
 	if (!stack)
 	{
@@ -303,32 +304,32 @@ GrammarStack::Ptr ParseAmbiguousStatement(const string& code, Expression::List& 
 TEST_CASE(TestParseStatement)
 {
 	{
-		auto stat = ParseNonAmbiguousStatement("end");
+		auto stat = ParseNonAmbiguousStatement(T("end"));
 		auto log = stat->ToLog();
 		auto code = stat->ToCode();
-		TEST_ASSERT(log == "end()");
-		TEST_ASSERT(code == "(end)");
+		TEST_ASSERT(log == T("end()"));
+		TEST_ASSERT(code == T("(end)"));
 	}
 	{
-		auto stat = ParseNonAmbiguousStatement("select item 1 of array new array of 10 items + 1");
+		auto stat = ParseNonAmbiguousStatement(T("select item 1 of array new array of 10 items + 1"));
 		auto log = stat->ToLog();
 		auto code = stat->ToCode();
-		TEST_ASSERT(log == "select <expression>(+(item <expression> of array <primitive>(1, new array of <expression> items(10)), 1))");
-		TEST_ASSERT(code == "(select ((item 1 of array (new array of 10 items)) + 1))");
+		TEST_ASSERT(log == T("select <expression>(+(item <expression> of array <primitive>(1, new array of <expression> items(10)), 1))"));
+		TEST_ASSERT(code == T("(select ((item 1 of array (new array of 10 items)) + 1))"));
 	}
 	{
-		auto stat = ParseNonAmbiguousStatement("set true to false");
+		auto stat = ParseNonAmbiguousStatement(T("set true to false"));
 		auto log = stat->ToLog();
 		auto code = stat->ToCode();
-		TEST_ASSERT(log == "set <assignable> to <expression>(true, false)");
-		TEST_ASSERT(code == "(set (true) to (false))");
+		TEST_ASSERT(log == T("set <assignable> to <expression>(true, false)"));
+		TEST_ASSERT(code == T("(set (true) to (false))"));
 	}
 	{
-		auto stat = ParseNonAmbiguousStatement("set new variable to false");
+		auto stat = ParseNonAmbiguousStatement(T("set new variable to false"));
 		auto log = stat->ToLog();
 		auto code = stat->ToCode();
-		TEST_ASSERT(log == "set <assignable> to <expression>((argument: new variable), false)");
-		TEST_ASSERT(code == "(set (new variable) to (false))");
+		TEST_ASSERT(log == T("set <assignable> to <expression>((argument: new variable), false)"));
+		TEST_ASSERT(code == T("(set (new variable) to (false))"));
 	}
 }
 
@@ -336,7 +337,7 @@ TEST_CASE(TestParseAmbiguousStatement)
 {
 	{
 		Expression::List stats;
-		auto stack = ParseAmbiguousStatement("set field something wrong of null to true", stats);
+		auto stack = ParseAmbiguousStatement(T("set field something wrong of null to true"), stats);
 		TEST_ASSERT(stats.size() == 2);
 		{
 			auto stat = stats[0];
@@ -347,8 +348,8 @@ TEST_CASE(TestParseAmbiguousStatement)
 			stat->CollectNewAssignable(assignables, arguments, modifiedAssignables);
 			auto assignable = stack->CountStatementAssignables(assignables);
 
-			TEST_ASSERT(log == "set <assignable> to <expression>((argument: field something wrong of null), true)");
-			TEST_ASSERT(code == "(set (field something wrong of null) to (true))");
+			TEST_ASSERT(log == T("set <assignable> to <expression>((argument: field something wrong of null), true)"));
+			TEST_ASSERT(code == T("(set (field something wrong of null) to (true))"));
 			TEST_ASSERT(assignable == -1);
 		}
 		{
@@ -360,8 +361,8 @@ TEST_CASE(TestParseAmbiguousStatement)
 			stat->CollectNewAssignable(assignables, arguments, modifiedAssignables);
 			auto assignable = stack->CountStatementAssignables(assignables);
 
-			TEST_ASSERT(log == "set field <argument> of <expression> to <expression>((argument: something wrong), null, true)");
-			TEST_ASSERT(code == "(set field (something wrong) of (null) to (true))");
+			TEST_ASSERT(log == T("set field <argument> of <expression> to <expression>((argument: something wrong), null, true)"));
+			TEST_ASSERT(code == T("(set field (something wrong) of (null) to (true))"));
 			TEST_ASSERT(assignable == 0);
 		}
 	}
@@ -380,21 +381,21 @@ TEST_CASE(TestParseStatementInContext)
 		
 		item->symbols.push_back(
 			make_shared<GrammarSymbol>(GrammarSymbolType::Sentence)
-			+ "print" + GrammarFragmentType::Expression
+			+ T("print") + GrammarFragmentType::Expression
 			);
 
 		item->symbols.push_back(
 			make_shared<GrammarSymbol>(GrammarSymbolType::Phrase)
-			+ "sum" + "from" + GrammarFragmentType::Expression + "to" + GrammarFragmentType::Primitive
+			+ T("sum") + T("from") + GrammarFragmentType::Expression + T("to") + GrammarFragmentType::Primitive
 			);
 
 		stack->Push(item);
 	}
 	{
-		auto stat = ParseNonAmbiguousStatement("print \"1+ ... +100 = \" & sum from 1 to 100", stack);
+		auto stat = ParseNonAmbiguousStatement(T("print \"1+ ... +100 = \" & sum from 1 to 100"), stack);
 		auto log = stat->ToLog();
 		auto code = stat->ToCode();
-		TEST_ASSERT(log == "print <expression>(&(\"1+ ... +100 = \", sum from <expression> to <primitive>(1, 100)))");
-		TEST_ASSERT(code == "(print (\"1+ ... +100 = \" & (sum from 1 to 100)))");
+		TEST_ASSERT(log == T("print <expression>(&(\"1+ ... +100 = \", sum from <expression> to <primitive>(1, 100)))"));
+		TEST_ASSERT(code == T("(print (\"1+ ... +100 = \" & (sum from 1 to 100)))"));
 	}
 }

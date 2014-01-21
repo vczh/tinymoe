@@ -14,14 +14,14 @@ namespace tinymoe
 		shared_ptr<ast::AstDeclaration> SymbolDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstSymbolDeclaration>();
-			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
+			ast->composedName = symbolModule->module->name->GetComposedName() + T("::") + name->GetComposedName();
 			return ast;
 		}
 
 		shared_ptr<ast::AstDeclaration> TypeDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstTypeDeclaration>();
-			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + name->GetComposedName();
+			ast->composedName = symbolModule->module->name->GetComposedName() + T("::") + name->GetComposedName();
 			for (auto field : fields)
 			{
 				auto astField = make_shared<AstSymbolDeclaration>();
@@ -31,15 +31,15 @@ namespace tinymoe
 			return ast;
 		}
 
-		string FunctionDeclaration::GetComposedName()
+		string_t FunctionDeclaration::GetComposedName()
 		{
-			string result;
+			string_t result;
 			for (auto it = name.begin(); it != name.end(); it++)
 			{
 				result += (*it)->GetComposedName(type == FunctionDeclarationType::Phrase && (it == name.begin() || it + 1 == name.end()));
 				if (it + 1 != name.end())
 				{
-					result += "_";
+					result += T("_");
 				}
 			}
 			return result;
@@ -48,11 +48,11 @@ namespace tinymoe
 		shared_ptr<ast::AstDeclaration> FunctionDeclaration::GenerateAst(shared_ptr<SymbolModule> symbolModule)
 		{
 			auto ast = make_shared<AstFunctionDeclaration>();
-			ast->composedName = symbolModule->module->name->GetComposedName() + "::" + GetComposedName();
+			ast->composedName = symbolModule->module->name->GetComposedName() + T("::") + GetComposedName();
 			
 			{
 				auto argument = make_shared<AstSymbolDeclaration>();
-				argument->composedName = "$the_result";
+				argument->composedName = T("$the_result");
 				ast->resultVariable = argument;
 			}
 			{
@@ -63,7 +63,7 @@ namespace tinymoe
 				}
 				else
 				{
-					argument->composedName = "$state";
+					argument->composedName = T("$state");
 				}
 				ast->arguments.push_back(argument);
 				ast->stateArgument = argument;
@@ -105,7 +105,7 @@ namespace tinymoe
 				}
 				else
 				{
-					argument->composedName = "$continuation";
+					argument->composedName = T("$continuation");
 				}
 				ast->arguments.push_back(argument);
 				ast->continuationArgument = argument;

@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
@@ -8,16 +9,16 @@ using namespace tinymoe::ast;
 class CSharpNameResolver
 {
 private:
-	map<AstDeclaration*, AstDeclaration*>		declScopes;
-	map<AstDeclaration*, string>				resolvedNames;
-	map<pair<AstDeclaration*, string>, int>		scopedAppearCount;
+	map<AstDeclaration*, AstDeclaration*>			declScopes;
+	map<AstDeclaration*, string_t>					resolvedNames;
+	map<pair<AstDeclaration*, string_t>, int>		scopedAppearCount;
 public:
 	void Scope(AstDeclaration* decl, AstDeclaration* scope)
 	{
 		declScopes.insert(make_pair(decl, scope));
 	}
 
-	string Resolve(string name, AstDeclaration* scope)
+	string_t Resolve(string_t name, AstDeclaration* scope)
 	{
 		auto scopeName = make_pair(scope, name);
 		auto itappear = scopedAppearCount.find(scopeName);
@@ -29,32 +30,36 @@ public:
 		else
 		{
 			int counter = ++itappear->second;
-			char buffer[20] = { 0 };
-			_itoa_s(counter, buffer, 10);
-			return name + string("_x") + buffer;
+			char_t buffer[20] = { 0 };
+#ifdef _UNICODE_TINYMOE
+			_itow(counter, buffer, 10);
+#else
+			_itoa(counter, buffer, 10);
+#endif
+			return name + string_t(T("_x")) + buffer;
 		}
 	}
 
-	string Resolve(AstDeclaration* decl)
+	string_t Resolve(AstDeclaration* decl)
 	{
 		auto it = resolvedNames.find(decl);
 		if (it == resolvedNames.end())
 		{
-			stringstream ss;
+			stringstream_t ss;
 			for (auto c : decl->composedName)
 			{
-				if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || c == '_')
+				if (T('a') <= c && c <= T('z') || T('A') <= c && c <= T('Z') || T('0') <= c && c <= T('9') || c == T('_'))
 				{
 					ss << c;
 				}
 				else
 				{
-					ss << '_';
+					ss << T('_');
 				}
 			}
-			string name = ss.str();
+			string_t name = ss.str();
 			auto scope = declScopes.find(decl)->second;
-			string declName = Resolve(name, scope);
+			string_t declName = Resolve(name, scope);
 			resolvedNames.insert(make_pair(decl, declName));
 			return declName;
 		}
@@ -69,7 +74,7 @@ class CSharpTypeCodegen :public AstTypeVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	string					result;
+	string_t				result;
 
 	CSharpTypeCodegen(CSharpNameResolver& _resolver)
 		:resolver(_resolver)
@@ -81,28 +86,28 @@ public:
 		switch (node->typeName)
 		{
 		case AstPredefinedTypeName::Object:
-			result = "TinymoeObject";
+			result = T("TinymoeObject");
 			break;
 		case AstPredefinedTypeName::Symbol:
-			result = "TinymoeSymbol";
+			result = T("TinymoeSymbol");
 			break;
 		case AstPredefinedTypeName::Array:
-			result = "TinymoeArray";
+			result = T("TinymoeArray");
 			break;
 		case AstPredefinedTypeName::Boolean:
-			result = "TinymoeBoolean";
+			result = T("TinymoeBoolean");
 			break;
 		case AstPredefinedTypeName::Integer:
-			result = "TinymoeInteger";
+			result = T("TinymoeInteger");
 			break;
 		case AstPredefinedTypeName::Float:
-			result = "TinymoeFloat";
+			result = T("TinymoeFloat");
 			break;
 		case AstPredefinedTypeName::String:
-			result = "TinymoeString";
+			result = T("TinymoeString");
 			break;
 		case AstPredefinedTypeName::Function:
-			result = "TinymoeFunction";
+			result = T("TinymoeFunction");
 			break;
 		}
 	}
@@ -112,7 +117,7 @@ public:
 		result = resolver.Resolve(node->typeDeclaration.lock().get());
 	}
 
-	static string ToString(AstType::Ptr type, CSharpNameResolver& _resolver)
+	static string_t ToString(AstType::Ptr type, CSharpNameResolver& _resolver)
 	{
 		CSharpTypeCodegen codegen(_resolver);
 		type->Accept(&codegen);
@@ -120,49 +125,49 @@ public:
 	}
 };
 
-string FunctionToName(CSharpNameResolver& resolver, AstFunctionDeclaration* decl)
+string_t FunctionToName(CSharpNameResolver& resolver, AstFunctionDeclaration* decl)
 {
 	return resolver.Resolve(decl);
 }
 
-string FunctionToTypedName(CSharpNameResolver& resolver, AstFunctionDeclaration* decl)
+string_t FunctionToTypedName(CSharpNameResolver& resolver, AstFunctionDeclaration* decl)
 {
 	auto methodName = FunctionToName(resolver, decl);
-	return (decl->ownerType ? CSharpTypeCodegen::ToString(decl->ownerType, resolver) + "__" : "") + methodName;
+	return (decl->ownerType ? CSharpTypeCodegen::ToString(decl->ownerType, resolver) + T("__") : T("")) + methodName;
 }
 
-string FunctionToValue(CSharpNameResolver& resolver, AstFunctionDeclaration* decl, AstDeclaration* scope)
+string_t FunctionToValue(CSharpNameResolver& resolver, AstFunctionDeclaration* decl, AstDeclaration* scope)
 {
-	stringstream ss;
-	string argumentName = resolver.Resolve("__args__", scope);
-	ss << "new TinymoeFunction(" << argumentName << " => " << FunctionToTypedName(resolver, decl) << "(";
+	stringstream_t ss;
+	string_t argumentName = resolver.Resolve(T("__args__"), scope);
+	ss << T("new TinymoeFunction(") << argumentName << T(" => ") << FunctionToTypedName(resolver, decl) << T("(");
 	for (auto it = decl->arguments.begin(); it != decl->arguments.end(); it++)
 	{
-		ss << argumentName << "[" << it - decl->arguments.begin() << "]";
+		ss << argumentName << T("[") << it - decl->arguments.begin() << T("]");
 		if (it + 1 == decl->arguments.end())
 		{
-			ss << "))";
+			ss << T("))");
 		}
 		else
 		{
-			ss << ", ";
+			ss << T(", ");
 		}
 	}
 	return ss.str();
 }
 
-void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CSharpNameResolver& resolver, ostream& o, string prefix);
-void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream& o, string prefix, bool block);
+void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix);
+void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block);
 
 class CSharpExpressionCodegen :public AstExpressionVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	ostream&				o;
-	string					prefix;
+	ostream_t&				o;
+	string_t				prefix;
 	AstDeclaration*			scope;
 
-	CSharpExpressionCodegen(CSharpNameResolver& _resolver, ostream& _o, string _prefix, AstDeclaration* _scope)
+	CSharpExpressionCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix, AstDeclaration* _scope)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
@@ -177,7 +182,7 @@ public:
 			PrintExpression(*it, scope, resolver, o, prefix);
 			if (it + 1 != exprs.end())
 			{
-				o << ", ";
+				o << T(", ");
 			}
 		}
 	}
@@ -187,37 +192,37 @@ public:
 		switch (node->literalName)
 		{
 		case AstLiteralName::Null:
-			o << "null";
+			o << T("null");
 			break;
 		case AstLiteralName::True:
-			o << "new TinymoeBoolean(true)";
+			o << T("new TinymoeBoolean(true)");
 			break;
 		case AstLiteralName::False:
-			o << "new TinymoeBoolean(false)";
+			o << T("new TinymoeBoolean(false)");
 			break;
 		}
 	}
 
 	void Visit(AstIntegerExpression* node)
 	{
-		o << "new TinymoeInteger(" << node->value << ")";
+		o << T("new TinymoeInteger(") << node->value << T(")");
 	}
 
 	void Visit(AstFloatExpression* node)
 	{
-		o << "new TinymoeFloat(" << node->value << ")";
+		o << T("new TinymoeFloat(") << node->value << T(")");
 	}
 
 	void Visit(AstStringExpression* node)
 	{
-		o << "new TinymoeString(\"" << node->value << "\")";
+		o << T("new TinymoeString(\"") << node->value << T("\")");
 	}
 
 	void Visit(AstExternalSymbolExpression* node)
 	{
-		o << "GetExternalFunction(";
+		o << T("GetExternalFunction(");
 		PrintExpression(node->name, scope, resolver, o, prefix);
-		o << ")";
+		o << T(")");
 	}
 
 	void Visit(AstReferenceExpression* node)
@@ -238,17 +243,17 @@ public:
 		switch (node->op)
 		{
 		case AstUnaryOperator::Positive:
-			o << "Positive(";
+			o << T("Positive(");
 			break;
 		case AstUnaryOperator::Negative:
-			o << "Negative(";
+			o << T("Negative(");
 			break;
 		case AstUnaryOperator::Not:
-			o << "Not(";
+			o << T("Not(");
 			break;
 		}
 		PrintExpression(node->operand, scope, resolver, o, prefix);
-		o << ")";
+		o << T(")");
 	}
 
 	void Visit(AstBinaryExpression* node)
@@ -256,105 +261,105 @@ public:
 		switch (node->op)
 		{
 		case AstBinaryOperator::Concat:
-			o << "Concat(";
+			o << T("Concat(");
 			break;
 		case AstBinaryOperator::Add:
-			o << "Add(";
+			o << T("Add(");
 			break;
 		case AstBinaryOperator::Sub:
-			o << "Sub(";
+			o << T("Sub(");
 			break;
 		case AstBinaryOperator::Mul:
-			o << "Mul(";
+			o << T("Mul(");
 			break;
 		case AstBinaryOperator::Div:
-			o << "Div(";
+			o << T("Div(");
 			break;
 		case AstBinaryOperator::IntDiv:
-			o << "IntDiv(";
+			o << T("IntDiv(");
 			break;
 		case AstBinaryOperator::Mod:
-			o << "Mod(";
+			o << T("Mod(");
 			break;
 		case AstBinaryOperator::LT:
-			o << "LT(";
+			o << T("LT(");
 			break;
 		case AstBinaryOperator::GT:
-			o << "GT(";
+			o << T("GT(");
 			break;
 		case AstBinaryOperator::LE:
-			o << "LE(";
+			o << T("LE(");
 			break;
 		case AstBinaryOperator::GE:
-			o << "GE(";
+			o << T("GE(");
 			break;
 		case AstBinaryOperator::EQ:
-			o << "EQ(";
+			o << T("EQ(");
 			break;
 		case AstBinaryOperator::NE:
-			o << "NE(";
+			o << T("NE(");
 			break;
 		case AstBinaryOperator::And:
-			o << "And(";
+			o << T("And(");
 			break;
 		case AstBinaryOperator::Or:
-			o << "Or(";
+			o << T("Or(");
 			break;
 		}
 		PrintExpression(node->first, scope, resolver, o, prefix);
-		o << ", ";
+		o << T(", ");
 		PrintExpression(node->second, scope, resolver, o, prefix);
-		o << ")";
+		o << T(")");
 	}
 
 	void Visit(AstNewTypeExpression* node)
 	{
-		o << "new " << CSharpTypeCodegen::ToString(node->type, resolver) << "().SetFields(new TinymoeObject[] {";
+		o << T("new ") << CSharpTypeCodegen::ToString(node->type, resolver) << T("().SetFields(new TinymoeObject[] {");
 		PrintExpressionList(node->fields);
-		o << "}).FinishConstruction()";
+		o << T("}).FinishConstruction()");
 	}
 
 	void Visit(AstTestTypeExpression* node)
 	{
-		o << "new TinymoeBoolean(";
+		o << T("new TinymoeBoolean(");
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << " is " << CSharpTypeCodegen::ToString(node->type, resolver) << ")";
+		o << T(" is ") << CSharpTypeCodegen::ToString(node->type, resolver) << T(")");
 	}
 
 	void Visit(AstNewArrayExpression* node)
 	{
-		o << "new TinymoeArray(((TinymoeInteger)CastToInteger(";
+		o << T("new TinymoeArray(((TinymoeInteger)CastToInteger(");
 		PrintExpression(node->length, scope, resolver, o, prefix);
-		o << ")).Value)";
+		o << T(")).Value)");
 	}
 
 	void Visit(AstNewArrayLiteralExpression* node)
 	{
-		o << "new TinymoeArray(new TinymoeObject[] {";
+		o << T("new TinymoeArray(new TinymoeObject[] {");
 		PrintExpressionList(node->elements);
-		o << "})";
+		o << T("})");
 	}
 
 	void Visit(AstArrayLengthExpression* node)
 	{
-		o << "ArrayLength(";
+		o << T("ArrayLength(");
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << ")";
+		o << T(")");
 	}
 
 	void Visit(AstArrayAccessExpression* node)
 	{
-		o << "ArrayGet(";
+		o << T("ArrayGet(");
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << ", ";
+		o << T(", ");
 		PrintExpression(node->index, scope, resolver, o, prefix);
-		o << ")";
+		o << T(")");
 	}
 
 	void Visit(AstFieldAccessExpression* node)
 	{
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << ".GetField(\"" << node->composedFieldName << "\")";
+		o << T(".GetField(\"") << node->composedFieldName << T("\")");
 	}
 
 	void Visit(AstInvokeExpression* node)
@@ -367,45 +372,45 @@ public:
 
 		if (func)
 		{
-			o << FunctionToName(resolver, func.get()) << "(" << endl;
+			o << FunctionToName(resolver, func.get()) << T("(") << endl;
 		}
 		else
 		{
-			o << "Invoke(";
+			o << T("Invoke(");
 			PrintExpression(node->function, scope, resolver, o, prefix);
-			o << ", new TinymoeObject[] {" << endl;
+			o << T(", new TinymoeObject[] {") << endl;
 		}
 		for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
 		{
-			o << prefix << "\t";
-			PrintExpression(*it, scope, resolver, o, prefix + "\t");
+			o << prefix << T("\t");
+			PrintExpression(*it, scope, resolver, o, prefix + T("\t"));
 			if (it + 1 != node->arguments.end())
 			{
-				o << "," << endl;
+				o << T(",") << endl;
 			}
 		}
 		if (func)
 		{
-			o << endl << prefix << "\t)";
+			o << endl << prefix << T("\t)");
 		}
 		else
 		{
-			o << endl << prefix << "\t})";
+			o << endl << prefix << T("\t})");
 		}
 	}
 
 	void Visit(AstLambdaExpression* node)
 	{
-		string argumentName = resolver.Resolve("__args__", scope);
-		o << "new TinymoeFunction(" << argumentName << " => " << endl;
-		o << prefix << "{" << endl;
+		string_t argumentName = resolver.Resolve(T("__args__"), scope);
+		o << T("new TinymoeFunction(") << argumentName << T(" => ") << endl;
+		o << prefix << T("{") << endl;
 		for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
 		{
 			resolver.Scope(it->get(), scope);
-			o << prefix << "\tTinymoeObject " << resolver.Resolve(it->get()) << " = " << argumentName << "[" << it - node->arguments.begin() << "];" << endl;
+			o << prefix << T("\tTinymoeObject ") << resolver.Resolve(it->get()) << T(" = ") << argumentName << T("[") << it - node->arguments.begin() << T("];") << endl;
 		}
-		PrintStatement(node->statement, scope, resolver, o, prefix + "\t", true);
-		o << endl << prefix << "})";
+		PrintStatement(node->statement, scope, resolver, o, prefix + T("\t"), true);
+		o << endl << prefix << T("})");
 	}
 };
 
@@ -413,12 +418,12 @@ class CSharpSetExpressionCodegen :public AstExpressionVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	ostream&				o;
-	string					prefix;
+	ostream_t&				o;
+	string_t					prefix;
 	AstDeclaration*			scope;
 	AstExpression::Ptr		value;
 
-	CSharpSetExpressionCodegen(CSharpNameResolver& _resolver, ostream& _o, string _prefix, AstDeclaration* _scope, AstExpression::Ptr _value)
+	CSharpSetExpressionCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix, AstDeclaration* _scope, AstExpression::Ptr _value)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
@@ -463,9 +468,9 @@ public:
 		{
 			o << resolver.Resolve(decl.get());
 		}
-		o << " = ";
+		o << T(" = ");
 		PrintExpression(value, scope, resolver, o, prefix);
-		o << ";";
+		o << T(";");
 	}
 
 	void Visit(AstUnaryExpression* node)
@@ -505,21 +510,21 @@ public:
 
 	void Visit(AstArrayAccessExpression* node)
 	{
-		o << "ArraySet(";
+		o << T("ArraySet(");
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << ", ";
+		o << T(", ");
 		PrintExpression(node->index, scope, resolver, o, prefix);
-		o << ", ";
+		o << T(", ");
 		PrintExpression(value, scope, resolver, o, prefix);
-		o << ");";
+		o << T(");");
 	}
 
 	void Visit(AstFieldAccessExpression* node)
 	{
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << ".SetField(\"" << node->composedFieldName << "\", ";
+		o << T(".SetField(\"") << node->composedFieldName << T("\", ");
 		PrintExpression(value, scope, resolver, o, prefix);
-		o << ");";
+		o << T(");");
 	}
 
 	void Visit(AstInvokeExpression* node)
@@ -537,12 +542,12 @@ class CSharpStatementCodegen :public AstStatementVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	ostream&				o;
-	string					prefix;
+	ostream_t&				o;
+	string_t					prefix;
 	bool					block;
 	AstDeclaration*			scope;
 
-	CSharpStatementCodegen(CSharpNameResolver& _resolver, ostream& _o, string _prefix, bool _block, AstDeclaration* _scope)
+	CSharpStatementCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix, bool _block, AstDeclaration* _scope)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
@@ -566,13 +571,13 @@ public:
 		}
 		else
 		{
-			o << prefix << "{" << endl;
+			o << prefix << T("{") << endl;
 			for (auto stat : node->statements)
 			{
-				PrintStatement(stat, scope, resolver, o, prefix + "\t", false);
+				PrintStatement(stat, scope, resolver, o, prefix + T("\t"), false);
 				o << endl;
 			}
-			o << prefix << "}";
+			o << prefix << T("}");
 		}
 	}
 
@@ -580,13 +585,13 @@ public:
 	{
 		o << prefix;
 		PrintExpression(node->expression, scope, resolver, o, prefix);
-		o << ";";
+		o << T(";");
 	}
 
 	void Visit(AstDeclarationStatement* node)
 	{
 		resolver.Scope(node->declaration.get(), scope);
-		o << prefix << "TinymoeObject " << resolver.Resolve(node->declaration.get()) << " = null;";
+		o << prefix << T("TinymoeObject ") << resolver.Resolve(node->declaration.get()) << T(" = null;");
 	}
 
 	void Visit(AstAssignmentStatement* node)
@@ -602,36 +607,36 @@ public:
 		o << prefix;
 		while (true)
 		{
-			o << "if (((TinymoeBoolean)CastToBoolean(";
+			o << T("if (((TinymoeBoolean)CastToBoolean(");
 			PrintExpression(current->condition, scope, resolver, o, prefix);
-			o << ")).Value)" << endl;
-			o << prefix << "{" << endl;
-			PrintStatement(current->trueBranch, scope, resolver, o, prefix + "\t", true);
-			o << endl << prefix << "}";
+			o << T(")).Value)") << endl;
+			o << prefix << T("{") << endl;
+			PrintStatement(current->trueBranch, scope, resolver, o, prefix + T("\t"), true);
+			o << endl << prefix << T("}");
 
 			auto nextCurrent = dynamic_cast<AstIfStatement*>(current->falseBranch.get());
 			if (!nextCurrent) break;
-			o << endl << prefix << "else ";
+			o << endl << prefix << T("else ");
 			current = nextCurrent;
 		}
 
 		if (current->falseBranch)
 		{
-			o << endl << prefix << "else" << endl;
-			o << prefix << "{" << endl;
-			PrintStatement(current->falseBranch, scope, resolver, o, prefix + "\t", true);
-			o << endl << prefix << "}";
+			o << endl << prefix << T("else") << endl;
+			o << prefix << T("{") << endl;
+			PrintStatement(current->falseBranch, scope, resolver, o, prefix + T("\t"), true);
+			o << endl << prefix << T("}");
 		}
 	}
 };
 
-void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CSharpNameResolver& resolver, ostream& o, string prefix)
+void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix)
 {
 	CSharpExpressionCodegen codegen(resolver, o, prefix, scope);
 	expression->Accept(&codegen);
 }
 
-void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream& o, string prefix, bool block)
+void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block)
 {
 	CSharpStatementCodegen codegen(resolver, o, prefix, block, scope);
 	statement->Accept(&codegen);
@@ -641,10 +646,10 @@ class CSharpDeclarationCodegen :public AstDeclarationVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	ostream&				o;
-	string					prefix;
+	ostream_t&				o;
+	string_t					prefix;
 
-	CSharpDeclarationCodegen(CSharpNameResolver& _resolver, ostream& _o, string _prefix)
+	CSharpDeclarationCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
@@ -653,52 +658,52 @@ public:
 
 	void Visit(AstSymbolDeclaration* node)override
 	{
-		o << prefix << "public readonly TinymoeObject " << resolver.Resolve(node) << " = new TinymoeSymbol(\"" << resolver.Resolve(node) << "\");" << endl << endl;
+		o << prefix << T("public readonly TinymoeObject ") << resolver.Resolve(node) << T(" = new TinymoeSymbol(\"") << resolver.Resolve(node) << T("\");") << endl << endl;
 	}
 
 	void Visit(AstTypeDeclaration* node)override
 	{
-		o << prefix << "public class " << resolver.Resolve(node);
+		o << prefix << T("public class ") << resolver.Resolve(node);
 		if (node->baseType.expired())
 		{
-			o << " : TinymoeObject" << endl;
+			o << T(" : TinymoeObject") << endl;
 		}
 		else
 		{
-			o << " : " << CSharpTypeCodegen::ToString(node->baseType.lock(), resolver) << endl;
+			o << T(" : ") << CSharpTypeCodegen::ToString(node->baseType.lock(), resolver) << endl;
 		}
-		o << prefix << "{" << endl;
-		o << prefix << "\tpublic " << resolver.Resolve(node) << "()" << endl;
-		o << prefix << "\t{" << endl;
+		o << prefix << T("{") << endl;
+		o << prefix << T("\tpublic ") << resolver.Resolve(node) << T("()") << endl;
+		o << prefix << T("\t{") << endl;
 		for (auto field : node->fields)
 		{
 			resolver.Scope(field.get(), node);
-			o << prefix << "\t\tSetField(\"" << resolver.Resolve(field.get()) << "\", null);" << endl;
+			o << prefix << T("\t\tSetField(\"") << resolver.Resolve(field.get()) << T("\", null);") << endl;
 		}
-		o << prefix << "\t}" << endl;
-		o << prefix << "}" << endl << endl;
+		o << prefix << T("\t}") << endl;
+		o << prefix << T("}") << endl << endl;
 	}
 
 	void Visit(AstFunctionDeclaration* node)override
 	{
-		o << prefix << "public void " << FunctionToTypedName(resolver, node) << "(";
+		o << prefix << T("public void ") << FunctionToTypedName(resolver, node) << T("(");
 		for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
 		{
 			resolver.Scope(it->get(), node);
-			o << "TinymoeObject " << resolver.Resolve(it->get());
+			o << T("TinymoeObject ") << resolver.Resolve(it->get());
 			if (it + 1 == node->arguments.end())
 			{
-				o << ")" << endl;
+				o << T(")") << endl;
 			}
 			else
 			{
-				o << ", ";
+				o << T(", ");
 			}
 		}
-		o << prefix << "{" << endl;
-		PrintStatement(node->statement, node, resolver, o, prefix + "\t", true);
+		o << prefix << T("{") << endl;
+		PrintStatement(node->statement, node, resolver, o, prefix + T("\t"), true);
 		o << endl;
-		o << prefix << "}" << endl << endl;
+		o << prefix << T("}") << endl << endl;
 	}
 };
 
@@ -706,10 +711,10 @@ class CSharpExtensionDeclarationCodegen :public AstDeclarationVisitor
 {
 public:
 	CSharpNameResolver&		resolver;
-	ostream&				o;
-	string					prefix;
+	ostream_t&				o;
+	string_t					prefix;
 
-	CSharpExtensionDeclarationCodegen(CSharpNameResolver& _resolver, ostream& _o, string _prefix)
+	CSharpExtensionDeclarationCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
@@ -731,74 +736,74 @@ public:
 			auto typeName = CSharpTypeCodegen::ToString(node->ownerType, resolver);
 			auto methodName = node->composedName;
 			auto targetName = FunctionToValue(resolver, node, nullptr);
-			o << prefix << "TinymoeObject.SetExtension(" << endl;
-			o << prefix << "\ttypeof(" << typeName << ")," << endl;
-			o << prefix << "\t\"" << methodName << "\"," << endl;
-			o << prefix << "\t" << targetName << endl;
-			o << prefix << "\t); " << endl;
+			o << prefix << T("TinymoeObject.SetExtension(") << endl;
+			o << prefix << T("\ttypeof(") << typeName << T("),") << endl;
+			o << prefix << T("\t\"") << methodName << T("\",") << endl;
+			o << prefix << T("\t") << targetName << endl;
+			o << prefix << T("\t); ") << endl;
 		}
 	}
 };
 
-void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream& o)
+void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream_t& o)
 {
 	CSharpNameResolver resolver;
-	o << "using System;" << endl;
-	o << "using System.Collections.Generic;" << endl;
-	o << "using TinymoeDotNet;" << endl;
-	o << "" << endl;
-	o << "namespace TinymoeProgramNamespace" << endl;
-	o << "{" << endl;
-	o << "\tpublic class TinymoeProgram : TinymoeOperations" << endl;
-	o << "\t{" << endl;
+	o << T("using System;") << endl;
+	o << T("using System.Collections.Generic;") << endl;
+	o << T("using TinymoeDotNet;") << endl;
+	o << T("") << endl;
+	o << T("namespace TinymoeProgramNamespace") << endl;
+	o << T("{") << endl;
+	o << T("\tpublic class TinymoeProgram : TinymoeOperations") << endl;
+	o << T("\t{") << endl;
 	{
 		for (auto decl : assembly->declarations)
 		{
 			resolver.Scope(decl.get(), nullptr);
 		}
-		CSharpDeclarationCodegen codegen(resolver, o, "\t\t");
+		CSharpDeclarationCodegen codegen(resolver, o, T("\t\t"));
 		for (auto decl : assembly->declarations)
 		{
 			decl->Accept(&codegen);
 		}
 	}
-	o << "\t\tpublic TinymoeProgram()" << endl;
-	o << "\t\t{" << endl;
+	o << T("\t\tpublic TinymoeProgram()") << endl;
+	o << T("\t\t{") << endl;
 	{
-		CSharpExtensionDeclarationCodegen codegen(resolver, o, "\t\t\t");
+		CSharpExtensionDeclarationCodegen codegen(resolver, o, T("\t\t\t"));
 		for (auto decl : assembly->declarations)
 		{
 			decl->Accept(&codegen);
 		}
 	}
-	o << "\t\t}" << endl;
+	o << T("\t\t}") << endl;
 	o << endl;
 	{
-		string mainName;
+		string_t mainName;
 		for (auto decl : assembly->declarations)
 		{
 			if (decl->composedName.size() >= 6)
 			{
-				if (decl->composedName.substr(decl->composedName.size() - 6, 6) == "::main")
+				if (decl->composedName.substr(decl->composedName.size() - 6, 6) == T("::main"))
 				{
 					mainName = resolver.Resolve(decl.get());
 					break;
 				}
 			}
 		}
-		o << "\t\tstatic void Main(string[] args)" << endl;
-		o << "\t\t{" << endl;
-		o << "\t\t\tvar program = new TinymoeProgram();" << endl;
-		o << "\t\t\tvar continuation = new TinymoeFunction((TinymoeObject[] arguments) =>" << endl;
-		o << "\t\t\t{" << endl;
-		o << "\t\t\t});" << endl;
-		o << "\t\t\tvar trap = new TinymoeProgram.standard_library__continuation_trap();" << endl;
-		o << "\t\t\ttrap.SetField(\"continuation\", continuation);" << endl;
-		o << "\t\t\tvar state = new TinymoeProgram.standard_library__continuation_state();" << endl;
-		o << "\t\t\tstate.SetField(\"trap\", trap);" << endl;
-		o << "\t\t\tprogram." << mainName << "(state, continuation);" << endl;
-		o << "\t\t}" << endl;
+		o << T("\t\tstatic void Main(string[] args)") << endl;
+		o << T("\t\t{") << endl;
+		o << T("\t\t\tvar program = new TinymoeProgram();") << endl;
+		o << T("\t\t\tvar continuation = new TinymoeFunction((TinymoeObject[] arguments) =>") << endl;
+		o << T("\t\t\t{") << endl;
+		o << T("\t\t\t});") << endl;
+		o << T("\t\t\tvar trap = new TinymoeProgram.standard_library__continuation_trap();") << endl;
+		o << T("\t\t\ttrap.SetField(\"continuation\", continuation);") << endl;
+		o << T("\t\t\tvar state = new TinymoeProgram.standard_library__continuation_state();") << endl;
+		o << T("\t\t\tstate.SetField(\"trap\", trap);") << endl;
+		o << T("\t\t\tprogram.") << mainName << T("(state, continuation);") << endl;
+		o << T("\t\t}") << endl;
 	}
-	o << "\t}" << endl;
-	o << "}" << endl;
+	o << T("\t}") << endl;
+	o << T("}") << endl;
 }

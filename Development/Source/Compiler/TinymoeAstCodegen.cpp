@@ -60,10 +60,10 @@ namespace tinymoe
 		SymbolAstContext
 		*************************************************************/
 
-		string SymbolAstContext::GetUniquePostfix()
+		string_t SymbolAstContext::GetUniquePostfix()
 		{
-			stringstream ss;
-			ss << "_" << uniqueId++;
+			stringstream_t ss;
+			ss << T("_") << uniqueId++;
 			return ss.str();
 		}
 
@@ -117,7 +117,7 @@ namespace tinymoe
 					auto var = make_shared<AstDeclarationStatement>();
 					{
 						auto decl = make_shared<AstSymbolDeclaration>();
-						decl->composedName = "$var" + context.GetUniquePostfix();
+						decl->composedName = T("$var") + context.GetUniquePostfix();
 						var->declaration = decl;
 
 						auto declstat = make_shared<AstDeclarationStatement>();
@@ -209,43 +209,43 @@ namespace tinymoe
 		FunctionFragment::GetComposedName
 		*************************************************************/
 
-		string NameFragment::GetComposedName(bool primitive)
+		string_t NameFragment::GetComposedName(bool primitive)
 		{
 			return name->GetComposedName();
 		}
 
-		string VariableArgumentFragment::GetComposedName(bool primitive)
+		string_t VariableArgumentFragment::GetComposedName(bool primitive)
 		{
-			string result;
+			string_t result;
 			switch (type)
 			{
 			case FunctionArgumentType::Argument:
-				result = "$argument";
+				result = T("$argument");
 				break;
 			case FunctionArgumentType::Assignable:
-				result = "assignable";
+				result = T("assignable");
 				break;
 			case FunctionArgumentType::Expression:
-				result = (primitive ? "$primitive" : "$expression");
+				result = (primitive ? T("$primitive") : T("$expression"));
 				break;
 			case FunctionArgumentType::List:
-				result = "list";
+				result = T("list");
 				break;
 			case FunctionArgumentType::Normal:
-				result = (primitive ? "$primitive" : "$expression");
+				result = (primitive ? T("$primitive") : T("$expression"));
 				break;
 			}
 			
 			if (receivingType)
 			{
-				result += "<" + receivingType->GetComposedName() + ">";
+				result += T("<") + receivingType->GetComposedName() + T(">");
 			}
 			return result;
 		}
 
-		string FunctionArgumentFragment::GetComposedName(bool primitive)
+		string_t FunctionArgumentFragment::GetComposedName(bool primitive)
 		{
-			return (primitive ? "$primitive" : "$expression");
+			return (primitive ? T("$primitive") : T("$expression"));
 		}
 
 		/*************************************************************
@@ -266,10 +266,10 @@ namespace tinymoe
 			else if (type == FunctionArgumentType::Assignable)
 			{
 				auto read = make_shared<AstSymbolDeclaration>();
-				read->composedName = "$read_" + name->GetComposedName();
+				read->composedName = T("$read_") + name->GetComposedName();
 
 				auto write = make_shared<AstSymbolDeclaration>();
-				write->composedName = "$write_" + name->GetComposedName();
+				write->composedName = T("$write_") + name->GetComposedName();
 				return AstPair(read, write);
 			}
 			else
@@ -396,7 +396,7 @@ namespace tinymoe
 
 		void FillMultipleDispatchStepAst(
 			AstFunctionDeclaration::Ptr ast,
-			string functionName,
+			string_t functionName,
 			int dispatch
 			)
 		{
@@ -457,23 +457,23 @@ namespace tinymoe
 					}
 				}
 				
-				FillMultipleDispatchStepAst(rootAst, "$dispatch<>" + rootAst->composedName, rootAst->readArgumentAstMap.find(*dispatches.begin())->second);
+				FillMultipleDispatchStepAst(rootAst, T("$dispatch<>") + rootAst->composedName, rootAst->readArgumentAstMap.find(*dispatches.begin())->second);
 				{
 					auto ast = rootFunc->function->GenerateAst(module);
-					ast->composedName = "$dispatch_fail<>" + rootAst->composedName;
+					ast->composedName = T("$dispatch_fail<>") + rootAst->composedName;
 					assembly->declarations.push_back(ast);
 					dispatchFailAst = dynamic_pointer_cast<AstFunctionDeclaration>(ast);
 				}
 
-				set<string> createdFunctions, typeFunctions, objectFunctions;
+				set<string_t> createdFunctions, typeFunctions, objectFunctions;
 				for (it = lower; it != upper; it++)
 				{
 					auto func = it->second;
 					auto module = functionModules.find(func)->second;
-					string signature;
+					string_t signature;
 					for (auto itd = dispatches.begin(); itd != dispatches.end(); itd++)
 					{
-						string methodName = "$dispatch<" + signature + ">" + rootAst->composedName;
+						string_t methodName = T("$dispatch<") + signature + T(">") + rootAst->composedName;
 						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->function->GenerateAst(module));
 						ast->composedName = methodName;
 
@@ -493,15 +493,15 @@ namespace tinymoe
 
 						if (itd != dispatches.begin())
 						{
-							signature += ", ";
+							signature += T(", ");
 						}
 						{
-							stringstream o;
+							stringstream_t o;
 							ast->ownerType->Print(o, 0);
 							signature += o.str();
 						}
 
-						string functionName = "$dispatch<" + signature + ">" + rootAst->composedName;
+						string_t functionName = T("$dispatch<") + signature + T(">") + rootAst->composedName;
 						if (createdFunctions.insert(functionName).second)
 						{
 							assembly->declarations.push_back(ast);

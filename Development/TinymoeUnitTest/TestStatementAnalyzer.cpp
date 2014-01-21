@@ -4,9 +4,11 @@
 using namespace tinymoe;
 using namespace tinymoe::compiler;
 
+extern string_t GetCodeForStandardLibrary();
+
 TEST_CASE(TestParseStandardLibraryModule)
 {
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	auto assembly = SymbolAssembly::Parse(codes, errors);
@@ -16,7 +18,7 @@ TEST_CASE(TestParseStandardLibraryModule)
 
 TEST_CASE(TestParseHelloWorldModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -34,9 +36,9 @@ end
 phrase main
     print "1+ ... +100 = " & sum from 1 to 100
 end
-)tinymoe";
+)tinymoe");
 
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
@@ -47,7 +49,7 @@ end
 
 TEST_CASE(TestParseNamedBlockModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -70,9 +72,9 @@ end
 phrase main
     print "1+ ... +100 = " & sum from 1 to 100
 end
-)tinymoe";
+)tinymoe");
 
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
@@ -83,7 +85,7 @@ end
 
 TEST_CASE(TestParsePotentialAmbiguousModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -104,9 +106,9 @@ phrase main
 	set field name of kula to console input
 	print "kula's name is " & field name of kula & "."
 end
-)tinymoe";
+)tinymoe");
 
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
@@ -117,16 +119,12 @@ end
 	auto decl = assembly->symbolModules[1]->module->declarations[3];
 	auto func = assembly->symbolModules[1]->declarationFunctions.find(decl)->second;
 	TEST_ASSERT(func->function->name.size() == 1);
-	TEST_ASSERT(dynamic_pointer_cast<NameFragment>(func->function->name[0])->name->GetName() == "main");
-	for (auto s : func->statement->statements)
-	{
-		cout << "  > " << s->statementExpression->ToCode() << endl;
-	}
+	TEST_ASSERT(dynamic_pointer_cast<NameFragment>(func->function->name[0])->name->GetName() == T("main"));
 }
 
 TEST_CASE(TestParseConnectedBlocksModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -154,9 +152,9 @@ phrase main
 		print "Unacceptable."
 	end
 end
-)tinymoe";
+)tinymoe");
 
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
@@ -167,7 +165,7 @@ end
 
 TEST_CASE(TestParseCategorizedSentenceModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -194,9 +192,9 @@ phrase main
 	end
 	print "The sum is " & sum & "."
 end
-)tinymoe";
+)tinymoe");
 
-	vector<string> codes;
+	vector<string_t> codes;
 	CodeError::List errors;
 	codes.push_back(GetCodeForStandardLibrary());
 	codes.push_back(code);
@@ -208,7 +206,7 @@ end
 TEST_CASE(TestParseWrongModule)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -217,9 +215,9 @@ phrase main
 	catch the exception
 	end
 end
-)tinymoe";
+)tinymoe");
 
-		vector<string> codes;
+		vector<string_t> codes;
 		CodeError::List errors;
 		codes.push_back(GetCodeForStandardLibrary());
 		codes.push_back(code);
@@ -228,7 +226,7 @@ end
 		TEST_ASSERT(assembly->symbolModules.size() == 2);
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 module hello world
 using standard library
 
@@ -237,9 +235,9 @@ phrase main
 		break
 	end
 end
-)tinymoe";
+)tinymoe");
 
-		vector<string> codes;
+		vector<string_t> codes;
 		CodeError::List errors;
 		codes.push_back(GetCodeForStandardLibrary());
 		codes.push_back(code);

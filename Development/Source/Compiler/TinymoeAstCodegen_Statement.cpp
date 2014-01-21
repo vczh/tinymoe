@@ -82,12 +82,12 @@ namespace tinymoe
 					auto lambda = make_shared<AstLambdaExpression>();
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$state" + context.GetUniquePostfix();
+						ref->composedName = T("$state") + context.GetUniquePostfix();
 						lambda->arguments.push_back(ref);
 					}
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$continuation" + context.GetUniquePostfix();
+						ref->composedName = T("$continuation") + context.GetUniquePostfix();
 						lambda->arguments.push_back(ref);
 					}
 					reader = lambda;
@@ -116,17 +116,17 @@ namespace tinymoe
 					auto lambda = make_shared<AstLambdaExpression>();
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$state" + context.GetUniquePostfix();
+						ref->composedName = T("$state") + context.GetUniquePostfix();
 						lambda->arguments.push_back(ref);
 					}
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$input" + context.GetUniquePostfix();
+						ref->composedName = T("$input") + context.GetUniquePostfix();
 						lambda->arguments.push_back(ref);
 					}
 					{
 						auto ref = make_shared<AstSymbolDeclaration>();
-						ref->composedName = "$continuation" + context.GetUniquePostfix();
+						ref->composedName = T("$continuation") + context.GetUniquePostfix();
 						lambda->arguments.push_back(ref);
 					}
 					writer = lambda;
@@ -191,12 +191,12 @@ namespace tinymoe
 			auto lambda = make_shared<AstLambdaExpression>();
 			{
 				auto decl = make_shared<AstSymbolDeclaration>();
-				decl->composedName = "$state" + context.GetUniquePostfix();
+				decl->composedName = T("$state") + context.GetUniquePostfix();
 				lambda->arguments.push_back(decl);
 			}
 			{
 				auto decl = make_shared<AstSymbolDeclaration>();
-				decl->composedName = "$continuation" + context.GetUniquePostfix();
+				decl->composedName = T("$continuation") + context.GetUniquePostfix();
 				lambda->arguments.push_back(decl);
 			}
 			SymbolAstResult result = expression->GenerateAst(scope, context, lambda->arguments[0]);
@@ -233,7 +233,7 @@ namespace tinymoe
 					decl->composedName += *it;
 					if (it + 1 != ids.end())
 					{
-						decl->composedName += "_";
+						decl->composedName += T("_");
 					}
 				}
 				newVariableDecls.push_back(decl);
@@ -258,7 +258,7 @@ namespace tinymoe
 					decl->composedName += *it;
 					if (it + 1 != ids.end())
 					{
-						decl->composedName += "_";
+						decl->composedName += T("_");
 					}
 				}
 				blockArgumentDecls.push_back(decl);
@@ -280,10 +280,10 @@ namespace tinymoe
 					auto selectLambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 
 					auto selectContinuation = make_shared<AstSymbolDeclaration>();
-					selectContinuation->composedName = "$select_continuation" + context.GetUniquePostfix();
+					selectContinuation->composedName = T("$select_continuation") + context.GetUniquePostfix();
 
 					auto selectValue = make_shared<AstSymbolDeclaration>();
-					selectValue->composedName = "$select_value" + context.GetUniquePostfix();
+					selectValue->composedName = T("$select_value") + context.GetUniquePostfix();
 
 					{
 						auto stat = make_shared<AstDeclarationStatement>();
@@ -675,7 +675,7 @@ namespace tinymoe
 				auto lambda = make_shared<AstLambdaExpression>();
 				{
 					auto ref = make_shared<AstSymbolDeclaration>();
-					ref->composedName = "$state" + context.GetUniquePostfix();
+					ref->composedName = T("$state") + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
 				for (auto decl : blockArgumentDecls)
@@ -684,7 +684,7 @@ namespace tinymoe
 				}
 				{
 					auto ref = make_shared<AstSymbolDeclaration>();
-					ref->composedName = "$continuation" + context.GetUniquePostfix();
+					ref->composedName = T("$continuation") + context.GetUniquePostfix();
 					lambda->arguments.push_back(ref);
 				}
 

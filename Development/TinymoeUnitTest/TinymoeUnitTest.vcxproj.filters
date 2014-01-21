@@ -108,4 +108,9 @@
       <Filter>Tinymoe\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Library\StandardLibrary.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

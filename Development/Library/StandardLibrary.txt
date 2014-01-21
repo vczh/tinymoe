@@ -1,0 +1,487 @@
+module standard library
+
+symbol breaking repeating
+symbol continuing repeating
+symbol raising exception
+symbol exiting program
+symbol exiting block
+
+-------------------------------------------------------------------------------
+--	Continuation state types
+-------------------------------------------------------------------------------
+
+type continuation trap
+	continuation
+	previous trap
+end
+
+type continuation fall back argument
+	value
+	trap
+	fall back counter
+end
+
+type continuation state
+	flag
+	argument
+	continuation
+	trap
+end
+
+type continuation coroutine
+	body
+	continuation
+	trap
+	fall back counter
+end
+
+-------------------------------------------------------------------------------
+--	State
+-------------------------------------------------------------------------------
+
+sentence reset continuation state (state) to (flag)
+	set field flag of state to flag
+	set field argument of state to null
+	set field continuation of state to null
+end
+
+-------------------------------------------------------------------------------
+--	Converting expression to sentence
+-------------------------------------------------------------------------------
+
+sentence call (value)
+end
+
+-------------------------------------------------------------------------------
+--	Trap call
+-------------------------------------------------------------------------------
+--	use (trap (value)) to 
+--	use (fall into the previous trap) to jump to the code after the last call to (trap (value))
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence trap (expression value) internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value)
+	trap value internal
+	set field trap of state to field previous trap of (field trap of state)
+end
+
+cps (state) (continuation)
+sentence fall into the previous trap
+	set the current trap to field continuation of (field trap of state)
+	call continuation the current trap of (null)
+end
+
+-------------------------------------------------------------------------------
+--	Trap link calculation for fall back
+-------------------------------------------------------------------------------
+--	use (enable fall back ...) to make the paused routine re-entranable
+--	use (set fall back counter ...) to record the number of times
+--		of calling (fall into the previous trap)
+--		from the last (trap (value) ...) until now
+--	use (restored trap ...) to get a new value of (continuation trap)
+--		that is used to restore the context and continue to run a paused routine
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
+-------------------------------------------------------------------------------
+
+sentence enable fall back to (state) with (continuation) and (value)
+    set field continuation of state to continuation
+    set field argument of state to new continuation fall back argument of (value, field trap of state)
+end
+
+phrase fall back counter between (top trap) and (current trap) from (counter)
+	select top trap <> current trap
+		case true
+			set the result to fall back counter between (field previous trap of top trap) and current trap from (counter + 1)
+		case false
+			set the result to counter
+	end
+end
+
+sentence set fall back counter of (state)
+	set top trap to field trap of (field argument of state)
+	set current trap to field trap of state
+	set counter to (fall back counter between top trap and current trap from -1)
+	set field fall back counter of (field argument of state) to counter
+end
+
+phrase restored trap (trap) with fall back (fall back trap) and counter (counter)
+	select counter
+		case 0
+			set the result to trap
+		case else
+			set previous trap to restored trap trap with fall back (field previous trap of fall back trap) and counter (counter - 1)
+			set the result to new continuation trap of (field continuation of fall back trap, previous trap)
+	end
+end
+
+-------------------------------------------------------------------------------
+--	Trap call to start fall back enabled continuation
+-------------------------------------------------------------------------------
+--	use (trap (value) with ... enabled) to start a continuation
+--		execution of the expression may be paused
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back enabled internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set field trap of state to the current trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back enabled
+	trap value with fall back enabled internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
+end
+
+-------------------------------------------------------------------------------
+--	Trap call to continue fall back enabled continuation
+-------------------------------------------------------------------------------
+--	use (trap (value) with ... restored) to run the continuation
+--		which is given by a paused evalulation
+--		of (trap (value) with ... enabled)
+-------------------------------------------------------------------------------
+--	To implement pause-and-continue
+--		coroutine is suggested to use
+--		DO NOT call these functions directly if coroutine satisfied your requirement
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored internal
+	set the current trap to new continuation trap of (continuation, field trap of state)
+	set new trap to restored trap (the current trap) with fall back (field trap of fall back) and counter (field fall back counter of fall back)
+	set field trap of state to new trap
+	set the result to value
+end
+
+cps (state) (continuation)
+sentence trap (expression value) with fall back (fall back) restored
+	trap value with fall back (fall back) restored internal
+	set field trap of state to field previous trap of (field trap of state)
+	set fall back counter of state
+end
+
+-------------------------------------------------------------------------------
+--	Coroutine
+-------------------------------------------------------------------------------
+--	use (create closure to (variable)) to turn some code into a function with no argument
+--	use (new coroutine from (body)) to turn a function with no argument into a coroutine
+--	use (coroutine (coroutine) stopped) to determine if a coroutine is no longer active
+--	use (run coroutine (coroutine)) to start a new coroutine, or continue a paused coroutine
+--		after a coroutine is paused, a call to (continue coroutine (coroutine)) is required before continue to run this coroutine
+--	use (continue coroutine (coroutine)) to make a coroutine continuable
+--	use (stop coroutine (coroutine)) to make a coroutine no longer active
+--	use (pause coroutine to ...) in the code of a coroutine to pause the current coroutine
+--		the three argument of this routine is important
+--		flag					: the reason why this coroutine needs to pause
+--		coroutine continuation	: the continuation to continue this coroutine
+--		value					: the argument that relating to the flag
+-------------------------------------------------------------------------------
+
+block (body) create closure to (assignable closure)
+	set closure to body
+end
+
+phrase new coroutine from (body)
+	set the result to new continuation coroutine of ()
+	set field body of the result to body
+end
+
+phrase coroutine (coroutine) stopped
+	set the result to field body of coroutine = null and field continuation of coroutine = null
+end
+
+cps (state) (continuation)
+sentence run coroutine (coroutine)
+	set need to exit to false
+	if field body of coroutine <> null
+		trap field body of coroutine of () with fall back enabled
+		set field body of coroutine to null
+	else if field continuation of coroutine <> null
+		trap continuation field continuation of coroutine of (null) with fall back (coroutine) restored
+	else
+		set need to exit to true
+	end
+
+	if (not need to exit) and (field argument of state is continuation fall back argument)
+		set field trap of coroutine to field trap of (field argument of state)
+		set field fall back counter of coroutine to field fall back counter of (field argument of state)
+	end
+end
+
+cps (state) (continuation)
+sentence continue coroutine (coroutine)
+	set field continuation of coroutine to field continuation of state
+	reset continuation state state to null
+end
+
+cps (state) (continuation)
+sentence stop coroutine (coroutine)
+	set field continuation of coroutine to null
+	reset continuation state state to null
+end
+
+cps (state) (continuation)
+sentence pause coroutine to (flag) with (coroutine continuation) and (value)
+	reset continuation state state to flag
+	enable fall back to state with coroutine continuation and value
+	fall into the previous trap
+end
+
+-------------------------------------------------------------------------------
+--	Repeat
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+category
+	inside REPEAT
+sentence break
+	reset continuation state state to breaking repeating
+	fall into the previous trap
+end
+
+cps (state) (continuation)
+category
+	inside REPEAT
+sentence continue
+	reset continuation state state to continuing repeating
+	fall into the previous trap
+end
+
+cps (state)
+category
+	start REPEAT
+	closable
+block (body) repeat : repeat statement
+	trap body of ()
+	select field flag of state
+		case breaking repeating
+			reset continuation state state to null
+		case continuing repeating
+			reset continuation state state to null
+			call repeat statement of (body)
+		case null
+			call repeat statement of (body)
+		case else
+			fall into the previous trap
+	end
+end
+
+category
+	start REPEAT
+	closable
+block (sentence body) repeat while (expression condition)
+	repeat
+		if not condition
+			break
+		end
+		body
+	end
+end
+
+category
+	start REPEAT
+	closable
+block (sentence deal with (item)) repeat with (argument item) from (lower bound) to (upper bound)
+	set the current number to (lower bound - 1)
+	repeat while the current number < upper bound
+		add 1 to the current number
+		deal with the current number
+	end
+end
+
+category
+	start REPEAT
+	closable
+block (sentence deal with (item)) repeat with (argument item) in (items)
+	raise "Only enumerable object (like containers) can be iterated using the repeat-with-in statement."
+end
+
+block (sentence deal with (item)) repeat with (argument item) in (items : array)
+	repeat with index from 1 to length of array items
+		deal with item index of array items
+	end
+end
+
+-------------------------------------------------------------------------------
+--	If/Else If/Else
+-------------------------------------------------------------------------------
+
+category
+	start IFELSE if
+	closable
+block (sentence body) if (condition)
+	set the result to condition
+	select the result
+		case true
+			body
+	end
+end
+
+category (signal)
+	follow IFELSE if
+	start IFELSE if
+	closable
+block (sentence body) else if (expression condition)
+	set the result to signal
+	select the result
+		case false
+			set the result to condition
+			select the result
+				case true
+					body
+			end
+	end
+end
+
+category (signal)
+	follow IFELSE if
+	closable
+block (sentence body) else
+	set the result to signal
+	select the result
+		case false
+			body
+	end
+end
+
+-------------------------------------------------------------------------------
+--	Try/Else Try/Catch/Finally
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence raise (exception)
+	reset continuation state state to raising exception
+	set field argument of state to exception
+	fall into the previous trap
+end
+
+cps (state)
+category
+	start SEH try
+block (body) try
+	trap body of ()
+	select field flag of state
+		case raising exception
+			set the result to field argument of state
+			reset continuation state state to null
+		case null
+		case else
+			fall into the previous trap
+	end
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	start SEH try
+	closable
+block (body) else try
+	if signal <> null
+		trap body of ()
+		select field flag of state
+			case raising exception
+				set the result to field argument of state
+				reset continuation state state to null
+			case null
+			case else
+				fall into the previous trap
+		end
+	end	
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	start SEH catch
+	closable
+block (sentence deal with (exception)) catch (argument exception)
+	if signal <> null
+		deal with signal
+	end	
+end
+
+cps (state)
+category (signal)
+	follow SEH try
+	follow SEH catch
+	closable
+block (sentence body) finally
+	body
+end
+
+-------------------------------------------------------------------------------
+--	Named Block
+-------------------------------------------------------------------------------
+
+cps (state) (continuation)
+sentence exit program
+	reset continuation state state to exiting program
+	fall into the previous trap
+end
+
+cps (state) (continuation)
+category
+	inside NAMEDBLOCK
+sentence exit block (handle)
+	reset continuation state state to exiting block
+	set field argument of state to handle
+	fall into the previous trap
+end
+
+cps (state)
+category
+	start NAMEDBLOCK
+	closable
+block (body) named block (argument handle)
+	set handle to new object of ()
+	trap body of (handle)
+	if field flag of state = exiting block and field argument of state = handle
+		reset continuation state state to null
+	else if field flag of state <> null
+		fall into the previous trap
+	end
+end
+
+-------------------------------------------------------------------------------
+--	Mics
+-------------------------------------------------------------------------------
+
+sentence add (value) to (assignable variable)
+	set variable to variable + value
+end
+
+sentence substract (value) from (assignable variable)
+	set variable to variable - value
+end
+
+phrase boolean of (value)
+	redirect to "CastToBoolean"
+end
+
+phrase integer of (value)
+	redirect to "CastToInteger"
+end
+
+phrase floating point of (value)
+	redirect to "CastToFloat"
+end
+
+phrase string of (value)
+	redirect to "CastToString"
+end

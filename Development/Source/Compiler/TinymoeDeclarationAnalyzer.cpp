@@ -20,7 +20,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"CPS definition should begin with \"cps\".",
+					T("CPS definition should begin with \"cps\"."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -28,20 +28,20 @@ namespace tinymoe
 			it++;
 
 			auto decl = make_shared<FunctionCps>();
-			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", cpsToken, errors)) goto END_OF_PARSING;
-			decl->stateName = SymbolName::ParseToFarest(it, line->tokens.end(), "CPS state", cpsToken, errors);
-			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", cpsToken, errors)) goto END_OF_PARSING;
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, T("("), cpsToken, errors)) goto END_OF_PARSING;
+			decl->stateName = SymbolName::ParseToFarest(it, line->tokens.end(), T("CPS state"), cpsToken, errors);
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, T(")"), cpsToken, errors)) goto END_OF_PARSING;
 			if (it == line->tokens.end()) goto END_OF_PARSING;
 		
-			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", cpsToken, errors)) goto END_OF_PARSING;
-			decl->continuationName = SymbolName::ParseToFarest(it, line->tokens.end(), "CPS continuation", cpsToken, errors);
-			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", cpsToken, errors)) goto END_OF_PARSING;
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, T("("), cpsToken, errors)) goto END_OF_PARSING;
+			decl->continuationName = SymbolName::ParseToFarest(it, line->tokens.end(), T("CPS continuation"), cpsToken, errors);
+			if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, T(")"), cpsToken, errors)) goto END_OF_PARSING;
 			if (it != line->tokens.end())
 			{
 				CodeError error =
 				{
 					*it,
-					"Too many tokens.",
+					T("Too many tokens."),
 				};
 				errors.push_back(error);
 			}
@@ -64,7 +64,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"Category definition should begin with \"category\".",
+					T("Category definition should begin with \"category\"."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -74,16 +74,16 @@ namespace tinymoe
 			auto decl = make_shared<FunctionCategory>();
 			if (it != line->tokens.end())
 			{
-				if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, "(", categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
-				decl->signalName = SymbolName::ParseToFarest(it, line->tokens.end(), "Category signal", categoryToken, errors);
-				if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, ")", categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
+				if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::OpenBracket, T("("), categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
+				decl->signalName = SymbolName::ParseToFarest(it, line->tokens.end(), T("Category signal"), categoryToken, errors);
+				if (!SymbolName::ConsumeToken(it, line->tokens.end(), CodeTokenType::CloseBracket, T(")"), categoryToken, errors)) goto END_OF_SIGNAL_PARSING;
 
 				if (it != line->tokens.end())
 				{
 					CodeError error =
 					{
 						*it,
-						"Too many tokens.",
+						T("Too many tokens."),
 					};
 					errors.push_back(error);
 				}
@@ -95,34 +95,34 @@ namespace tinymoe
 				line = codeFile->lines[lineIndex++];
 				it = line->tokens.begin();
 
-				if (it->value == "start")
+				if (it->value == T("start"))
 				{
 					if (decl->categoryName)
 					{
 						CodeError error =
 						{
 							*it,
-							"Too many start category name.",
+							T("Too many start category name."),
 						};
 						errors.push_back(error);
 					}
 					else
 					{
 						auto startToken = *it;
-						decl->categoryName = SymbolName::ParseToEnd(++it, line->tokens.end(), "Start category", startToken, errors);
+						decl->categoryName = SymbolName::ParseToEnd(++it, line->tokens.end(), T("Start category"), startToken, errors);
 					}
 				}
-				else if (it->value == "follow")
+				else if (it->value == T("follow"))
 				{
 					auto followToken = *it;
-					decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Follow category", followToken, errors));
+					decl->followCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), T("Follow category"), followToken, errors));
 				}
-				else if (it->value == "inside")
+				else if (it->value == T("inside"))
 				{
 					auto insideToken = *it;
-					decl->insideCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Inside category", insideToken, errors));
+					decl->insideCategories.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), T("Inside category"), insideToken, errors));
 				}
-				else if (it->value == "closable")
+				else if (it->value == T("closable"))
 				{
 					decl->closable = true;
 					if (++it != line->tokens.end())
@@ -130,7 +130,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							*it,
-							"Too many tokens.",
+							T("Too many tokens."),
 						};
 						errors.push_back(error);
 					}
@@ -149,7 +149,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						categoryToken,
-						"A category with signal parameter should have follow categories.",
+						T("A category with signal parameter should have follow categories."),
 					};
 					errors.push_back(error);
 				}
@@ -162,7 +162,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						categoryToken,
-						"A category without start category name and inside categories should be closable.",
+						T("A category without start category name and inside categories should be closable."),
 					};
 					errors.push_back(error);
 				}
@@ -184,7 +184,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"Symbol definition should begin with \"symbol\".",
+					T("Symbol definition should begin with \"symbol\"."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -192,7 +192,7 @@ namespace tinymoe
 
 			auto decl = make_shared<SymbolDeclaration>();
 			decl->keywordToken = *it;
-			decl->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Symbol", line->tokens[0], errors);
+			decl->name = SymbolName::ParseToEnd(++it, line->tokens.end(), T("Symbol"), line->tokens[0], errors);
 			return decl;
 		}
 
@@ -211,7 +211,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"Type definition should begin with \"type\".",
+					T("Type definition should begin with \"type\"."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -219,20 +219,20 @@ namespace tinymoe
 
 			auto decl = make_shared<TypeDeclaration>();
 			decl->keywordToken = *it;
-			decl->name = SymbolName::ParseToFarest(++it, line->tokens.end(), "Type", line->tokens[0], errors);
+			decl->name = SymbolName::ParseToFarest(++it, line->tokens.end(), T("Type"), line->tokens[0], errors);
 			if (it != line->tokens.end())
 			{
 				if (it->type == CodeTokenType::Colon)
 				{
 					auto parentTypeToken = *it;
-					decl->parent = SymbolName::ParseToEnd(++it, line->tokens.end(), "Parent type", parentTypeToken, errors);
+					decl->parent = SymbolName::ParseToEnd(++it, line->tokens.end(), T("Parent type"), parentTypeToken, errors);
 				}
 				else
 				{
 					CodeError error =
 					{
 						*it,
-						"Inheriting from a type should begin with a \":\".",
+						T("Inheriting from a type should begin with a \":\"."),
 					};
 					errors.push_back(error);
 				}
@@ -249,7 +249,7 @@ namespace tinymoe
 				}
 				else
 				{
-					decl->fields.push_back(SymbolName::ParseToEnd(line->tokens.begin(), line->tokens.end(), "Field", line->tokens[0], errors));
+					decl->fields.push_back(SymbolName::ParseToEnd(line->tokens.begin(), line->tokens.end(), T("Field"), line->tokens[0], errors));
 				}
 			}
 
@@ -258,7 +258,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					typeToken,
-					"Ending of the type is not found.",
+					T("Ending of the type is not found."),
 				};
 				errors.push_back(error);
 			}
@@ -280,7 +280,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					ownerToken,
-					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+					T("Function declaration should begin with \"phrase\", \"sentence\" or \"block\"."),
 				};
 				errors.push_back(error);
 				goto END_OF_PARSING;
@@ -303,7 +303,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						ownerToken,
-						"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+						T("Function declaration should begin with \"phrase\", \"sentence\" or \"block\"."),
 					};
 					errors.push_back(error);
 					goto END_OF_PARSING;
@@ -316,7 +316,7 @@ namespace tinymoe
 			{
 				if (it->type == CodeTokenType::Colon)
 				{
-					decl->alias = SymbolName::ParseToFarest(++it, end, "Function alias", ownerToken, errors);
+					decl->alias = SymbolName::ParseToFarest(++it, end, T("Function alias"), ownerToken, errors);
 					break;
 				}
 				else if (it->type == CodeTokenType::OpenBracket)
@@ -324,7 +324,7 @@ namespace tinymoe
 					if (auto argument = ArgumentFragment::Parse(++it, end, ownerToken, errors))
 					{
 						decl->name.push_back(argument);
-						if (!SymbolName::ConsumeToken(it, end, CodeTokenType::CloseBracket, ")", ownerToken, errors)) goto END_OF_PARSING;
+						if (!SymbolName::ConsumeToken(it, end, CodeTokenType::CloseBracket, T(")"), ownerToken, errors)) goto END_OF_PARSING;
 					}
 					else
 					{
@@ -334,7 +334,7 @@ namespace tinymoe
 				else if (it->IsNameFragmentToken())
 				{
 					auto nameFragment = make_shared<NameFragment>();
-					nameFragment->name = SymbolName::ParseToFarest(it, end, "Function", ownerToken, errors);
+					nameFragment->name = SymbolName::ParseToFarest(it, end, T("Function"), ownerToken, errors);
 					if (nameFragment->name->identifiers.size() > 0)
 					{
 						nameFragment->keywordToken = nameFragment->name->identifiers[0];
@@ -361,7 +361,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					ownerToken,
-					"Function name should not be empty.",
+					T("Function name should not be empty."),
 				};
 				errors.push_back(error);
 			}
@@ -374,7 +374,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							ownerToken,
-							"Sentence and block's name should not begin with an argument.",
+							T("Sentence and block's name should not begin with an argument."),
 						};
 						errors.push_back(error);
 					}
@@ -396,7 +396,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								ownerToken,
-								"Function argument cannot appear just after another function argument.",
+								T("Function argument cannot appear just after another function argument."),
 							};
 							errors.push_back(error);
 						}
@@ -412,7 +412,7 @@ namespace tinymoe
 									CodeError error =
 									{
 										ownerToken,
-										"Argument of type \"argument\" is only allowed in block declaration.",
+										T("Argument of type \"argument\" is only allowed in block declaration."),
 									};
 									errors.push_back(error);
 								}
@@ -424,7 +424,7 @@ namespace tinymoe
 									CodeError error =
 									{
 										ownerToken,
-										"Argument of type \"assignable\" or \"expression\" is only allowed in sentence or block declaration.",
+										T("Argument of type \"assignable\" or \"expression\" is only allowed in sentence or block declaration."),
 									};
 									errors.push_back(error);
 								}
@@ -439,7 +439,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						ownerToken,
-						"Function name should not be form just by function arguments.",
+						T("Function name should not be form just by function arguments."),
 					};
 					errors.push_back(error);
 				}
@@ -464,7 +464,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					functionToken,
-					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+					T("Function declaration should begin with \"phrase\", \"sentence\" or \"block\"."),
 				};
 				errors.push_back(error);
 				goto END_OF_PARSING;
@@ -478,7 +478,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					functionToken,
-					"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+					T("Function declaration should begin with \"phrase\", \"sentence\" or \"block\"."),
 				};
 				errors.push_back(error);
 				goto END_OF_PARSING;
@@ -500,7 +500,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							*it,
-							"Too many tokens.",
+							T("Too many tokens."),
 						};
 						errors.push_back(error);
 					}
@@ -510,7 +510,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							functionToken,
-							"Function declaration should begin with \"phrase\", \"sentence\" or \"block\".",
+							T("Function declaration should begin with \"phrase\", \"sentence\" or \"block\"."),
 						};
 						errors.push_back(error);
 						lineIndex--;
@@ -527,7 +527,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"Phrase should not have a continuation definition.",
+								T("Phrase should not have a continuation definition."),
 							};
 							errors.push_back(error);
 						}
@@ -538,7 +538,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"CPS sentence should have a CPS continuation argument.",
+								T("CPS sentence should have a CPS continuation argument."),
 							};
 							errors.push_back(error);
 						}
@@ -549,7 +549,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"CPS block should not have a CPS continuation argument.",
+								T("CPS block should not have a CPS continuation argument."),
 							};
 							errors.push_back(error);
 						}
@@ -565,7 +565,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"Phrase should not have a category definition.",
+								T("Phrase should not have a category definition."),
 							};
 							errors.push_back(error);
 						}
@@ -576,7 +576,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"A category of a sentence should have inside categories.",
+								T("A category of a sentence should have inside categories."),
 							};
 							errors.push_back(error);
 						}
@@ -585,7 +585,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"A category of a sentence should not have start category name, signal name or follow categories.",
+								T("A category of a sentence should not have start category name, signal name or follow categories."),
 							};
 							errors.push_back(error);
 						}
@@ -594,7 +594,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"A category of a sentence cannot be closable.",
+								T("A category of a sentence cannot be closable."),
 							};
 							errors.push_back(error);
 						}
@@ -605,7 +605,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								functionToken,
-								"A category of a block cannot have inside categories.",
+								T("A category of a block cannot have inside categories."),
 							};
 							errors.push_back(error);
 						}
@@ -619,7 +619,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							functionToken,
-							"Block name should start with an argument for the block body.",
+							T("Block name should start with an argument for the block body."),
 						};
 						errors.push_back(error);
 					}
@@ -666,7 +666,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					ownerToken,
-					"Function argument needed.",
+					T("Function argument needed."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -707,7 +707,7 @@ namespace tinymoe
 				{
 					decl->type = FunctionArgumentType::Normal;
 				}
-				decl->name = SymbolName::ParseToFarest(it, end, "Function argument", ownerToken, errors);
+				decl->name = SymbolName::ParseToFarest(it, end, T("Function argument"), ownerToken, errors);
 
 				if (it->type == CodeTokenType::Colon)
 				{
@@ -716,10 +716,10 @@ namespace tinymoe
 						CodeError error =
 						{
 							*it,
-							"Argument type for multiple dispatch is only allowed for value argument (that is, not \"list\", \"expression\", \"assignable\" and \"argument\").",
+							T("Argument type for multiple dispatch is only allowed for value argument (that is, not \"list\", \"expression\", \"assignable\" and \"argument\")."),
 						};
 					}
-					decl->receivingType = SymbolName::ParseToFarest(++it, end, "Function argument type", ownerToken, errors);
+					decl->receivingType = SymbolName::ParseToFarest(++it, end, T("Function argument type"), ownerToken, errors);
 				}
 				return decl;
 			}
@@ -728,7 +728,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*it,
-					"Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name.",
+					T("Function argument should begin with \"expression\", \"assignable\", \"argument\", \"phrase\", \"sentence\" or a name."),
 				};
 				errors.push_back(error);
 				return nullptr;
@@ -756,21 +756,21 @@ namespace tinymoe
 						CodeError error =
 						{
 							*it,
-							"A module can only have one name.",
+							T("A module can only have one name."),
 						};
 						errors.push_back(error);
 					}
 					else
 					{
 						auto token = *it;
-						module->name = SymbolName::ParseToEnd(++it, line->tokens.end(), "Module", token, errors);
+						module->name = SymbolName::ParseToEnd(++it, line->tokens.end(), T("Module"), token, errors);
 					}
 					lineIndex++;
 					break;
 				case CodeTokenType::Using:
 					{
 						auto token = *it;
-						module->usings.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), "Module using", token, errors));
+						module->usings.push_back(SymbolName::ParseToEnd(++it, line->tokens.end(), T("Module using"), token, errors));
 						lineIndex++;
 					}
 					break;
@@ -792,7 +792,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							*it,
-							"Cannot process a declaration that begins with \"" + it->value + "\".",
+							T("Cannot process a declaration that begins with \"") + it->value + T("\"."),
 						};
 						errors.push_back(error);
 						lineIndex++;

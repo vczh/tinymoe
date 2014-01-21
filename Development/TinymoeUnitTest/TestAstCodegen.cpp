@@ -5,9 +5,12 @@ using namespace tinymoe;
 using namespace tinymoe::compiler;
 using namespace tinymoe::ast;
 
-extern void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream& o);
+extern void WriteAnsiFile(string_t fileName, stringstream_t& ss);
+extern string_t ReadAnsiFile(string_t fileName);
+extern string_t GetCodeForStandardLibrary();
+extern void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream_t& o);
 
-void CodeGen(vector<string>& codes, string name)
+void CodeGen(vector<string_t>& codes, string_t name)
 {
 	CodeError::List errors;
 	auto assembly = SymbolAssembly::Parse(codes, errors);
@@ -16,12 +19,14 @@ void CodeGen(vector<string>& codes, string name)
 
 	auto ast = GenerateAst(assembly);
 	{
-		ofstream o("../CSharpCodegenTest/" + name + "/GeneratedAst.txt");
+		stringstream_t o;
 		ast->Print(o, 0);
+		WriteAnsiFile(T("../CSharpCodegenTest/") + name + T("/GeneratedAst.txt"), o);
 	}
 	{
-		ofstream o("../CSharpCodegenTest/" + name + "/TinymoeProgram.cs");
+		stringstream_t o;
 		GenerateCSharpCode(ast, o);
+		WriteAnsiFile(T("../CSharpCodegenTest/") + name + T("/TinymoeProgram.cs"), o);
 	}
 }
 
@@ -31,9 +36,9 @@ Hello World
 
 TEST_CASE(TestStandardLibraryAstCodegen)
 {
-	vector<string> codes;
+	vector<string_t> codes;
 	codes.push_back(GetCodeForStandardLibrary());
-	codes.push_back(R"tinymoe(
+	codes.push_back(T(R"tinymoe(
 module hello world
 using standard library
 
@@ -67,8 +72,8 @@ phrase main
 	end
 end
 
-)tinymoe");
-	CodeGen(codes, "StandardLibraryAst");
+)tinymoe"));
+	CodeGen(codes, T("StandardLibraryAst"));
 }
 
 /*************************************************************
@@ -77,10 +82,10 @@ Multiple Dispatch
 
 TEST_CASE(TestMultipleDispatchAstCodegen)
 {
-	vector<string> codes;
+	vector<string_t> codes;
 	codes.push_back(GetCodeForStandardLibrary());
 
-	codes.push_back(R"tinymoe(
+	codes.push_back(T(R"tinymoe(
 module geometry
 using standard library
 
@@ -154,9 +159,9 @@ phrase main
 	end
 end
 
-)tinymoe");
+)tinymoe"));
 
-	CodeGen(codes, "MultipleDispatchAst");
+	CodeGen(codes, T("MultipleDispatchAst"));
 }
 
 /*************************************************************
@@ -165,10 +170,10 @@ Yield Return
 
 TEST_CASE(TestYieldReturnAstCodegen)
 {
-	vector<string> codes;
+	vector<string_t> codes;
 	codes.push_back(GetCodeForStandardLibrary());
 
-	codes.push_back(R"tinymoe(
+	codes.push_back(T(R"tinymoe(
 module enumerable
 using standard library
 
@@ -270,9 +275,9 @@ phrase main
 	end
 end
 
-)tinymoe");
+)tinymoe"));
 
-	CodeGen(codes, "YieldReturnAst");
+	CodeGen(codes, T("YieldReturnAst"));
 }
 
 /*************************************************************
@@ -281,9 +286,9 @@ Unit Test
 
 TEST_CASE(TestUnitTestAstCodegen)
 {
-	vector<string> codes;
+	vector<string_t> codes;
 	codes.push_back(GetCodeForStandardLibrary());
-	codes.push_back(R"tinymoe(
+	codes.push_back(T(R"tinymoe(
 module unit test
 using standard library
 
@@ -472,6 +477,6 @@ phrase main
 	end
 end
 
-)tinymoe");
-	CodeGen(codes, "UnitTestAst");
+)tinymoe"));
+	CodeGen(codes, T("UnitTestAst"));
 }

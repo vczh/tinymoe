@@ -13,32 +13,32 @@ namespace tinymoe
 		{
 		}
 
-		string GrammarFragment::GetUniqueIdFragment()
+		string_t GrammarFragment::GetUniqueIdFragment()
 		{
 			switch (type)
 			{
 			case GrammarFragmentType::Type:
-				return "<type>";
+				return T("<type>");
 			case GrammarFragmentType::Primitive:
-				return "<primitive>";
+				return T("<primitive>");
 			case GrammarFragmentType::Expression:
-				return "<expression>";
+				return T("<expression>");
 			case GrammarFragmentType::List:
-				return "<list>";
+				return T("<list>");
 			case GrammarFragmentType::Assignable:
-				return "<assignable>";
+				return T("<assignable>");
 			case GrammarFragmentType::Argument:
-				return "<argument>";
+				return T("<argument>");
 				break;
 			}
 		
-			string uniqueId;
+			string_t uniqueId;
 			for (auto i = identifiers.begin(); i != identifiers.end(); i++)
 			{
 				uniqueId += *i;
 				if (i + 1 != identifiers.end())
 				{
-					uniqueId += " ";
+					uniqueId += T(" ");
 				}
 			}
 			return uniqueId;
@@ -56,18 +56,18 @@ namespace tinymoe
 
 		void GrammarSymbol::CalculateUniqueId()
 		{
-			uniqueId = "";
+			uniqueId = T("");
 			for (auto i = fragments.begin(); i != fragments.end(); i++)
 			{
 				uniqueId += (*i)->GetUniqueIdFragment();
 				if (i + 1 != fragments.end())
 				{
-					uniqueId += " ";
+					uniqueId += T(" ");
 				}
 			}
 		}
 
-		GrammarSymbol::Ptr operator+(GrammarSymbol::Ptr symbol, const string& name)
+		GrammarSymbol::Ptr operator+(GrammarSymbol::Ptr symbol, const string_t& name)
 		{
 			GrammarFragment::Ptr fragment;
 			if (symbol->fragments.size() == 0 || (fragment = symbol->fragments.back())->type != GrammarFragmentType::Name)
@@ -95,122 +95,122 @@ namespace tinymoe
 		{
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Object)
-				+ "object"
+				+ T("object")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Array)
-				+ "array"
+				+ T("array")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Symbol)
-				+ "symbol"
+				+ T("symbol")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Boolean)
-				+ "boolean"
+				+ T("boolean")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Integer)
-				+ "integer"
+				+ T("integer")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Float)
-				+ "float"
+				+ T("float")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::String)
-				+ "string"
+				+ T("string")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Type, GrammarSymbolTarget::Function)
-				+ "function"
+				+ T("function")
 				);
 		
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::True)
-				+ "true"
+				+ T("true")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::False)
-				+ "false"
+				+ T("false")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::Null)
-				+ "null"
+				+ T("null")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Symbol, GrammarSymbolTarget::TheResult)
-				+ "the" + "result"
+				+ T("the") + T("result")
 				);
 			
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::Invoke)
-				+ GrammarFragmentType::Primitive + "of" + GrammarFragmentType::List
+				+ GrammarFragmentType::Primitive + T("of") + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::InvokeContinuation)
-				+ "continuation" + GrammarFragmentType::Expression + "of" + GrammarFragmentType::List
+				+ T("continuation") + GrammarFragmentType::Expression + T("of") + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewTypeOfFields)
-				+ "new" + GrammarFragmentType::Type + "of" + GrammarFragmentType::List
+				+ T("new") + GrammarFragmentType::Type + T("of") + GrammarFragmentType::List
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::NewArray)
-				+ "new" + "array" + "of" + GrammarFragmentType::Expression + "items"
+				+ T("new") + T("array") + T("of") + GrammarFragmentType::Expression + T("items")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::GetArrayItem)
-				+ "item" + GrammarFragmentType::Expression + "of" + "array" + GrammarFragmentType::Primitive
+				+ T("item") + GrammarFragmentType::Expression + T("of") + T("array") + GrammarFragmentType::Primitive
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::GetArrayLength)
-				+ "length" + "of" + "array" + GrammarFragmentType::Primitive
+				+ T("length") + T("of") + T("array") + GrammarFragmentType::Primitive
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::IsType)
-				+ GrammarFragmentType::Primitive + "is" + GrammarFragmentType::Type
+				+ GrammarFragmentType::Primitive + T("is") + GrammarFragmentType::Type
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::IsNotType)
-				+ GrammarFragmentType::Primitive + "is" + "not" + GrammarFragmentType::Type
+				+ GrammarFragmentType::Primitive + T("is") + T("not") + GrammarFragmentType::Type
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Phrase, GrammarSymbolTarget::GetField)
-				+ "field" + GrammarFragmentType::Argument + "of" + GrammarFragmentType::Primitive
+				+ T("field") + GrammarFragmentType::Argument + T("of") + GrammarFragmentType::Primitive
 				);
 
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::End)
-				+ "end"
+				+ T("end")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Block, GrammarSymbolTarget::Select)
-				+ "select" + GrammarFragmentType::Expression
+				+ T("select") + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Case)
-				+ "case" + GrammarFragmentType::Expression
+				+ T("case") + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::CaseElse)
-				+ "case" + "else"
+				+ T("case") + T("else")
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::RedirectTo)
-				+ "redirect" + "to" + GrammarFragmentType::Expression
+				+ T("redirect") + T("to") + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::Assign)
-				+ "set" + GrammarFragmentType::Assignable + "to" + GrammarFragmentType::Expression
+				+ T("set") + GrammarFragmentType::Assignable + T("to") + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::SetArrayItem)
-				+ "set" + "item" + GrammarFragmentType::Expression + "of" + "array" + GrammarFragmentType::Expression + "to" + GrammarFragmentType::Expression
+				+ T("set") + T("item") + GrammarFragmentType::Expression + T("of") + T("array") + GrammarFragmentType::Expression + T("to") + GrammarFragmentType::Expression
 				);
 			symbols.push_back(
 				make_shared<GrammarSymbol>(GrammarSymbolType::Sentence, GrammarSymbolTarget::SetField)
-				+ "set" + "field" + GrammarFragmentType::Argument + "of" + GrammarFragmentType::Expression + "to" + GrammarFragmentType::Expression
+				+ T("set") + T("field") + GrammarFragmentType::Argument + T("of") + GrammarFragmentType::Expression + T("to") + GrammarFragmentType::Expression
 				);
 		}
 
@@ -218,11 +218,11 @@ namespace tinymoe
 		Expression::ToLog
 		*************************************************************/
 
-		string LiteralExpression::ToLog()
+		string_t LiteralExpression::ToLog()
 		{
 			if (token.type == CodeTokenType::String)
 			{
-				return "\"" + CodeToken::EscapeString(token.value) + "\"";
+				return T("\"") + CodeToken::EscapeString(token.value) + T("\"");
 			}
 			else
 			{
@@ -230,118 +230,118 @@ namespace tinymoe
 			}
 		}
 
-		string ArgumentExpression::ToLog()
+		string_t ArgumentExpression::ToLog()
 		{
-			string result = "(argument: " + name->GetName() + ")";
+			string_t result = T("(argument: ") + name->GetName() + T(")");
 			return result;
 		}
 
-		string ReferenceExpression::ToLog()
+		string_t ReferenceExpression::ToLog()
 		{
 			return symbol->uniqueId;
 		}
 
-		string InvokeExpression::ToLog()
+		string_t InvokeExpression::ToLog()
 		{
-			string result = function->ToLog() + "(";
+			string_t result = function->ToLog() + T("(");
 			for (auto i = arguments.begin(); i != arguments.end(); i++)
 			{
 				result += (*i)->ToLog();
 				if (i + 1 != arguments.end())
 				{
-					result += ", ";
+					result += T(", ");
 				}
 			}
-			result += ")";
+			result += T(")");
 			return result;
 		}
 
-		string ListExpression::ToLog()
+		string_t ListExpression::ToLog()
 		{
-			string result = "(list: ";
+			string_t result = T("(list: ");
 			for (auto i = elements.begin(); i != elements.end(); i++)
 			{
 				result += (*i)->ToLog();
 				if (i + 1 != elements.end())
 				{
-					result += ", ";
+					result += T(", ");
 				}
 			}
-			result += ")";
+			result += T(")");
 			return result;
 		}
 
-		string UnaryExpression::ToLog()
+		string_t UnaryExpression::ToLog()
 		{
-			string result;
+			string_t result;
 			switch (op)
 			{
 			case UnaryOperator::Positive:
-				result = "+(";
+				result = T("+(");
 				break;
 			case UnaryOperator::Negative:
-				result = "-(";
+				result = T("-(");
 				break;
 			case UnaryOperator::Not:
-				result = "not(";
+				result = T("not(");
 				break;
 			}
-			result += operand->ToLog() + ")";
+			result += operand->ToLog() + T(")");
 			return result;
 		}
 
-		string BinaryExpression::ToLog()
+		string_t BinaryExpression::ToLog()
 		{
-			string result;
+			string_t result;
 			switch (op)
 			{
 			case BinaryOperator::Concat:
-				result += "&(";
+				result += T("&(");
 				break;
 			case BinaryOperator::Add:
-				result += "+(";
+				result += T("+(");
 				break;
 			case BinaryOperator::Sub:
-				result += "-(";
+				result += T("-(");
 				break;
 			case BinaryOperator::Mul:
-				result += "*(";
+				result += T("*(");
 				break;
 			case BinaryOperator::Div:
-				result += "/(";
+				result += T("/(");
 				break;
 			case BinaryOperator::IntDiv:
-				result += "\\(";
+				result += T("\\(");
 				break;
 			case BinaryOperator::Mod:
-				result += "%(";
+				result += T("%(");
 				break;
 			case BinaryOperator::LT:
-				result += "<(";
+				result += T("<(");
 				break;
 			case BinaryOperator::GT:
-				result += ">(";
+				result += T(">(");
 				break;
 			case BinaryOperator::LE:
-				result += "<=(";
+				result += T("<=(");
 				break;
 			case BinaryOperator::GE:
-				result += ">=(";
+				result += T(">=(");
 				break;
 			case BinaryOperator::EQ:
-				result += "=(";
+				result += T("=(");
 				break;
 			case BinaryOperator::NE:
-				result += "<>(";
+				result += T("<>(");
 				break;
 			case BinaryOperator::And:
-				result += "and(";
+				result += T("and(");
 				break;
 			case BinaryOperator::Or:
-				result += "or(";
+				result += T("or(");
 				break;
 			}
-			result += first->ToLog() + ", " + second->ToLog() + ")";
+			result += first->ToLog() + T(", ") + second->ToLog() + T(")");
 			return result;
 		}
 
@@ -349,11 +349,11 @@ namespace tinymoe
 		Expression::ToCode
 		*************************************************************/
 
-		string LiteralExpression::ToCode()
+		string_t LiteralExpression::ToCode()
 		{
 			if (token.type == CodeTokenType::String)
 			{
-				return "\"" + CodeToken::EscapeString(token.value) + "\"";
+				return T("\"") + CodeToken::EscapeString(token.value) + T("\"");
 			}
 			else
 			{
@@ -361,21 +361,21 @@ namespace tinymoe
 			}
 		}
 
-		string ArgumentExpression::ToCode()
+		string_t ArgumentExpression::ToCode()
 		{
-			string result = "(" + name->GetName() + ")";
+			string_t result = T("(") + name->GetName() + T(")");
 			return result;
 		}
 
-		string ReferenceExpression::ToCode()
+		string_t ReferenceExpression::ToCode()
 		{
-			return "(" + symbol->uniqueId + ")";
+			return T("(") + symbol->uniqueId + T(")");
 		}
 
-		string InvokeExpression::ToCode()
+		string_t InvokeExpression::ToCode()
 		{
 			auto reference = dynamic_pointer_cast<ReferenceExpression>(function);
-			string result = "(";
+			string_t result = T("(");
 			auto it = arguments.begin();
 			for (auto i = reference->symbol->fragments.begin(); i != reference->symbol->fragments.end(); i++)
 			{
@@ -389,99 +389,99 @@ namespace tinymoe
 				}
 				if (i + 1 != reference->symbol->fragments.end())
 				{
-					result += " ";
+					result += T(" ");
 				}
 			}
-			result += ")";
+			result += T(")");
 			return result;
 		}
 
-		string ListExpression::ToCode()
+		string_t ListExpression::ToCode()
 		{
-			string result = "(";
+			string_t result = T("(");
 			for (auto i = elements.begin(); i != elements.end(); i++)
 			{
 				result += (*i)->ToCode();
 				if (i + 1 != elements.end())
 				{
-					result += ", ";
+					result += T(", ");
 				}
 			}
-			result += ")";
+			result += T(")");
 			return result;
 		}
 
-		string UnaryExpression::ToCode()
+		string_t UnaryExpression::ToCode()
 		{
-			string result;
+			string_t result;
 			switch (op)
 			{
 			case UnaryOperator::Positive:
-				result = "(+";
+				result = T("(+");
 				break;
 			case UnaryOperator::Negative:
-				result = "(-";
+				result = T("(-");
 				break;
 			case UnaryOperator::Not:
-				result = "(not";
+				result = T("(not");
 				break;
 			}
-			result += operand->ToCode() + ")";
+			result += operand->ToCode() + T(")");
 			return result;
 		}
 
-		string BinaryExpression::ToCode()
+		string_t BinaryExpression::ToCode()
 		{
-			string result = "(" + first->ToCode() + " ";
+			string_t result = T("(") + first->ToCode() + T(" ");
 			switch (op)
 			{
 			case BinaryOperator::Concat:
-				result += "&";
+				result += T("&");
 				break;
 			case BinaryOperator::Add:
-				result += "+";
+				result += T("+");
 				break;
 			case BinaryOperator::Sub:
-				result += "-";
+				result += T("-");
 				break;
 			case BinaryOperator::Mul:
-				result += "*";
+				result += T("*");
 				break;
 			case BinaryOperator::Div:
-				result += "/";
+				result += T("/");
 				break;
 			case BinaryOperator::IntDiv:
-				result += "\\";
+				result += T("\\");
 				break;
 			case BinaryOperator::Mod:
-				result += "%";
+				result += T("%");
 				break;
 			case BinaryOperator::LT:
-				result += "<";
+				result += T("<");
 				break;
 			case BinaryOperator::GT:
-				result += ">";
+				result += T(">");
 				break;
 			case BinaryOperator::LE:
-				result += "<=";
+				result += T("<=");
 				break;
 			case BinaryOperator::GE:
-				result += ">=";
+				result += T(">=");
 				break;
 			case BinaryOperator::EQ:
-				result += "=";
+				result += T("=");
 				break;
 			case BinaryOperator::NE:
-				result += "<>";
+				result += T("<>");
 				break;
 			case BinaryOperator::And:
-				result += "and";
+				result += T("and");
 				break;
 			case BinaryOperator::Or:
-				result += "or";
+				result += T("or");
 				break;
 			}
-			result += " " + second->ToCode() + ")";
+			result += T(" ") + second->ToCode() + T(")");
 			return result;
 		}
 
@@ -592,7 +592,7 @@ namespace tinymoe
 			{
 				auto begin = availableSymbols.lower_bound(symbol->uniqueId);
 				auto end = availableSymbols.upper_bound(symbol->uniqueId);
-				auto it = find_if(begin, end, [symbol](pair<string, GrammarSymbol::Ptr> x){return x.second == symbol; });
+				auto it = find_if(begin, end, [symbol](pair<string_t, GrammarSymbol::Ptr> x){return x.second == symbol; });
 				while (it != availableSymbols.end())
 				{
 					if (it->second == symbol) break;
@@ -609,7 +609,7 @@ namespace tinymoe
 			return CodeError();
 		}
 
-		CodeError GrammarStack::ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result)
+		CodeError GrammarStack::ParseToken(const string_t& token, Iterator input, Iterator end, vector<Iterator>& result)
 		{
 			if (input == end)
 			{
@@ -617,7 +617,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					token,
-					"Unexpected end of line.",
+					T("Unexpected end of line."),
 				};
 				return error;
 			}
@@ -626,7 +626,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					*input,
-					"\"" + token + "\" expected but \"" + input->value + "\" found.",
+					T("\"") + token + T("\" expected but \"") + input->value + T("\" found."),
 				};
 				return error;
 			}
@@ -796,7 +796,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					token,
-					"Unexpected end of line.",
+					T("Unexpected end of line."),
 				};
 				return error;
 			}
@@ -845,7 +845,7 @@ namespace tinymoe
 
 			{
 				vector<Iterator> tokenResult;
-				auto resultError = ParseToken("(", input, end, tokenResult);
+				auto resultError = ParseToken(T("("), input, end, tokenResult);
 				if (tokenResult.size() > 0)
 				{
 					ResultList expressionResult;
@@ -855,7 +855,7 @@ namespace tinymoe
 					for (auto er : expressionResult)
 					{
 						tokenResult.clear();
-						error = ParseToken(")", er.first, end, tokenResult);
+						error = ParseToken(T(")"), er.first, end, tokenResult);
 						resultError = FoldError(resultError, error);
 						if (tokenResult.size() > 0)
 						{
@@ -938,13 +938,13 @@ namespace tinymoe
 		CodeError GrammarStack::ParseList(Iterator input, Iterator end, ResultList& result)
 		{
 			vector<Iterator> tokenResult;
-			auto resultError = ParseToken("(", input, end, tokenResult);
+			auto resultError = ParseToken(T("("), input, end, tokenResult);
 			if (tokenResult.size() == 0) return resultError;
 			input = tokenResult[0];
 
 			tokenResult.clear();
 			{
-				auto error = ParseToken(")", input, end, tokenResult);
+				auto error = ParseToken(T(")"), input, end, tokenResult);
 				resultError = FoldError(resultError, error);
 				if (tokenResult.size() == 1)
 				{
@@ -974,7 +974,7 @@ namespace tinymoe
 						link->previous = previousExpression;
 
 						tokenResult.clear();
-						auto error = ParseToken(",", er.first, end, tokenResult);
+						auto error = ParseToken(T(","), er.first, end, tokenResult);
 						resultError = FoldError(resultError, error);
 						if (tokenResult.size() != 0)
 						{
@@ -983,7 +983,7 @@ namespace tinymoe
 						else
 						{
 							tokenResult.clear();
-							error = ParseToken(")", er.first, end, tokenResult);
+							error = ParseToken(T(")"), er.first, end, tokenResult);
 							resultError = FoldError(resultError, error);
 							if (tokenResult.size() != 0)
 							{
@@ -1066,7 +1066,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					token,
-					"Unexpected end of line.",
+					T("Unexpected end of line."),
 				};
 				return error;
 			}

@@ -1,13 +1,14 @@
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
+using namespace tinymoe;
 using namespace tinymoe::compiler;
 
 TEST_CASE(TestParseCorrectSymbol)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 symbol symbol name
-)tinymoe";
+)tinymoe");
 	CodeError::List errors;
 
 	auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -19,18 +20,18 @@ symbol symbol name
 	TEST_ASSERT(lineIndex == 1);
 	TEST_ASSERT(errors.size() == 0);
 
-	TEST_ASSERT(decl->keywordToken.value == "symbol");
+	TEST_ASSERT(decl->keywordToken.value == T("symbol"));
 	TEST_ASSERT(decl->name->identifiers.size() == 2);
-	TEST_ASSERT(decl->name->identifiers[0].value == "symbol");
-	TEST_ASSERT(decl->name->identifiers[1].value == "name");
+	TEST_ASSERT(decl->name->identifiers[0].value == T("symbol"));
+	TEST_ASSERT(decl->name->identifiers[1].value == T("name"));
 }
 
 TEST_CASE(TestParseWrongSymbol)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 symbol
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -41,12 +42,12 @@ symbol
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "symbol");
+		TEST_ASSERT(errors[0].position.value == T("symbol"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 symbol illegal + name
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -57,17 +58,17 @@ symbol illegal + name
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "+");
+		TEST_ASSERT(errors[0].position.value == T("+"));
 	}
 }
 
 TEST_CASE(TestParseCorrectType)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type empty type
 end
-	)tinymoe";
+	)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -79,20 +80,20 @@ end
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 0);
 		
-		TEST_ASSERT(decl->keywordToken.value == "type");
+		TEST_ASSERT(decl->keywordToken.value == T("type"));
 		TEST_ASSERT(decl->name->identifiers.size() == 2);
-		TEST_ASSERT(decl->name->identifiers[0].value == "empty");
-		TEST_ASSERT(decl->name->identifiers[1].value == "type");
+		TEST_ASSERT(decl->name->identifiers[0].value == T("empty"));
+		TEST_ASSERT(decl->name->identifiers[1].value == T("type"));
 		TEST_ASSERT(!decl->parent);
 		TEST_ASSERT(decl->fields.size() == 0);
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type pair
 	first
 	second
 end
-	)tinymoe";
+	)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -104,24 +105,24 @@ end
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 0);
 		
-		TEST_ASSERT(decl->keywordToken.value == "type");
+		TEST_ASSERT(decl->keywordToken.value == T("type"));
 		TEST_ASSERT(decl->name->identifiers.size() == 1);
-		TEST_ASSERT(decl->name->identifiers[0].value == "pair");
+		TEST_ASSERT(decl->name->identifiers[0].value == T("pair"));
 		TEST_ASSERT(!decl->parent);
 
 		TEST_ASSERT(decl->fields.size() == 2);
 		TEST_ASSERT(decl->fields[0]->identifiers.size() == 1);
-		TEST_ASSERT(decl->fields[0]->identifiers[0].value == "first");
+		TEST_ASSERT(decl->fields[0]->identifiers[0].value == T("first"));
 		TEST_ASSERT(decl->fields[1]->identifiers.size() == 1);
-		TEST_ASSERT(decl->fields[1]->identifiers[0].value == "second");
+		TEST_ASSERT(decl->fields[1]->identifiers[0].value == T("second"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type derived : base
 	first
 	second
 end
-	)tinymoe";
+	)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -133,27 +134,27 @@ end
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 0);
 		
-		TEST_ASSERT(decl->keywordToken.value == "type");
+		TEST_ASSERT(decl->keywordToken.value == T("type"));
 		TEST_ASSERT(decl->name->identifiers.size() == 1);
-		TEST_ASSERT(decl->name->identifiers[0].value == "derived");
+		TEST_ASSERT(decl->name->identifiers[0].value == T("derived"));
 		TEST_ASSERT(decl->parent->identifiers.size() == 1);
-		TEST_ASSERT(decl->parent->identifiers[0].value == "base");
+		TEST_ASSERT(decl->parent->identifiers[0].value == T("base"));
 
 		TEST_ASSERT(decl->fields.size() == 2);
 		TEST_ASSERT(decl->fields[0]->identifiers.size() == 1);
-		TEST_ASSERT(decl->fields[0]->identifiers[0].value == "first");
+		TEST_ASSERT(decl->fields[0]->identifiers[0].value == T("first"));
 		TEST_ASSERT(decl->fields[1]->identifiers.size() == 1);
-		TEST_ASSERT(decl->fields[1]->identifiers[0].value == "second");
+		TEST_ASSERT(decl->fields[1]->identifiers[0].value == T("second"));
 	}
 }
 
 TEST_CASE(TestParseWrongType)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type
 end
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -164,13 +165,13 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "type");
+		TEST_ASSERT(errors[0].position.value == T("type"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type illegal + name
 end
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -181,14 +182,14 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "+");
+		TEST_ASSERT(errors[0].position.value == T("+"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 type type name
 	illegal + name
 end
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -199,16 +200,16 @@ end
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "+");
+		TEST_ASSERT(errors[0].position.value == T("+"));
 	}
 }
 
 TEST_CASE(TestParseCorrectCps)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -222,13 +223,13 @@ cps (state)
 
 		TEST_ASSERT(decl->stateName);
 		TEST_ASSERT(decl->stateName->identifiers.size() == 1);
-		TEST_ASSERT(decl->stateName->identifiers[0].value == "state");
+		TEST_ASSERT(decl->stateName->identifiers[0].value == T("state"));
 		TEST_ASSERT(!decl->continuationName);
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state) (continuation)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -242,19 +243,19 @@ cps (state) (continuation)
 
 		TEST_ASSERT(decl->stateName);
 		TEST_ASSERT(decl->stateName->identifiers.size() == 1);
-		TEST_ASSERT(decl->stateName->identifiers[0].value == "state");
+		TEST_ASSERT(decl->stateName->identifiers[0].value == T("state"));
 		TEST_ASSERT(decl->continuationName);
 		TEST_ASSERT(decl->continuationName->identifiers.size() == 1);
-		TEST_ASSERT(decl->continuationName->identifiers[0].value == "continuation");
+		TEST_ASSERT(decl->continuationName->identifiers[0].value == T("continuation"));
 	}
 }
 
 TEST_CASE(TestParseWrongCps)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -265,12 +266,12 @@ cps
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps +
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -281,12 +282,12 @@ cps +
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "+");
+		TEST_ASSERT(errors[0].position.value == T("+"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps ()
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -297,12 +298,12 @@ cps ()
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -313,12 +314,12 @@ cps (state
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state) (
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -329,13 +330,13 @@ cps (state) (
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].position.value == "cps");
-		TEST_ASSERT(errors[1].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
+		TEST_ASSERT(errors[1].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state) )
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -346,12 +347,12 @@ cps (state) )
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == ")");
+		TEST_ASSERT(errors[0].position.value == T(")"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state) (continuation) (too many parameters)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -362,17 +363,17 @@ cps (state) (continuation) (too many parameters)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "(");
+		TEST_ASSERT(errors[0].position.value == T("("));
 	}
 }
 
 TEST_CASE(TestParseCorrectCategory)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -390,12 +391,12 @@ category
 		TEST_ASSERT(decl->closable);
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (signal)
 	follow SEH try
 	follow SEH catch
 	start SEH catch
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -409,18 +410,18 @@ category (signal)
 		
 		TEST_ASSERT(decl->signalName);
 		TEST_ASSERT(decl->signalName->identifiers.size() == 1);
-		TEST_ASSERT(decl->signalName->identifiers[0].value == "signal");
+		TEST_ASSERT(decl->signalName->identifiers[0].value == T("signal"));
 		TEST_ASSERT(decl->categoryName);
 		TEST_ASSERT(decl->categoryName->identifiers.size() == 2);
-		TEST_ASSERT(decl->categoryName->identifiers[0].value == "SEH");
-		TEST_ASSERT(decl->categoryName->identifiers[1].value == "catch");
+		TEST_ASSERT(decl->categoryName->identifiers[0].value == T("SEH"));
+		TEST_ASSERT(decl->categoryName->identifiers[1].value == T("catch"));
 		TEST_ASSERT(decl->followCategories.size() == 2);
 		TEST_ASSERT(decl->followCategories[0]->identifiers.size() == 2);
-		TEST_ASSERT(decl->followCategories[0]->identifiers[0].value == "SEH");
-		TEST_ASSERT(decl->followCategories[0]->identifiers[1].value == "try");
+		TEST_ASSERT(decl->followCategories[0]->identifiers[0].value == T("SEH"));
+		TEST_ASSERT(decl->followCategories[0]->identifiers[1].value == T("try"));
 		TEST_ASSERT(decl->followCategories[1]->identifiers.size() == 2);
-		TEST_ASSERT(decl->followCategories[1]->identifiers[0].value == "SEH");
-		TEST_ASSERT(decl->followCategories[1]->identifiers[1].value == "catch");
+		TEST_ASSERT(decl->followCategories[1]->identifiers[0].value == T("SEH"));
+		TEST_ASSERT(decl->followCategories[1]->identifiers[1].value == T("catch"));
 		TEST_ASSERT(!decl->closable);
 	}
 }
@@ -428,10 +429,10 @@ category (signal)
 TEST_CASE(TestParseWrongCategory)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (state
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -442,15 +443,15 @@ category (state
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].position.value == "category");
-		TEST_ASSERT(errors[1].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("category"));
+		TEST_ASSERT(errors[1].position.value == T("category"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (state)
 	start illegal + name
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -461,16 +462,16 @@ category (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 3);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].position.value == "+");
-		TEST_ASSERT(errors[1].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("+"));
+		TEST_ASSERT(errors[1].position.value == T("category"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (state)
 	start SEH try
 	follow
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -481,12 +482,12 @@ category (state)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 4);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "follow");
+		TEST_ASSERT(errors[0].position.value == T("follow"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (signal)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -497,14 +498,14 @@ category (signal)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 1);
 		TEST_ASSERT(errors.size() == 2);
-		TEST_ASSERT(errors[0].position.value == "category");
-		TEST_ASSERT(errors[1].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("category"));
+		TEST_ASSERT(errors[1].position.value == T("category"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category (signal)
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -515,13 +516,13 @@ category (signal)
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("category"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	follow a category
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -532,16 +533,16 @@ category
 		TEST_ASSERT(decl);
 		TEST_ASSERT(lineIndex == 2);
 		TEST_ASSERT(errors.size() == 1);
-		TEST_ASSERT(errors[0].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("category"));
 	}
 }
 
 TEST_CASE(TestParseCorrectFunction)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 sentence abort
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -562,16 +563,16 @@ sentence abort
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
 		
-		TEST_ASSERT(decl->keywordToken.value == "sentence");
+		TEST_ASSERT(decl->keywordToken.value == T("sentence"));
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+			TEST_ASSERT(name->name->identifiers[0].value == T("abort"));
 		}
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 sentence abort
 	do something
 end
@@ -579,7 +580,7 @@ end
 sentence halt
 	do something
 end
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -600,18 +601,18 @@ end
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
 		
-		TEST_ASSERT(decl->keywordToken.value == "sentence");
+		TEST_ASSERT(decl->keywordToken.value == T("sentence"));
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+			TEST_ASSERT(name->name->identifiers[0].value == T("abort"));
 		}
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 sentence abort : an alias
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -631,22 +632,22 @@ sentence abort : an alias
 		TEST_ASSERT(!decl->bodyName);
 		TEST_ASSERT(decl->alias);
 		TEST_ASSERT(decl->alias->identifiers.size() == 2);
-		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
-		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
+		TEST_ASSERT(decl->alias->identifiers[0].value == T("an"));
+		TEST_ASSERT(decl->alias->identifiers[1].value == T("alias"));
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
 		
-		TEST_ASSERT(decl->keywordToken.value == "sentence");
+		TEST_ASSERT(decl->keywordToken.value == T("sentence"));
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+			TEST_ASSERT(name->name->identifiers[0].value == T("abort"));
 		}
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f (assignable q) g (list r) : an alias
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -668,57 +669,57 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->bodyName);
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "body");
+			TEST_ASSERT(name->name->identifiers[0].value == T("body"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		TEST_ASSERT(decl->alias);
 		TEST_ASSERT(decl->alias->identifiers.size() == 2);
-		TEST_ASSERT(decl->alias->identifiers[0].value == "an");
-		TEST_ASSERT(decl->alias->identifiers[1].value == "alias");
+		TEST_ASSERT(decl->alias->identifiers[0].value == T("an"));
+		TEST_ASSERT(decl->alias->identifiers[1].value == T("alias"));
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
 		
-		TEST_ASSERT(decl->keywordToken.value == "block");
+		TEST_ASSERT(decl->keywordToken.value == T("block"));
 		TEST_ASSERT(decl->name.size() == 14);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "a");
+			TEST_ASSERT(name->name->identifiers[0].value == T("a"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "x");
+			TEST_ASSERT(name->name->identifiers[0].value == T("x"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[2]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "b");
+			TEST_ASSERT(name->name->identifiers[0].value == T("b"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[3]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Expression);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "y");
+			TEST_ASSERT(name->name->identifiers[0].value == T("y"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[4]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "c");
+			TEST_ASSERT(name->name->identifiers[0].value == T("c"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[5]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Argument);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "z");
+			TEST_ASSERT(name->name->identifiers[0].value == T("z"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[6]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "d");
+			TEST_ASSERT(name->name->identifiers[0].value == T("d"));
 		}
 		{
 			auto name = dynamic_pointer_cast<FunctionArgumentFragment>(decl->name[7]);
@@ -727,12 +728,12 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f
 			
 			auto argument = dynamic_pointer_cast<NameFragment>(name->declaration->name[0]);
 			TEST_ASSERT(argument->name->identifiers.size() == 1);
-			TEST_ASSERT(argument->name->identifiers[0].value == "o");
+			TEST_ASSERT(argument->name->identifiers[0].value == T("o"));
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[8]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "e");
+			TEST_ASSERT(name->name->identifiers[0].value == T("e"));
 		}
 		{
 			auto name = dynamic_pointer_cast<FunctionArgumentFragment>(decl->name[9]);
@@ -741,37 +742,37 @@ block (body) a (x) b (expression y) c (argument z) d (phrase o) e (sentence p) f
 			
 			auto argument = dynamic_pointer_cast<NameFragment>(name->declaration->name[0]);
 			TEST_ASSERT(argument->name->identifiers.size() == 1);
-			TEST_ASSERT(argument->name->identifiers[0].value == "p");
+			TEST_ASSERT(argument->name->identifiers[0].value == T("p"));
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[10]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "f");
+			TEST_ASSERT(name->name->identifiers[0].value == T("f"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[11]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Assignable);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "q");
+			TEST_ASSERT(name->name->identifiers[0].value == T("q"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[12]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "g");
+			TEST_ASSERT(name->name->identifiers[0].value == T("g"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[13]);
 			TEST_ASSERT(name->type == FunctionArgumentType::List);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "r");
+			TEST_ASSERT(name->name->identifiers[0].value == T("r"));
 			TEST_ASSERT(!name->receivingType);
 		}
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 block (body) abort
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -793,24 +794,24 @@ block (body) abort
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->bodyName);
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "body");
+			TEST_ASSERT(name->name->identifiers[0].value == T("body"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Block);
 		
-		TEST_ASSERT(decl->keywordToken.value == "block");
+		TEST_ASSERT(decl->keywordToken.value == T("block"));
 		TEST_ASSERT(decl->name.size() == 1);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "abort");
+			TEST_ASSERT(name->name->identifiers[0].value == T("abort"));
 		}
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 sentence remove (item) from (items : collection)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -831,33 +832,33 @@ sentence remove (item) from (items : collection)
 		TEST_ASSERT(!decl->alias);
 		TEST_ASSERT(decl->type == FunctionDeclarationType::Sentence);
 		
-		TEST_ASSERT(decl->keywordToken.value == "sentence");
+		TEST_ASSERT(decl->keywordToken.value == T("sentence"));
 		TEST_ASSERT(decl->name.size() == 4);
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "remove");
+			TEST_ASSERT(name->name->identifiers[0].value == T("remove"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "item");
+			TEST_ASSERT(name->name->identifiers[0].value == T("item"));
 			TEST_ASSERT(!name->receivingType);
 		}
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[2]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "from");
+			TEST_ASSERT(name->name->identifiers[0].value == T("from"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[3]);
 			TEST_ASSERT(name->type == FunctionArgumentType::Normal);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "items");
+			TEST_ASSERT(name->name->identifiers[0].value == T("items"));
 			TEST_ASSERT(name->receivingType);
 			TEST_ASSERT(name->receivingType->identifiers.size() == 1);
-			TEST_ASSERT(name->receivingType->identifiers[0].value == "collection");
+			TEST_ASSERT(name->receivingType->identifiers[0].value == T("collection"));
 		}
 	}
 }
@@ -865,9 +866,9 @@ sentence remove (item) from (items : collection)
 TEST_CASE(TestParseWrongFunction)
 {
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -882,13 +883,13 @@ cps (state)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -903,14 +904,14 @@ category
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].position.value == "category");
+		TEST_ASSERT(errors[0].position.value == T("category"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state)
 category
 	closable
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -925,14 +926,14 @@ category
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	closable
 cps (state)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -947,13 +948,13 @@ cps (state)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].position.value == "cps");
+		TEST_ASSERT(errors[0].position.value == T("cps"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 cps (state)
 phrase whatever
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -968,14 +969,14 @@ phrase whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 1);
 
-		TEST_ASSERT(errors[0].position.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == T("phrase"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	closable
 phrase whatever
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -990,14 +991,14 @@ phrase whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].position.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == T("phrase"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 category
 	closable
 sentence whatever
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1012,12 +1013,12 @@ sentence whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 2);
 
-		TEST_ASSERT(errors[0].position.value == "sentence");
+		TEST_ASSERT(errors[0].position.value == T("sentence"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 block whatever
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1032,12 +1033,12 @@ block whatever
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "block");
+		TEST_ASSERT(errors[0].position.value == T("block"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 sentence (x) y
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1052,12 +1053,12 @@ sentence (x) y
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "sentence");
+		TEST_ASSERT(errors[0].position.value == T("sentence"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 block (body) (x) y
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1072,12 +1073,12 @@ block (body) (x) y
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "block");
+		TEST_ASSERT(errors[0].position.value == T("block"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 phrase
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1092,12 +1093,12 @@ phrase
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == T("phrase"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 phrase (x)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1112,12 +1113,12 @@ phrase (x)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == T("phrase"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 phrase (x) (y)
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1132,13 +1133,13 @@ phrase (x) (y)
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == "phrase");
-		TEST_ASSERT(errors[1].position.value == "phrase");
+		TEST_ASSERT(errors[0].position.value == T("phrase"));
+		TEST_ASSERT(errors[1].position.value == T("phrase"));
 	}
 	{
-		string code = R"tinymoe(
+		string_t code = T(R"tinymoe(
 phrase a : b )
-)tinymoe";
+)tinymoe");
 		CodeError::List errors;
 
 		auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1153,24 +1154,24 @@ phrase a : b )
 		TEST_ASSERT(decl->codeLineIndex == -1);
 		TEST_ASSERT(decl->endLineIndex == 0);
 
-		TEST_ASSERT(errors[0].position.value == ")");
+		TEST_ASSERT(errors[0].position.value == T(")"));
 	}
 }
 
 TEST_CASE(TestParseCorrectModule)
 {
-	string code = R"tinymoe(
+	string_t code = T(R"tinymoe(
 module hello world
 using standard library
 using another module
 
 phrase print (message)
-	redirect to "TheNameOfAnExternalPrintFunction"
+	redirect to T("TheNameOfAnExternalPrintFunction"
 
 phrase main
-	print "Hello, world!"
+	print T("Hello, world!"
 end
-)tinymoe";
+)tinymoe");
 	CodeError::List errors;
 
 	auto codeFile = CodeFile::Parse(code, 0, errors);
@@ -1181,16 +1182,16 @@ end
 	TEST_ASSERT(errors.size() == 0);
 
 	TEST_ASSERT(module->name->identifiers.size() == 2);
-	TEST_ASSERT(module->name->identifiers[0].value == "hello");
-	TEST_ASSERT(module->name->identifiers[1].value == "world");
+	TEST_ASSERT(module->name->identifiers[0].value == T("hello"));
+	TEST_ASSERT(module->name->identifiers[1].value == T("world"));
 
 	TEST_ASSERT(module->usings.size() == 2);
 	TEST_ASSERT(module->usings[0]->identifiers.size() == 2);
-	TEST_ASSERT(module->usings[0]->identifiers[0].value == "standard");
-	TEST_ASSERT(module->usings[0]->identifiers[1].value == "library");
+	TEST_ASSERT(module->usings[0]->identifiers[0].value == T("standard"));
+	TEST_ASSERT(module->usings[0]->identifiers[1].value == T("library"));
 	TEST_ASSERT(module->usings[1]->identifiers.size() == 2);
-	TEST_ASSERT(module->usings[1]->identifiers[0].value == "another");
-	TEST_ASSERT(module->usings[1]->identifiers[1].value == "module");
+	TEST_ASSERT(module->usings[1]->identifiers[0].value == T("another"));
+	TEST_ASSERT(module->usings[1]->identifiers[1].value == T("module"));
 
 	TEST_ASSERT(module->declarations.size() == 2);
 	{
@@ -1199,12 +1200,12 @@ end
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "print");
+			TEST_ASSERT(name->name->identifiers[0].value == T("print"));
 		}
 		{
 			auto name = dynamic_pointer_cast<VariableArgumentFragment>(decl->name[1]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "message");
+			TEST_ASSERT(name->name->identifiers[0].value == T("message"));
 		}
 	}
 	{
@@ -1213,7 +1214,7 @@ end
 		{
 			auto name = dynamic_pointer_cast<NameFragment>(decl->name[0]);
 			TEST_ASSERT(name->name->identifiers.size() == 1);
-			TEST_ASSERT(name->name->identifiers[0].value == "main");
+			TEST_ASSERT(name->name->identifiers[0].value == T("main"));
 		}
 	}
 }

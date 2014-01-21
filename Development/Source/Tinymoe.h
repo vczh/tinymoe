@@ -11,7 +11,6 @@
 
 namespace tinymoe
 {
-	extern string			GetCodeForStandardLibrary();
 }
 
 #endif

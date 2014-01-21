@@ -16,17 +16,17 @@ namespace tinymoe
 		{
 		}
 
-		string AstNode::Indent(int indentation)
+		string_t AstNode::Indent(int indentation)
 		{
-			string s;
+			string_t s;
 			for (int i = 0; i < indentation; i++)
 			{
-				s += "    ";
+				s += T("    ");
 			}
 			return s;
 		}
 
-		void AstNode::Print(ostream& o, int indentation, AstNode::WeakPtr _parent)
+		void AstNode::Print(ostream_t& o, int indentation, AstNode::WeakPtr _parent)
 		{
 			ASSERT(_parent.expired() || parent.lock() == _parent.lock());
 			PrintInternal(o, indentation);
@@ -238,48 +238,48 @@ namespace tinymoe
 		AstDeclaration::Print
 		*************************************************************/
 
-		void AstSymbolDeclaration::PrintInternal(ostream& o, int indentation)
+		void AstSymbolDeclaration::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << Indent(indentation) << "$symbol " << composedName << ";";
+			o << Indent(indentation) << T("$symbol ") << composedName << T(";");
 		}
 
-		void AstTypeDeclaration::PrintInternal(ostream& o, int indentation)
+		void AstTypeDeclaration::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << Indent(indentation) << "$type " << composedName;
+			o << Indent(indentation) << T("$type ") << composedName;
 			if (!baseType.expired())
 			{
-				o << " : ";
+				o << T(" : ");
 				baseType.lock()->Print(o, indentation);
 			}
-			o << endl << Indent(indentation) << "{" << endl;
+			o << endl << Indent(indentation) << T("{") << endl;
 			for (auto field : fields)
 			{
 				field->Print(o, indentation + 1, shared_from_this());
 				o << endl;
 			}
-			o << Indent(indentation) << "}";
+			o << Indent(indentation) << T("}");
 		}
 
-		void AstFunctionDeclaration::PrintInternal(ostream& o, int indentation)
+		void AstFunctionDeclaration::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << Indent(indentation) << "$procedure ";
+			o << Indent(indentation) << T("$procedure ");
 			if (ownerType)
 			{
-				o << "(";
+				o << T("(");
 				ownerType->Print(o, indentation, shared_from_this());
-				o << ").";
+				o << T(").");
 			}
-			o << composedName << "(";
+			o << composedName << T("(");
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
 				o << (*it)->composedName;
 				if (it + 1 != arguments.end())
 				{
-					o << ", ";
+					o << T(", ");
 				}
 			}
 
-			o << ")" << endl;
+			o << T(")") << endl;
 			statement->Print(o, indentation, shared_from_this());
 		}
 
@@ -287,218 +287,218 @@ namespace tinymoe
 		AstExpression::Print
 		*************************************************************/
 
-		void AstLiteralExpression::PrintInternal(ostream& o, int indentation)
+		void AstLiteralExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			switch (literalName)
 			{
 			case AstLiteralName::Null:
-				o << "$null";
+				o << T("$null");
 				break;
 			case AstLiteralName::True:
-				o << "$true";
+				o << T("$true");
 				break;
 			case AstLiteralName::False:
-				o << "$false";
+				o << T("$false");
 				break;
 			}
 		}
 
-		void AstIntegerExpression::PrintInternal(ostream& o, int indentation)
+		void AstIntegerExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << value;
 		}
 
-		void AstFloatExpression::PrintInternal(ostream& o, int indentation)
+		void AstFloatExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << value;
 		}
 
-		void AstStringExpression::PrintInternal(ostream& o, int indentation)
+		void AstStringExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "\"" << value << "\"";
+			o << T("\"") << value << T("\"");
 		}
 
-		void AstExternalSymbolExpression::PrintInternal(ostream& o, int indentation)
+		void AstExternalSymbolExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "$external (";
+			o << T("$external (");
 			name->Print(o, indentation);
-			o << ")";
+			o << T(")");
 		}
 
-		void AstReferenceExpression::PrintInternal(ostream& o, int indentation)
+		void AstReferenceExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << reference.lock()->composedName;
 		}
 
-		void AstUnaryExpression::PrintInternal(ostream& o, int indentation)
+		void AstUnaryExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			switch (op)
 			{
 			case AstUnaryOperator::Not:
-				o << "!";
+				o << T("!");
 				break;
 			case AstUnaryOperator::Positive:
-				o << "+";
+				o << T("+");
 				break;
 			case AstUnaryOperator::Negative:
-				o << "-";
+				o << T("-");
 				break;
 			}
 			operand->Print(o, indentation, shared_from_this());
 		}
 
-		void AstBinaryExpression::PrintInternal(ostream& o, int indentation)
+		void AstBinaryExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "(";
+			o << T("(");
 			first->Print(o, indentation, shared_from_this());
 			switch (op)
 			{
 			case AstBinaryOperator::Concat:
-				o << " & ";
+				o << T(" & ");
 				break;
 			case AstBinaryOperator::Add:
-				o << " + ";
+				o << T(" + ");
 				break;
 			case AstBinaryOperator::Sub:
-				o << " - ";
+				o << T(" - ");
 				break;
 			case AstBinaryOperator::Mul:
-				o << " * ";
+				o << T(" * ");
 				break;
 			case AstBinaryOperator::Div:
-				o << " / ";
+				o << T(" / ");
 				break;
 			case AstBinaryOperator::IntDiv:
-				o << " \\ ";
+				o << T(" \\ ");
 				break;
 			case AstBinaryOperator::Mod:
-				o << " % ";
+				o << T(" % ");
 				break;
 			case AstBinaryOperator::LT:
-				o << " < ";
+				o << T(" < ");
 				break;
 			case AstBinaryOperator::GT:
-				o << " > ";
+				o << T(" > ");
 				break;
 			case AstBinaryOperator::LE:
-				o << " <= ";
+				o << T(" <= ");
 				break;
 			case AstBinaryOperator::GE:
-				o << " >= ";
+				o << T(" >= ");
 				break;
 			case AstBinaryOperator::EQ:
-				o << " == ";
+				o << T(" == ");
 				break;
 			case AstBinaryOperator::NE:
-				o << " != ";
+				o << T(" != ");
 				break;
 			case AstBinaryOperator::And:
-				o << " && ";
+				o << T(" && ");
 				break;
 			case AstBinaryOperator::Or:
-				o << " || ";
+				o << T(" || ");
 				break;
 			}
 			second->Print(o, indentation, shared_from_this());
-			o << ")";
+			o << T(")");
 		}
 
-		void AstNewTypeExpression::PrintInternal(ostream& o, int indentation)
+		void AstNewTypeExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "new ";
+			o << T("new ");
 			type->Print(o, indentation, shared_from_this());
-			o << "(";
+			o << T("(");
 			for (auto it = fields.begin(); it != fields.end(); it++)
 			{
 				(*it)->Print(o, indentation, shared_from_this());
 				if (it + 1 != fields.end())
 				{
-					o << ", ";
+					o << T(", ");
 				}
 			}
-			o << ")";
+			o << T(")");
 		}
 
-		void AstTestTypeExpression::PrintInternal(ostream& o, int indentation)
+		void AstTestTypeExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "(";
+			o << T("(");
 			target->Print(o, indentation, shared_from_this());
-			o << " is ";
+			o << T(" is ");
 			type->Print(o, indentation, shared_from_this());
-			o << ")";
+			o << T(")");
 		}
 
-		void AstNewArrayExpression::PrintInternal(ostream& o, int indentation)
+		void AstNewArrayExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "new $Array(";
+			o << T("new $Array(");
 			length->Print(o, indentation, shared_from_this());
-			o << ")";
+			o << T(")");
 		}
 
-		void AstNewArrayLiteralExpression::PrintInternal(ostream& o, int indentation)
+		void AstNewArrayLiteralExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "[";
+			o << T("[");
 			for (auto it = elements.begin(); it != elements.end(); it++)
 			{
 				(*it)->Print(o, indentation, shared_from_this());
 				if (it + 1 != elements.end())
 				{
-					o << ", ";
+					o << T(", ");
 				}
 			}
-			o << "]";
+			o << T("]");
 		}
 
-		void AstArrayLengthExpression::PrintInternal(ostream& o, int indentation)
+		void AstArrayLengthExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "$ArrayLength(";
+			o << T("$ArrayLength(");
 			target->Print(o, indentation, shared_from_this());
-			o << ")";
+			o << T(")");
 		}
 
-		void AstArrayAccessExpression::PrintInternal(ostream& o, int indentation)
+		void AstArrayAccessExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			target->Print(o, indentation, shared_from_this());
-			o << "[";
+			o << T("[");
 			index->Print(o, indentation, shared_from_this());
-			o << "]";
+			o << T("]");
 		}
 
-		void AstFieldAccessExpression::PrintInternal(ostream& o, int indentation)
+		void AstFieldAccessExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			target->Print(o, indentation, shared_from_this());
-			o << "." << composedFieldName;
+			o << T(".") << composedFieldName;
 		}
 
-		void AstInvokeExpression::PrintInternal(ostream& o, int indentation)
+		void AstInvokeExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			function->Print(o, indentation, shared_from_this());
-			o << "(" << endl;
+			o << T("(") << endl;
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
 				o << Indent(indentation + 1);
 				(*it)->Print(o, indentation + 1, shared_from_this());
 				if (it + 1 != arguments.end())
 				{
-					o << ", ";
+					o << T(", ");
 				}
 				o << endl;
 			}
-			o << Indent(indentation + 1) << ")";
+			o << Indent(indentation + 1) << T(")");
 		}
 
-		void AstLambdaExpression::PrintInternal(ostream& o, int indentation)
+		void AstLambdaExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << "$lambda (";
+			o << T("$lambda (");
 			for (auto it = arguments.begin(); it != arguments.end(); it++)
 			{
 				o << (*it)->composedName;
 				if (it + 1 != arguments.end())
 				{
-					o << ", ";
+					o << T(", ");
 				}
 			}
-			o << ")" << endl;
+			o << T(")") << endl;
 			statement->Print(o, indentation + 1, shared_from_this());
 		}
 
@@ -506,47 +506,47 @@ namespace tinymoe
 		AstStatement::Print
 		*************************************************************/
 
-		void AstBlockStatement::PrintInternal(ostream& o, int indentation)
+		void AstBlockStatement::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << Indent(indentation) << "{" << endl;
+			o << Indent(indentation) << T("{") << endl;
 			for (auto statement : statements)
 			{
 				statement->Print(o, indentation + 1, shared_from_this());
 				o << endl;
 			}
-			o << Indent(indentation) << "}";
+			o << Indent(indentation) << T("}");
 		}
 
-		void AstExpressionStatement::PrintInternal(ostream& o, int indentation)
+		void AstExpressionStatement::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << Indent(indentation);
 			expression->Print(o, indentation, shared_from_this());
-			o << ";";
+			o << T(";");
 		}
 
-		void AstDeclarationStatement::PrintInternal(ostream& o, int indentation)
+		void AstDeclarationStatement::PrintInternal(ostream_t& o, int indentation)
 		{
 			declaration->Print(o, indentation, shared_from_this());
 		}
 
-		void AstAssignmentStatement::PrintInternal(ostream& o, int indentation)
+		void AstAssignmentStatement::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << Indent(indentation);
 			target->Print(o, indentation, shared_from_this());
-			o << " = ";
+			o << T(" = ");
 			value->Print(o, indentation, shared_from_this());
-			o << ";";
+			o << T(";");
 		}
 
-		void AstIfStatement::PrintInternal(ostream& o, int indentation)
+		void AstIfStatement::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << Indent(indentation) << "if (";
+			o << Indent(indentation) << T("if (");
 			condition->Print(o, indentation, shared_from_this());
 			o << endl;
 			trueBranch->Print(o, indentation + 1, shared_from_this());
 			if (falseBranch)
 			{
-				o << endl << Indent(indentation) << "else" << endl;
+				o << endl << Indent(indentation) << T("else") << endl;
 				falseBranch->Print(o, indentation + 1, shared_from_this());
 			}
 		}
@@ -555,35 +555,35 @@ namespace tinymoe
 		AstType::Print
 		*************************************************************/
 
-		void AstPredefinedType::PrintInternal(ostream& o, int indentation)
+		void AstPredefinedType::PrintInternal(ostream_t& o, int indentation)
 		{
 			switch (typeName)
 			{
 			case AstPredefinedTypeName::Object:
-				o << "$Object";
+				o << T("$Object");
 				break;
 			case AstPredefinedTypeName::Symbol:
-				o << "$Symbol";
+				o << T("$Symbol");
 				break;
 			case AstPredefinedTypeName::Array:
-				o << "$Array";
+				o << T("$Array");
 				break;
 			case AstPredefinedTypeName::Boolean:
-				o << "$Boolean";
+				o << T("$Boolean");
 				break;
 			case AstPredefinedTypeName::Integer:
-				o << "$Integer";
+				o << T("$Integer");
 				break;
 			case AstPredefinedTypeName::Float:
-				o << "$Float";
+				o << T("$Float");
 				break;
 			case AstPredefinedTypeName::String:
-				o << "$Function";
+				o << T("$Function");
 				break;
 			}
 		}
 
-		void AstReferenceType::PrintInternal(ostream& o, int indentation)
+		void AstReferenceType::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << typeDeclaration.lock()->composedName;
 		}
@@ -592,7 +592,7 @@ namespace tinymoe
 		AstAssembly::Print
 		*************************************************************/
 
-		void AstAssembly::PrintInternal(ostream& o, int indentation)
+		void AstAssembly::PrintInternal(ostream_t& o, int indentation)
 		{
 			for (auto decl : declarations)
 			{

@@ -63,13 +63,13 @@ namespace tinymoe
 			CodeTokenType					type = CodeTokenType::Unknown;
 			int								row = -1;
 			int								column = -1;
-			string							value;
+			string_t						value;
 			int								codeIndex = -1;
 
 			bool							IsNameFragmentToken();
 
-			static string					EscapeString(string value);
-			static string					UnescapeString(string str);
+			static string_t					EscapeString(string_t value);
+			static string_t					UnescapeString(string_t str);
 		};
 
 		struct CodeError
@@ -77,7 +77,7 @@ namespace tinymoe
 			typedef vector<CodeError>				List;
 
 			CodeToken						position;
-			string							message;
+			string_t						message;
 		};
 
 		struct CodeLine
@@ -95,7 +95,7 @@ namespace tinymoe
 
 			CodeLine::List					lines;
 
-			static CodeFile::Ptr			Parse(const string& code, int codeIndex, CodeError::List& errors);
+			static CodeFile::Ptr			Parse(const string_t& code, int codeIndex, CodeError::List& errors);
 		};
 
 		class CodeFragment
@@ -113,12 +113,12 @@ namespace tinymoe
 
 			vector<CodeToken>									identifiers;
 
-			string												GetName();
-			string												GetComposedName();
+			string_t											GetName();
+			string_t											GetComposedName();
 
-			static bool											ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string& content, CodeToken ownerToken, CodeError::List& errors);
-			static SymbolName::Ptr								ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
-			static SymbolName::Ptr								ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string& ownerName, CodeToken ownerToken, CodeError::List& errors);
+			static bool											ConsumeToken(CodeToken::List::iterator& it, CodeToken::List::iterator end, CodeTokenType tokenType, const string_t& content, CodeToken ownerToken, CodeError::List& errors);
+			static SymbolName::Ptr								ParseToEnd(CodeToken::List::iterator it, CodeToken::List::iterator end, const string_t& ownerName, CodeToken ownerToken, CodeError::List& errors);
+			static SymbolName::Ptr								ParseToFarest(CodeToken::List::iterator& it, CodeToken::List::iterator end, const string_t& ownerName, CodeToken ownerToken, CodeError::List& errors);
 		};
 	}
 }

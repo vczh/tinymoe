@@ -45,12 +45,12 @@ namespace tinymoe
 			typedef vector<Ptr>							List;
 
 			GrammarFragmentType							type;
-			vector<string>								identifiers;
+			vector<string_t>							identifiers;
 			shared_ptr<FunctionFragment>				functionFragment;
 
 			GrammarFragment(GrammarFragmentType _type);
 
-			string										GetUniqueIdFragment();
+			string_t									GetUniqueIdFragment();
 		};
 
 		enum class GrammarSymbolTarget
@@ -63,7 +63,7 @@ namespace tinymoe
 			Boolean,				// (type)		boolean
 			Integer,				// (type)		integer
 			Float,					// (type)		float
-			String,					// (type)		string
+			String,					// (type)		string_t
 			Function,				// (type)		function
 
 			True,					// (primitive)	true
@@ -105,12 +105,12 @@ namespace tinymoe
 		public:
 			typedef shared_ptr<GrammarSymbol>			Ptr;
 			typedef vector<Ptr>							List;
-			typedef multimap<string, Ptr>				MultiMap;
+			typedef multimap<string_t, Ptr>				MultiMap;
 
 			GrammarFragment::List						fragments;		// grammar fragments for this symbol
 			// a statement cannot be an expression
 			// the top invoke expression's function of a statement should reference to a statement symbol
-			string										uniqueId;		// a string that identifies the grammar structure
+			string_t									uniqueId;		// a string_t that identifies the grammar structure
 			GrammarSymbolTarget							target;
 			GrammarSymbolType							type;
 
@@ -119,7 +119,7 @@ namespace tinymoe
 			void										CalculateUniqueId();
 		};
 
-		GrammarSymbol::Ptr								operator+(GrammarSymbol::Ptr symbol, const string& name);
+		GrammarSymbol::Ptr								operator+(GrammarSymbol::Ptr symbol, const string_t& name);
 		GrammarSymbol::Ptr								operator+(GrammarSymbol::Ptr symbol, GrammarFragmentType type);
 
 		/*************************************************************
@@ -132,8 +132,8 @@ namespace tinymoe
 			typedef shared_ptr<Expression>				Ptr;
 			typedef vector<Ptr>							List;
 
-			virtual string								ToLog() = 0;
-			virtual string								ToCode() = 0;
+			virtual string_t							ToLog() = 0;
+			virtual string_t							ToCode() = 0;
 			virtual void								CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables) = 0;
 			virtual SymbolAstResult						GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state) = 0;
 			static shared_ptr<ast::AstLambdaExpression>	GenerateContinuationLambdaAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state);
@@ -145,8 +145,8 @@ namespace tinymoe
 		public:
 			CodeToken									token;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -157,8 +157,8 @@ namespace tinymoe
 		public:
 			SymbolName::Ptr								name;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -169,8 +169,8 @@ namespace tinymoe
 		public:
 			GrammarSymbol::Ptr							symbol;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -184,8 +184,8 @@ namespace tinymoe
 			Expression::Ptr								function;
 			Expression::List							arguments;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -196,8 +196,8 @@ namespace tinymoe
 		public:
 			Expression::List							elements;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -216,8 +216,8 @@ namespace tinymoe
 			Expression::Ptr								operand;
 			UnaryOperator								op;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& newAssignables, Expression::List& newArguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -249,8 +249,8 @@ namespace tinymoe
 			Expression::Ptr								second;
 			BinaryOperator								op;
 
-			string										ToLog()override;
-			string										ToCode()override;
+			string_t									ToLog()override;
+			string_t									ToCode()override;
 			void										CollectNewAssignable(Expression::List& assignables, Expression::List& arguments, Expression::List& modifiedAssignables)override;
 			SymbolAstResult								GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)override;
 		};
@@ -296,7 +296,7 @@ namespace tinymoe
 			GrammarStackItem::Ptr						Pop();
 
 			CodeError									SuccessError();
-			CodeError									ParseToken(const string& token, Iterator input, Iterator end, vector<Iterator>& result);
+			CodeError									ParseToken(const string_t& token, Iterator input, Iterator end, vector<Iterator>& result);
 			CodeError									FoldError(CodeError error1, CodeError error2);
 
 			CodeError									ParseGrammarFragment(GrammarFragment::Ptr fragment, Iterator input, Iterator end, ResultList& result);

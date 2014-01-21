@@ -16,12 +16,12 @@ namespace tinymoe
 			auto lambda = make_shared<AstLambdaExpression>();
 			{
 				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->composedName = "$state" + context.GetUniquePostfix();
+				ref->composedName = T("$state") + context.GetUniquePostfix();
 				lambda->arguments.push_back(ref);
 			}
 			{
 				auto ref = make_shared<AstSymbolDeclaration>();
-				ref->composedName = "$result" + context.GetUniquePostfix();
+				ref->composedName = T("$result") + context.GetUniquePostfix();
 				lambda->arguments.push_back(ref);
 			}
 			return lambda;
@@ -33,16 +33,16 @@ namespace tinymoe
 			{
 			case CodeTokenType::Integer:
 				{
-					char* endptr = 0;
-					int result = strtol(token.value.c_str(), &endptr, 10);
+					char_t* endptr = 0;
+					int result = strtol_t(token.value.c_str(), &endptr, 10);
 					auto ast = make_shared<AstIntegerExpression>();
 					ast->value = result;
 					return SymbolAstResult(ast);
 				}
 			case CodeTokenType::Float:
 				{
-					char* endptr = 0;
-					double result = strtod(token.value.c_str(), &endptr);
+					char_t* endptr = 0;
+					double result = strtod_t(token.value.c_str(), &endptr);
 					auto ast = make_shared<AstFloatExpression>();
 					ast->value = result;
 					return SymbolAstResult(ast);

@@ -29,7 +29,7 @@ namespace tinymoe
 			ast::AstSymbolDeclaration::Ptr			continuation;
 			GrammarSymbol::List						createdVariables;
 
-			string									GetUniquePostfix();
+			string_t								GetUniquePostfix();
 		};
 
 		struct SymbolAstResult

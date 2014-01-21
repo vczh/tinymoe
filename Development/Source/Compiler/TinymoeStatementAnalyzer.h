@@ -122,7 +122,7 @@ namespace tinymoe
 
 			SymbolModule::List				symbolModules;
 
-			static SymbolAssembly::Ptr		Parse(vector<string>& codes, CodeError::List& errors);
+			static SymbolAssembly::Ptr		Parse(vector<string_t>& codes, CodeError::List& errors);
 		};
 	}
 }

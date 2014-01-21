@@ -73,7 +73,7 @@ namespace tinymoe
 
 			virtual shared_ptr<GrammarSymbol>					CreateSymbol() = 0;
 			virtual void										AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive) = 0;
-			virtual string										GetComposedName(bool primitive) = 0;
+			virtual string_t									GetComposedName(bool primitive) = 0;
 
 			typedef pair<shared_ptr<ast::AstSymbolDeclaration>, shared_ptr<ast::AstSymbolDeclaration>>	AstPair;
 			virtual AstPair										CreateAst(weak_ptr<ast::AstNode> parent) = 0;
@@ -141,7 +141,7 @@ namespace tinymoe
 			static FunctionDeclaration::Ptr						Parse(CodeToken::List::iterator& it, CodeToken::List::iterator end, FunctionDeclaration::Ptr decl, CodeToken ownerToken, CodeError::List& errors);
 			static FunctionDeclaration::Ptr						Parse(CodeFile::Ptr codeFile, CodeError::List& errors, int& lineIndex);
 		
-			string												GetComposedName();
+			string_t											GetComposedName();
 			shared_ptr<GrammarSymbol>							CreateSymbol(bool secondary)override;
 			shared_ptr<ast::AstDeclaration>						GenerateAst(shared_ptr<SymbolModule> symbolModule)override;
 		};
@@ -165,7 +165,7 @@ namespace tinymoe
 		
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
-			string												GetComposedName(bool primitive)override;
+			string_t												GetComposedName(bool primitive)override;
 			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 
@@ -178,7 +178,7 @@ namespace tinymoe
 		
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
-			string												GetComposedName(bool primitive)override;
+			string_t											GetComposedName(bool primitive)override;
 			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 
@@ -189,7 +189,7 @@ namespace tinymoe
 
 			shared_ptr<GrammarSymbol>							CreateSymbol()override;
 			void												AppendFunctionSymbol(shared_ptr<GrammarSymbol> symbol, bool primitive)override;
-			string												GetComposedName(bool primitive)override;
+			string_t											GetComposedName(bool primitive)override;
 			AstPair												CreateAst(weak_ptr<ast::AstNode> parent)override;
 		};
 

@@ -251,7 +251,7 @@ namespace tinymoe
 					CodeError error =
 					{
 						declb->keywordToken,
-						"Symbol redefinition.",
+						T("Symbol redefinition."),
 					};
 					errors.push_back(error);
 				}
@@ -337,7 +337,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								decl->keywordToken,
-								"Cannot find the root definition for this multple dispatching child function.",
+								T("Cannot find the root definition for this multple dispatching child function."),
 							};
 							errors.push_back(error);
 						}
@@ -427,7 +427,7 @@ namespace tinymoe
 					CodeError illegalAssignableError =
 					{
 						line->tokens[0],
-						"Illegal new variable name.",
+						T("Illegal new variable name."),
 					};
 					multimap<int, Expression::Ptr> statementScores;
 					for (auto r : result)
@@ -439,7 +439,7 @@ namespace tinymoe
 						int score = stack->CountStatementAssignables(assignables, illegalConvertedAssignable);
 						if (score == -1)
 						{
-							illegalAssignableError.message += "\r\n\tVariable can be parsed as ¡¾" + illegalConvertedAssignable->ToCode() + "¡¿ in ¡¾" + r.second->ToCode() + "¡¿";
+							illegalAssignableError.message += T("\r\n\tVariable can be parsed as ¡¾") + illegalConvertedAssignable->ToCode() + T("¡¿ in ¡¾") + r.second->ToCode() + T("¡¿");
 						}
 						else
 						{
@@ -482,11 +482,11 @@ namespace tinymoe
 						CodeError error =
 						{
 							line->tokens[0],
-							"Ambiguous statement."
+							T("Ambiguous statement.")
 						};
 						for (auto r : legalExpressions)
 						{
-							error.message += "\r\n\tStatement can be parsed as ¡¾" + r->ToCode() + "¡¿";
+							error.message += T("\r\n\tStatement can be parsed as ¡¾") + r->ToCode() + T("¡¿");
 						}
 						errors.push_back(error);
 						throw ParsingFailedException();
@@ -526,18 +526,18 @@ namespace tinymoe
 									CodeError error =
 									{
 										line->tokens[0],
-										"This sentence can only appear inside a block of category: ",
+										T("This sentence can only appear inside a block of category: "),
 									};
 									for (auto it = sentence->category->insideCategories.begin(); it != sentence->category->insideCategories.end(); it++)
 									{
 										error.message += (*it)->GetName();
 										if (it + 1 == sentence->category->insideCategories.end())
 										{
-											error.message += ".";
+											error.message += T(".");
 										}
 										else
 										{
-											error.message += ", ";
+											error.message += T(", ");
 										}
 									}
 									errors.push_back(error);
@@ -560,7 +560,7 @@ namespace tinymoe
 										CodeError error =
 										{
 											line->tokens[0],
-											"A non-closable block cannot be closed using \"end\".",
+											T("A non-closable block cannot be closed using \"end\"."),
 										};
 										errors.push_back(error);
 									}
@@ -589,7 +589,7 @@ namespace tinymoe
 												CodeError error =
 												{
 													childStat->keywordToken,
-													"Select sentence can only contain case or case else sentence.",
+													T("Select sentence can only contain case or case else sentence."),
 												};
 												errors.push_back(error);
 											}
@@ -606,7 +606,7 @@ namespace tinymoe
 								CodeError error =
 								{
 									line->tokens[0],
-									"Case sentence should appear inside select block.",
+									T("Case sentence should appear inside select block."),
 								};
 								errors.push_back(error);
 							}
@@ -647,7 +647,7 @@ namespace tinymoe
 								CodeError error =
 								{
 									newStatement->keywordToken,
-									"Symbol \"" + ref->symbol->uniqueId + "\" cannot be assigned to.",
+									T("Symbol \"") + ref->symbol->uniqueId + T("\" cannot be assigned to."),
 								};
 								errors.push_back(error);
 							}
@@ -686,7 +686,7 @@ namespace tinymoe
 								CodeError error =
 								{
 									symbolTokens.find(symbol)->second,
-									"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+									T("Symbol \"") + symbol->uniqueId + T("\" overrided other symbols in this scope or parent scopes."),
 								};
 								errors.push_back(error);
 							}
@@ -703,18 +703,18 @@ namespace tinymoe
 										CodeError error =
 										{
 											line->tokens[0],
-											"This is not a initial block. It should follow a block of category: ",
+											T("This is not a initial block. It should follow a block of category: "),
 										};
 										for (auto it = block->category->followCategories.begin(); it != block->category->followCategories.end(); it++)
 										{
 											error.message += (*it)->GetName();
 											if (it + 1 == block->category->followCategories.end())
 											{
-												error.message += ".";
+												error.message += T(".");
 											}
 											else
 											{
-												error.message += ", ";
+												error.message += T(", ");
 											}
 										}
 										errors.push_back(error);
@@ -724,7 +724,7 @@ namespace tinymoe
 										CodeError error =
 										{
 											line->tokens[0],
-											"This is not a initial block.",
+											T("This is not a initial block."),
 										};
 										errors.push_back(error);
 									}
@@ -748,7 +748,7 @@ namespace tinymoe
 										CodeError error =
 										{
 											symbolTokens.find(symbol)->second,
-											"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+											T("Symbol \"") + symbol->uniqueId + T("\" overrided other symbols in this scope or parent scopes."),
 										};
 										errors.push_back(error);
 									}
@@ -788,7 +788,7 @@ namespace tinymoe
 			CodeError error =
 			{
 				codeFile->lines[lineIndex - 1]->tokens[0],
-				"Block should be closed using \"end\".",
+				T("Block should be closed using \"end\"."),
 			};
 			errors.push_back(error);
 			throw ParsingFailedException();
@@ -808,7 +808,7 @@ namespace tinymoe
 				CodeError error =
 				{
 					name->identifiers[0],
-					"Type \"" + name->GetName() + "\" does not exist.",
+					T("Type \"") + name->GetName() + T("\" does not exist."),
 				};
 				errors.push_back(error);
 			}
@@ -956,7 +956,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							symbolTokens.find(symbol)->second,
-							"Symbol \"" + symbol->uniqueId + "\" overrided other symbols in this scope or parent scopes.",
+							T("Symbol \"") + symbol->uniqueId + T("\" overrided other symbols in this scope or parent scopes."),
 						};
 						errors.push_back(error);
 					}
@@ -966,7 +966,7 @@ namespace tinymoe
 						CodeError error =
 						{
 							funcdecl->keywordToken,
-							"Block should be closed using \"end\".",
+							T("Block should be closed using \"end\"."),
 						};
 						errors.push_back(error);
 					}
@@ -985,7 +985,7 @@ namespace tinymoe
 								CodeError error =
 								{
 									codeFile->lines[lineIndex]->tokens[0],
-									"Too many code."
+									T("Too many code.")
 								};
 								errors.push_back(error);
 							}
@@ -1007,7 +1007,7 @@ namespace tinymoe
 		SymbolAssembly
 		*************************************************************/
 
-		SymbolAssembly::Ptr SymbolAssembly::Parse(vector<string>& codes, CodeError::List& errors)
+		SymbolAssembly::Ptr SymbolAssembly::Parse(vector<string_t>& codes, CodeError::List& errors)
 		{
 			Module::List modules;
 			CodeFile::List codeFiles;
@@ -1033,7 +1033,7 @@ namespace tinymoe
 
 			if (errors.size() == 0)
 			{
-				multimap<string, SymbolModule::Ptr> moduleMap;
+				multimap<string_t, SymbolModule::Ptr> moduleMap;
 
 				for (auto module : assembly->symbolModules)
 				{
@@ -1042,7 +1042,7 @@ namespace tinymoe
 
 				for (auto module : assembly->symbolModules)
 				{
-					string moduleName = module->module->name->GetName();
+					string_t moduleName = module->module->name->GetName();
 					auto lower = moduleMap.lower_bound(moduleName);
 					auto upper = moduleMap.upper_bound(moduleName);
 					for (auto it = lower; it != upper; it++)
@@ -1055,7 +1055,7 @@ namespace tinymoe
 
 					for (auto ref : module->module->usings)
 					{
-						string refName = ref->GetName();
+						string_t refName = ref->GetName();
 						auto lower = moduleMap.lower_bound(refName);
 						auto upper = moduleMap.upper_bound(refName);
 						if (lower == moduleMap.end())
@@ -1063,7 +1063,7 @@ namespace tinymoe
 							CodeError error =
 							{
 								ref->identifiers[0],
-								"Cannot find the referencing module \"" + refName + "\".",
+								T("Cannot find the referencing module \"") + refName + T("\"."),
 							};
 						}
 						else
