@@ -26,7 +26,11 @@ string wtoa(const wstring& s)
 
 void WriteAnsiFile(string_t fileName, stringstream_t& ss)
 {
+#ifdef _UNICODE_TINYMOE
 	string buffer = wtoa(ss.str());
+#else
+	string buffer = ss.str();
+#endif
 
 	ofstream o(fileName, ios_base::binary);
 	o.write(&buffer[0], buffer.size());
