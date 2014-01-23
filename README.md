@@ -2,7 +2,7 @@ tinymoe
 =======
 
 ###English-like programming language
-######with dynamic typing, multiple dispatching and build-in continuation
+######For DSL (Domain Specific Language) building and embedding, with dynamic typing, multiple dispatching and build-in continuation.
 
 Here are several samples to introduce this language:
 
