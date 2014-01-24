@@ -346,6 +346,16 @@ namespace tinymoe
 								ref->reference = scope->opEQ;
 								invoke->function = ref;
 							}
+							{
+								auto arg = make_shared<AstReferenceExpression>();
+								arg->reference = state;
+								invoke->arguments.push_back(arg);
+							}
+							{
+								auto arg = make_shared<AstReferenceExpression>();
+								arg->reference = selectValue;
+								invoke->arguments.push_back(arg);
+							}
 							invoke->arguments.push_back(caseResult.value);
 
 							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
@@ -369,11 +379,11 @@ namespace tinymoe
 
 						if (lastIfStat)
 						{
-							lastIfStat->falseBranch = ifstat;
+							lastIfStat->falseBranch = caseResult.statement;
 						}
 						else
 						{
-							result.AppendStatement(ifstat);
+							result.AppendStatement(caseResult.statement);
 						}
 						result.continuation = caseResult.continuation;
 						lastIfStat = ifstat;

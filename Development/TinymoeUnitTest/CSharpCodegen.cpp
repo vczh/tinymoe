@@ -282,8 +282,9 @@ public:
 
 	void Visit(AstFieldAccessExpression* node)
 	{
+		o << T("GetField(");
 		PrintExpression(node->target, scope, resolver, o, prefix);
-		o << T(".GetField(\"") << node->composedFieldName << T("\")");
+		o << T(", \"") << node->composedFieldName << T("\")");
 	}
 
 	void Visit(AstInvokeExpression* node)
@@ -650,7 +651,7 @@ public:
 			auto typeName = CSharpTypeCodegen::ToString(node->ownerType, resolver);
 			auto methodName = node->composedName;
 			auto targetName = FunctionToValue(resolver, node, nullptr);
-			o << prefix << T("TinymoeObject.SetExtension(") << endl;
+			o << prefix << T("SetExtension(") << endl;
 			o << prefix << T("\ttypeof(") << typeName << T("),") << endl;
 			o << prefix << T("\t\"") << methodName << T("\",") << endl;
 			o << prefix << T("\t") << targetName << endl;

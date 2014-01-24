@@ -193,7 +193,7 @@ namespace TinymoeDotNet
                 return value;
             }
 
-            Type type = GetType();
+            Type type = target.GetType();
             while (type != null)
             {
                 if (extensions.TryGetValue(Tuple.Create(type, name), out value))
@@ -232,13 +232,12 @@ namespace TinymoeDotNet
             });
         }
 
-        public static TinymoeObject GetExternalFunction(TinymoeObject name)
+        public static TinymoeObject GetExternalFunction(string name)
         {
-            var realName = ((TinymoeString)CastToString(name)).Value;
-            TinymoeObject function = null;
-            if (!externalFunctions.TryGetValue(realName, out function))
+            TinymoeObject function;
+            if (!externalFunctions.TryGetValue(name, out function))
             {
-                switch (realName)
+                switch (name)
                 {
                     case "to_n":
                         function = BuildExternalFunction(__args__ => CastToNumber(__args__[0]));
@@ -259,9 +258,9 @@ namespace TinymoeDotNet
                         function = BuildExternalFunction(__args__ => Sqrt(__args__[0]));
                         break;
                     default:
-                        throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", realName));
+                        throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", name));
                 }
-                externalFunctions.Add(realName, function);
+                externalFunctions.Add(name, function);
             }
             return function;
         }

@@ -205,9 +205,15 @@ namespace tinymoe
 							invoke->function = ref;
 						}
 						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->reference = state;
+							invoke->arguments.push_back(arg);
+						}
+						{
 							auto arg = make_shared<AstTestTypeExpression>();
 							arg->target = result.value;
 							arg->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol);
+							invoke->arguments.push_back(arg);
 						}
 
 						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
@@ -337,6 +343,11 @@ namespace tinymoe
 				ref->reference = astOp;
 				invoke->function = ref;
 			}
+			{
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = state;
+				invoke->arguments.push_back(arg);
+			}
 			invoke->arguments.push_back(exprs[0]);
 
 			auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
@@ -416,6 +427,11 @@ namespace tinymoe
 				auto ref = make_shared<AstReferenceExpression>();
 				ref->reference = astOp;
 				invoke->function = ref;
+			}
+			{
+				auto arg = make_shared<AstReferenceExpression>();
+				arg->reference = state;
+				invoke->arguments.push_back(arg);
 			}
 			invoke->arguments.push_back(exprs[0]);
 			invoke->arguments.push_back(exprs[1]);
