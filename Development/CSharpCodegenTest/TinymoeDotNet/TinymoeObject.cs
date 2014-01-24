@@ -462,16 +462,16 @@ namespace TinymoeDotNet
             {
                 switch (realName)
                 {
-                    case "CastToBoolean":
-                        function = BuildExternalFunction(__args__ => CastToBoolean(__args__[0]));
+                    case "to_n":
+                        function = BuildExternalFunction(__args__ => CastToNumber(__args__[0]));
                         break;
-                    case "CastToInteger":
+                    case "to_i":
                         function = BuildExternalFunction(__args__ => CastToInteger(__args__[0]));
                         break;
-                    case "CastToFloat":
+                    case "to_f":
                         function = BuildExternalFunction(__args__ => CastToFloat(__args__[0]));
                         break;
-                    case "CastToString":
+                    case "to_s":
                         function = BuildExternalFunction(__args__ => CastToString(__args__[0]));
                         break;
                     case "Print":

@@ -1465,10 +1465,39 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void standard_library__boolean_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		public void standard_library__number_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			Invoke(value.GetField("$dispatch<>standard_library::number_of_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__number_of__primitive_integer_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
-			Invoke(GetExternalFunction(new TinymoeString("CastToBoolean")), new TinymoeObject[] {
+			_the_result = value;
+			Invoke(_continuation, new TinymoeObject[] {
+				_state,
+				_the_result
+				});
+		}
+
+		public void standard_library__number_of__primitive_float_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			_the_result = value;
+			Invoke(_continuation, new TinymoeObject[] {
+				_state,
+				_the_result
+				});
+		}
+
+		public void standard_library__number_of__primitive_string_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("s_to_n")), new TinymoeObject[] {
 				_state,
 				value,
 				new TinymoeFunction(__args__ => 
@@ -1485,8 +1514,27 @@ namespace TinymoeProgramNamespace
 
 		public void standard_library__integer_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
 		{
+			Invoke(value.GetField("$dispatch<>standard_library::integer_of_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__integer_of__primitive_integer_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
 			TinymoeObject _the_result = null;
-			Invoke(GetExternalFunction(new TinymoeString("CastToInteger")), new TinymoeObject[] {
+			_the_result = value;
+			Invoke(_continuation, new TinymoeObject[] {
+				_state,
+				_the_result
+				});
+		}
+
+		public void standard_library__integer_of__primitive_float_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f_to_i")), new TinymoeObject[] {
 				_state,
 				value,
 				new TinymoeFunction(__args__ => 
@@ -1501,10 +1549,65 @@ namespace TinymoeProgramNamespace
 				});
 		}
 
-		public void standard_library__floating_point_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		public void standard_library__integer_of__primitive_string_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
-			Invoke(GetExternalFunction(new TinymoeString("CastToFloat")), new TinymoeObject[] {
+			Invoke(GetExternalFunction(new TinymoeString("s_to_i")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__float_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			Invoke(value.GetField("$dispatch<>standard_library::float_of_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__float_of__primitive_integer_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i_to_f")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__float_of__primitive_float_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			_the_result = value;
+			Invoke(_continuation, new TinymoeObject[] {
+				_state,
+				_the_result
+				});
+		}
+
+		public void standard_library__float_of__primitive_string_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("s_to_f")), new TinymoeObject[] {
 				_state,
 				value,
 				new TinymoeFunction(__args__ => 
@@ -1522,9 +1625,1270 @@ namespace TinymoeProgramNamespace
 		public void standard_library__string_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
-			Invoke(GetExternalFunction(new TinymoeString("CastToString")), new TinymoeObject[] {
+			Invoke(GetExternalFunction(new TinymoeString("to_s")), new TinymoeObject[] {
 				_state,
 				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator_POS__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			Invoke(value.GetField("$dispatch<>standard_library::operator_POS_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator_POS__primitive_integer_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("+i")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator_POS__primitive_float_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("+f")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator_NEG__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			Invoke(value.GetField("$dispatch<>standard_library::operator_NEG_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator_NEG__primitive_integer_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("-i")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator_NEG__primitive_float_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("-f")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator_NOT__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			Invoke(value.GetField("$dispatch<>standard_library::operator_NOT_$primitive"), new TinymoeObject[] {
+				_state,
+				value,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator_NOT__primitive_boolean_(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("!b")), new TinymoeObject[] {
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_CONCAT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_CONCAT_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_string__CONCAT__primitive_string_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("s&s")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_ADD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_ADD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__ADD__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i+i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__ADD__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f+f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__ADD__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Add(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__ADD__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Add(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_SUB__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_SUB_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__SUB__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i-i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__SUB__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f-f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__SUB__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Sub(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__SUB__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Sub(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_MUL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_MUL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__MUL__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i*i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__MUL__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f*f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__MUL__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Mul(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__MUL__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Mul(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_DIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_DIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__DIV__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i/i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__DIV__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f/f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__DIV__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Div(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__DIV__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Div(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_INTDIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_INTDIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__INTDIV__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("ii")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__INTDIV__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("ff")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__INTDIV__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = IntDiv(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__INTDIV__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = IntDiv(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_MOD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_MOD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__MOD__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i%i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__MOD__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f%f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__MOD__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Mod(_result_1, b);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__MOD__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Mod(_var_2, _result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__EQUAL__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i_e_i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__EQUAL__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f_e_f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_string__EQUAL__primitive_string_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("s_e_s")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_boolean__EQUAL__primitive_boolean_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("b_e_b")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__EQUAL__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_EQUAL__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_result_1,
+						b,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_3 = __args___x3[0];
+							TinymoeObject _result_4 = __args___x3[1];
+							_the_result = _result_4;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__EQUAL__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_EQUAL__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			TinymoeObject _var_3 = null;
+			_var_3 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_var_3,
+						_result_1,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_4 = __args___x3[0];
+							TinymoeObject _result_5 = __args___x3[1];
+							_the_result = _result_5;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_string__EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_EQUAL__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			TinymoeObject _var_3 = null;
+			_var_3 = a;
+			standard_library__string_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_var_3,
+						_result_1,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_4 = __args___x3[0];
+							TinymoeObject _result_5 = __args___x3[1];
+							_the_result = _result_5;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_EQUAL__primitive_string_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_EQUAL__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			standard_library__string_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_result_1,
+						b,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_3 = __args___x3[0];
+							TinymoeObject _result_4 = __args___x3[1];
+							_the_result = _result_4;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_COMPARE_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_integer__COMPARE__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("i_c_i")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_float__COMPARE__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("f_c_f")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_string__COMPARE__primitive_string_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("s_c_s")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_integer__COMPARE__primitive_float_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_COMPARE__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			standard_library__float_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_result_1,
+						b,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_3 = __args___x3[0];
+							TinymoeObject _result_4 = __args___x3[1];
+							_the_result = _result_4;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_float__COMPARE__primitive_integer_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_COMPARE__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			TinymoeObject _var_3 = null;
+			_var_3 = a;
+			standard_library__float_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_var_3,
+						_result_1,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_4 = __args___x3[0];
+							TinymoeObject _result_5 = __args___x3[1];
+							_the_result = _result_5;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_string__COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_COMPARE__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			TinymoeObject _var_3 = null;
+			_var_3 = a;
+			standard_library__string_of__primitive(
+				_state,
+				b,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_var_3,
+						_result_1,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_4 = __args___x3[0];
+							TinymoeObject _result_5 = __args___x3[1];
+							_the_result = _result_5;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_COMPARE__primitive_string_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			TinymoeObject _var_2 = null;
+			_var_2 = new TinymoeFunction(__args__ => standard_library__operator__expression_COMPARE__primitive(__args__[0], __args__[1], __args__[2], __args__[3]));
+			standard_library__string_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args___x2 => 
+				{
+					TinymoeObject _state_0 = __args___x2[0];
+					TinymoeObject _result_1 = __args___x2[1];
+					Invoke(_var_2, new TinymoeObject[] {
+						_state_0,
+						_result_1,
+						b,
+						new TinymoeFunction(__args___x3 => 
+						{
+							TinymoeObject _state_3 = __args___x3[0];
+							TinymoeObject _result_4 = __args___x3[1];
+							_the_result = _result_4;
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_LT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = EQ(_result_1, Negative(new TinymoeInteger(1)));
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_GT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = EQ(_result_1, new TinymoeInteger(1));
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_LE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = NE(_result_1, new TinymoeInteger(1));
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_GE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = NE(_result_1, Negative(new TinymoeInteger(1)));
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_EQ__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = _result_1;
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_NE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Not(_result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void standard_library__operator__expression_AND__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_AND_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_boolean__AND__primitive_boolean_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("b&&b")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void standard_library__operator__expression_OR__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(a.GetField("$dispatch<>standard_library::operator_$expression_OR_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void standard_library__operator__expression_boolean__OR__primitive_boolean_(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("b||b")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
 				new TinymoeFunction(__args__ => 
 				{
 					TinymoeObject _state_0 = __args__[0];
@@ -1771,12 +3135,12 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void _dispatch_fail__standard_library__repeat_with__argument_in__expression(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		public void _dispatch_fail__standard_library__operator__expression_AND__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
 			TinymoeObject _the_result = null;
 			standard_library__raise__expression(
 				_state,
-				new TinymoeString("Only enumerable object (like containers) can be iterated using the repeat-with-in statement."),
+				Concat(Concat(Concat(a, new TinymoeString(" and ")), b), new TinymoeString("is illegal.")),
 				new TinymoeFunction(__args__ => 
 				{
 					TinymoeObject _state_0 = __args__[0];
@@ -1789,22 +3153,100 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
-		public void TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		public void TinymoeBoolean___dispatch__standard_library__operator__expression_AND__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			standard_library__repeat_with__argument_in__expression_array_(
+			Invoke(b.GetField("$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive"), new TinymoeObject[] {
 				_state,
-				deal_with__expression,
-				items,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_AND__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_boolean__AND__primitive_boolean_(
+				_state,
+				a,
+				b,
 				_continuation
 				);
 		}
 
-		public void TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		public void TinymoeObject___dispatch__Boolean_standard_library__operator__expression_AND__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
 		{
-			_dispatch_fail__standard_library__repeat_with__argument_in__expression(
+			_dispatch_fail__standard_library__operator__expression_AND__primitive(
 				_state,
-				deal_with__expression,
-				items,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_AND__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_AND__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_OR__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(Concat(a, new TinymoeString(" or ")), b), new TinymoeString("is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeBoolean___dispatch__standard_library__operator__expression_OR__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_OR__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_boolean__OR__primitive_boolean_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Boolean_standard_library__operator__expression_OR__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_OR__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_OR__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_OR__primitive(
+				_state,
+				a,
+				b,
 				_continuation
 				);
 		}
@@ -1973,87 +3415,2137 @@ namespace TinymoeProgramNamespace
 				);
 		}
 
+		public void _dispatch_fail__standard_library__repeat_with__argument_in__expression(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				new TinymoeString("Only enumerable object (like containers) can be iterated using the repeat-with-in statement."),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		{
+			standard_library__repeat_with__argument_in__expression_array_(
+				_state,
+				deal_with__expression,
+				items,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(TinymoeObject _state, TinymoeObject deal_with__expression, TinymoeObject items, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__repeat_with__argument_in__expression(
+				_state,
+				deal_with__expression,
+				items,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__number_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(new TinymoeString("number of "), value), new TinymoeString(" is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__number_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__number_of__primitive_integer_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__number_of__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__number_of__primitive_float_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__number_of__primitive_x3(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__number_of__primitive_string_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__number_of__primitive_x4(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__number_of__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__integer_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(new TinymoeString("integer of "), value), new TinymoeString(" is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__integer_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__integer_of__primitive_integer_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__integer_of__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__integer_of__primitive_float_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__integer_of__primitive_x3(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__integer_of__primitive_string_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__integer_of__primitive_x4(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__integer_of__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__float_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(new TinymoeString("float of "), value), new TinymoeString(" is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__float_of__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__float_of__primitive_integer_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__float_of__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__float_of__primitive_float_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__float_of__primitive_x3(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__float_of__primitive_string_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__float_of__primitive_x4(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__float_of__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator_POS__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Positive(_result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator_POS__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__operator_POS__primitive_float_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator_POS__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__operator_POS__primitive_integer_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator_POS__primitive_x3(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator_POS__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator_NEG__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				value,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					_the_result = Negative(_result_1);
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator_NEG__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__operator_NEG__primitive_integer_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator_NEG__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__operator_NEG__primitive_float_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator_NEG__primitive_x3(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator_NEG__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator_NOT__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(new TinymoeString("not "), value), new TinymoeString(" is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeBoolean___dispatch__standard_library__operator_NOT__primitive(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			standard_library__operator_NOT__primitive_boolean_(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator_NOT__primitive_x2(TinymoeObject _state, TinymoeObject value, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator_NOT__primitive(
+				_state,
+				value,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_CONCAT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__string_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__string_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Concat(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__operator__expression_CONCAT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeString___dispatch__Function_standard_library__operator__expression_CONCAT__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_string__CONCAT__primitive_string_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Function_standard_library__operator__expression_CONCAT__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_CONCAT__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_CONCAT__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_CONCAT__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_ADD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Add(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_ADD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_ADD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__ADD__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_ADD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_ADD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__ADD__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_ADD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__ADD__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_ADD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__ADD__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_ADD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_ADD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_ADD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_ADD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_ADD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_ADD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_SUB__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Sub(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_SUB__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_SUB__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__SUB__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_SUB__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_SUB__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__SUB__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_SUB__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__SUB__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_SUB__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__SUB__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_SUB__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_SUB__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_SUB__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_SUB__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_SUB__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_SUB__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_MUL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Mul(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_MUL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_MUL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__MUL__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_MUL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_MUL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__MUL__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_MUL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__MUL__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_MUL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__MUL__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_MUL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MUL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_MUL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MUL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_MUL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MUL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_DIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Div(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_DIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_DIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__DIV__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_DIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_DIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__DIV__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_DIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__DIV__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_DIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__DIV__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_DIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_DIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_DIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_DIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_DIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_DIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_INTDIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = IntDiv(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_INTDIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__INTDIV__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__INTDIV__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_INTDIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_INTDIV__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__INTDIV__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_INTDIV__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__INTDIV__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_INTDIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_INTDIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_INTDIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_INTDIV__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_INTDIV__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_MOD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__number_of__primitive(
+				_state,
+				a,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					TinymoeObject _var_4 = null;
+					_var_4 = _result_1;
+					standard_library__number_of__primitive(
+						_state_0,
+						b,
+						new TinymoeFunction(__args___x2 => 
+						{
+							TinymoeObject _state_2 = __args___x2[0];
+							TinymoeObject _result_3 = __args___x2[1];
+							_the_result = Mod(_var_4, _result_3);
+							Invoke(_continuation, new TinymoeObject[] {
+								_state,
+								_the_result
+								});
+						})
+						);
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_MOD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_MOD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__MOD__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_MOD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_MOD__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__MOD__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_MOD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__MOD__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_MOD__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__MOD__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_MOD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MOD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_MOD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MOD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_MOD__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_MOD__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			Invoke(GetExternalFunction(new TinymoeString("o_e_o")), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				});
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__EQUAL__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__EQUAL__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__operator__expression_EQUAL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeString___dispatch__Function_standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_string__EQUAL__primitive_string_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeBoolean___dispatch__standard_library__operator__expression_EQUAL__primitive_x4(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_boolean__EQUAL__primitive_boolean_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__EQUAL__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__EQUAL__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Function_standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_string__EQUAL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_EQUAL__primitive_x5(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeString___dispatch__Object_standard_library__operator__expression_EQUAL__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_EQUAL__primitive_string_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Boolean_standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_EQUAL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Object_standard_library__operator__expression_EQUAL__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_EQUAL__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void _dispatch_fail__standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			TinymoeObject _the_result = null;
+			standard_library__raise__expression(
+				_state,
+				Concat(Concat(Concat(a, new TinymoeString(" compare ")), b), new TinymoeString(" is illegal.")),
+				new TinymoeFunction(__args__ => 
+				{
+					TinymoeObject _state_0 = __args__[0];
+					TinymoeObject _result_1 = __args__[1];
+					Invoke(_continuation, new TinymoeObject[] {
+						_state,
+						_the_result
+						});
+				})
+				);
+		}
+
+		public void TinymoeInteger___dispatch__standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeInteger___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__COMPARE__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__standard_library__operator__expression_COMPARE__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeFloat___dispatch__Float_standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__COMPARE__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeString___dispatch__standard_library__operator__expression_COMPARE__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeString___dispatch__Function_standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_string__COMPARE__primitive_string_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeFloat___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_integer__COMPARE__primitive_float_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeInteger___dispatch__Float_standard_library__operator__expression_COMPARE__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_float__COMPARE__primitive_integer_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Function_standard_library__operator__expression_COMPARE__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_string__COMPARE__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__standard_library__operator__expression_COMPARE__primitive_x4(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			Invoke(b.GetField("$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive"), new TinymoeObject[] {
+				_state,
+				a,
+				b,
+				_continuation
+				});
+		}
+
+		public void TinymoeString___dispatch__Object_standard_library__operator__expression_COMPARE__primitive(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			standard_library__operator__expression_COMPARE__primitive_string_(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Float_standard_library__operator__expression_COMPARE__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive_x3(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
+		public void TinymoeObject___dispatch__Object_standard_library__operator__expression_COMPARE__primitive_x2(TinymoeObject _state, TinymoeObject a, TinymoeObject b, TinymoeObject _continuation)
+		{
+			_dispatch_fail__standard_library__operator__expression_COMPARE__primitive(
+				_state,
+				a,
+				b,
+				_continuation
+				);
+		}
+
 		public TinymoeProgram()
 		{
 			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<>standard_library::operator_$expression_AND_$primitive",
+				new TinymoeFunction(__args__ => TinymoeBoolean___dispatch__standard_library__operator__expression_AND__primitive(__args__[0], __args__[1], __args__[2], __args__[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive",
+				new TinymoeFunction(__args___x2 => TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_AND__primitive(__args___x2[0], __args___x2[1], __args___x2[2], __args___x2[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive",
+				new TinymoeFunction(__args___x3 => TinymoeObject___dispatch__Boolean_standard_library__operator__expression_AND__primitive_x2(__args___x3[0], __args___x3[1], __args___x3[2], __args___x3[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_AND_$primitive",
+				new TinymoeFunction(__args___x4 => TinymoeObject___dispatch__standard_library__operator__expression_AND__primitive_x2(__args___x4[0], __args___x4[1], __args___x4[2], __args___x4[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<>standard_library::operator_$expression_OR_$primitive",
+				new TinymoeFunction(__args___x5 => TinymoeBoolean___dispatch__standard_library__operator__expression_OR__primitive(__args___x5[0], __args___x5[1], __args___x5[2], __args___x5[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive",
+				new TinymoeFunction(__args___x6 => TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_OR__primitive(__args___x6[0], __args___x6[1], __args___x6[2], __args___x6[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive",
+				new TinymoeFunction(__args___x7 => TinymoeObject___dispatch__Boolean_standard_library__operator__expression_OR__primitive_x2(__args___x7[0], __args___x7[1], __args___x7[2], __args___x7[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_OR_$primitive",
+				new TinymoeFunction(__args___x8 => TinymoeObject___dispatch__standard_library__operator__expression_OR__primitive_x2(__args___x8[0], __args___x8[1], __args___x8[2], __args___x8[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__rectangle),
+				"$dispatch<>geometry::area_of_$primitive",
+				new TinymoeFunction(__args___x9 => geometry__rectangle___dispatch__geometry__area_of__primitive(__args___x9[0], __args___x9[1], __args___x9[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__triangle),
+				"$dispatch<>geometry::area_of_$primitive",
+				new TinymoeFunction(__args___x10 => geometry__triangle___dispatch__geometry__area_of__primitive_x2(__args___x10[0], __args___x10[1], __args___x10[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__circle),
+				"$dispatch<>geometry::area_of_$primitive",
+				new TinymoeFunction(__args___x11 => geometry__circle___dispatch__geometry__area_of__primitive_x3(__args___x11[0], __args___x11[1], __args___x11[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>geometry::area_of_$primitive",
+				new TinymoeFunction(__args___x12 => TinymoeObject___dispatch__geometry__area_of__primitive_x4(__args___x12[0], __args___x12[1], __args___x12[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__rectangle),
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x13 => geometry__rectangle___dispatch__geometry___primitive_and__expression_are_the_same_shape(__args___x13[0], __args___x13[1], __args___x13[2], __args___x13[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__rectangle),
+				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x14 => geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape(__args___x14[0], __args___x14[1], __args___x14[2], __args___x14[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__triangle),
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x15 => geometry__triangle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x2(__args___x15[0], __args___x15[1], __args___x15[2], __args___x15[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__triangle),
+				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x16 => geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape(__args___x16[0], __args___x16[1], __args___x16[2], __args___x16[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__circle),
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x17 => geometry__circle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x3(__args___x17[0], __args___x17[1], __args___x17[2], __args___x17[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(geometry__circle),
+				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x18 => geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape(__args___x18[0], __args___x18[1], __args___x18[2], __args___x18[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x19 => TinymoeObject___dispatch__geometry___primitive_and__expression_are_the_same_shape_x4(__args___x19[0], __args___x19[1], __args___x19[2], __args___x19[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x20 => TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x20[0], __args___x20[1], __args___x20[2], __args___x20[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x21 => TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x21[0], __args___x21[1], __args___x21[2], __args___x21[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
+				new TinymoeFunction(__args___x22 => TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x22[0], __args___x22[1], __args___x22[2], __args___x22[3]))
+				); 
+			TinymoeObject.SetExtension(
 				typeof(TinymoeArray),
 				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
-				new TinymoeFunction(__args__ => TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(__args__[0], __args__[1], __args__[2], __args__[3]))
+				new TinymoeFunction(__args___x23 => TinymoeArray___dispatch__standard_library__repeat_with__argument_in__expression(__args___x23[0], __args___x23[1], __args___x23[2], __args___x23[3]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
 				"$dispatch<>standard_library::repeat_with_$argument_in_$expression",
-				new TinymoeFunction(__args___x2 => TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(__args___x2[0], __args___x2[1], __args___x2[2], __args___x2[3]))
+				new TinymoeFunction(__args___x24 => TinymoeObject___dispatch__standard_library__repeat_with__argument_in__expression_x2(__args___x24[0], __args___x24[1], __args___x24[2], __args___x24[3]))
 				); 
 			TinymoeObject.SetExtension(
-				typeof(geometry__rectangle),
-				"$dispatch<>geometry::area_of_$primitive",
-				new TinymoeFunction(__args___x3 => geometry__rectangle___dispatch__geometry__area_of__primitive(__args___x3[0], __args___x3[1], __args___x3[2]))
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::number_of_$primitive",
+				new TinymoeFunction(__args___x25 => TinymoeInteger___dispatch__standard_library__number_of__primitive(__args___x25[0], __args___x25[1], __args___x25[2]))
 				); 
 			TinymoeObject.SetExtension(
-				typeof(geometry__triangle),
-				"$dispatch<>geometry::area_of_$primitive",
-				new TinymoeFunction(__args___x4 => geometry__triangle___dispatch__geometry__area_of__primitive_x2(__args___x4[0], __args___x4[1], __args___x4[2]))
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::number_of_$primitive",
+				new TinymoeFunction(__args___x26 => TinymoeFloat___dispatch__standard_library__number_of__primitive_x2(__args___x26[0], __args___x26[1], __args___x26[2]))
 				); 
 			TinymoeObject.SetExtension(
-				typeof(geometry__circle),
-				"$dispatch<>geometry::area_of_$primitive",
-				new TinymoeFunction(__args___x5 => geometry__circle___dispatch__geometry__area_of__primitive_x3(__args___x5[0], __args___x5[1], __args___x5[2]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(TinymoeObject),
-				"$dispatch<>geometry::area_of_$primitive",
-				new TinymoeFunction(__args___x6 => TinymoeObject___dispatch__geometry__area_of__primitive_x4(__args___x6[0], __args___x6[1], __args___x6[2]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__rectangle),
-				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x7 => geometry__rectangle___dispatch__geometry___primitive_and__expression_are_the_same_shape(__args___x7[0], __args___x7[1], __args___x7[2], __args___x7[3]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__rectangle),
-				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x8 => geometry__rectangle___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape(__args___x8[0], __args___x8[1], __args___x8[2], __args___x8[3]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__triangle),
-				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x9 => geometry__triangle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x2(__args___x9[0], __args___x9[1], __args___x9[2], __args___x9[3]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__triangle),
-				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x10 => geometry__triangle___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape(__args___x10[0], __args___x10[1], __args___x10[2], __args___x10[3]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__circle),
-				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x11 => geometry__circle___dispatch__geometry___primitive_and__expression_are_the_same_shape_x3(__args___x11[0], __args___x11[1], __args___x11[2], __args___x11[3]))
-				); 
-			TinymoeObject.SetExtension(
-				typeof(geometry__circle),
-				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x12 => geometry__circle___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape(__args___x12[0], __args___x12[1], __args___x12[2], __args___x12[3]))
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::number_of_$primitive",
+				new TinymoeFunction(__args___x27 => TinymoeString___dispatch__standard_library__number_of__primitive_x3(__args___x27[0], __args___x27[1], __args___x27[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"$dispatch<>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x13 => TinymoeObject___dispatch__geometry___primitive_and__expression_are_the_same_shape_x4(__args___x13[0], __args___x13[1], __args___x13[2], __args___x13[3]))
+				"$dispatch<>standard_library::number_of_$primitive",
+				new TinymoeFunction(__args___x28 => TinymoeObject___dispatch__standard_library__number_of__primitive_x4(__args___x28[0], __args___x28[1], __args___x28[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::integer_of_$primitive",
+				new TinymoeFunction(__args___x29 => TinymoeInteger___dispatch__standard_library__integer_of__primitive(__args___x29[0], __args___x29[1], __args___x29[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::integer_of_$primitive",
+				new TinymoeFunction(__args___x30 => TinymoeFloat___dispatch__standard_library__integer_of__primitive_x2(__args___x30[0], __args___x30[1], __args___x30[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::integer_of_$primitive",
+				new TinymoeFunction(__args___x31 => TinymoeString___dispatch__standard_library__integer_of__primitive_x3(__args___x31[0], __args___x31[1], __args___x31[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"$dispatch<geometry::circle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x14 => TinymoeObject___dispatch_geometry__circle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x14[0], __args___x14[1], __args___x14[2], __args___x14[3]))
+				"$dispatch<>standard_library::integer_of_$primitive",
+				new TinymoeFunction(__args___x32 => TinymoeObject___dispatch__standard_library__integer_of__primitive_x4(__args___x32[0], __args___x32[1], __args___x32[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::float_of_$primitive",
+				new TinymoeFunction(__args___x33 => TinymoeInteger___dispatch__standard_library__float_of__primitive(__args___x33[0], __args___x33[1], __args___x33[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::float_of_$primitive",
+				new TinymoeFunction(__args___x34 => TinymoeFloat___dispatch__standard_library__float_of__primitive_x2(__args___x34[0], __args___x34[1], __args___x34[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::float_of_$primitive",
+				new TinymoeFunction(__args___x35 => TinymoeString___dispatch__standard_library__float_of__primitive_x3(__args___x35[0], __args___x35[1], __args___x35[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"$dispatch<geometry::rectangle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x15 => TinymoeObject___dispatch_geometry__rectangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x15[0], __args___x15[1], __args___x15[2], __args___x15[3]))
+				"$dispatch<>standard_library::float_of_$primitive",
+				new TinymoeFunction(__args___x36 => TinymoeObject___dispatch__standard_library__float_of__primitive_x4(__args___x36[0], __args___x36[1], __args___x36[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_POS_$primitive",
+				new TinymoeFunction(__args___x37 => TinymoeFloat___dispatch__standard_library__operator_POS__primitive(__args___x37[0], __args___x37[1], __args___x37[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_POS_$primitive",
+				new TinymoeFunction(__args___x38 => TinymoeInteger___dispatch__standard_library__operator_POS__primitive_x2(__args___x38[0], __args___x38[1], __args___x38[2]))
 				); 
 			TinymoeObject.SetExtension(
 				typeof(TinymoeObject),
-				"$dispatch<geometry::triangle>geometry::$primitive_and_$expression_are_the_same_shape",
-				new TinymoeFunction(__args___x16 => TinymoeObject___dispatch_geometry__triangle_geometry___primitive_and__expression_are_the_same_shape_x2(__args___x16[0], __args___x16[1], __args___x16[2], __args___x16[3]))
+				"$dispatch<>standard_library::operator_POS_$primitive",
+				new TinymoeFunction(__args___x39 => TinymoeObject___dispatch__standard_library__operator_POS__primitive_x3(__args___x39[0], __args___x39[1], __args___x39[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_NEG_$primitive",
+				new TinymoeFunction(__args___x40 => TinymoeInteger___dispatch__standard_library__operator_NEG__primitive(__args___x40[0], __args___x40[1], __args___x40[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_NEG_$primitive",
+				new TinymoeFunction(__args___x41 => TinymoeFloat___dispatch__standard_library__operator_NEG__primitive_x2(__args___x41[0], __args___x41[1], __args___x41[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_NEG_$primitive",
+				new TinymoeFunction(__args___x42 => TinymoeObject___dispatch__standard_library__operator_NEG__primitive_x3(__args___x42[0], __args___x42[1], __args___x42[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<>standard_library::operator_NOT_$primitive",
+				new TinymoeFunction(__args___x43 => TinymoeBoolean___dispatch__standard_library__operator_NOT__primitive(__args___x43[0], __args___x43[1], __args___x43[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_NOT_$primitive",
+				new TinymoeFunction(__args___x44 => TinymoeObject___dispatch__standard_library__operator_NOT__primitive_x2(__args___x44[0], __args___x44[1], __args___x44[2]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::operator_$expression_CONCAT_$primitive",
+				new TinymoeFunction(__args___x45 => TinymoeString___dispatch__standard_library__operator__expression_CONCAT__primitive(__args___x45[0], __args___x45[1], __args___x45[2], __args___x45[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive",
+				new TinymoeFunction(__args___x46 => TinymoeString___dispatch__Function_standard_library__operator__expression_CONCAT__primitive(__args___x46[0], __args___x46[1], __args___x46[2], __args___x46[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive",
+				new TinymoeFunction(__args___x47 => TinymoeObject___dispatch__Function_standard_library__operator__expression_CONCAT__primitive_x2(__args___x47[0], __args___x47[1], __args___x47[2], __args___x47[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_CONCAT_$primitive",
+				new TinymoeFunction(__args___x48 => TinymoeObject___dispatch__standard_library__operator__expression_CONCAT__primitive_x2(__args___x48[0], __args___x48[1], __args___x48[2], __args___x48[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x49 => TinymoeInteger___dispatch__standard_library__operator__expression_ADD__primitive(__args___x49[0], __args___x49[1], __args___x49[2], __args___x49[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x50 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_ADD__primitive(__args___x50[0], __args___x50[1], __args___x50[2], __args___x50[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x51 => TinymoeFloat___dispatch__standard_library__operator__expression_ADD__primitive_x2(__args___x51[0], __args___x51[1], __args___x51[2], __args___x51[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x52 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_ADD__primitive(__args___x52[0], __args___x52[1], __args___x52[2], __args___x52[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x53 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_ADD__primitive_x2(__args___x53[0], __args___x53[1], __args___x53[2], __args___x53[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x54 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_ADD__primitive_x2(__args___x54[0], __args___x54[1], __args___x54[2], __args___x54[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x55 => TinymoeObject___dispatch__Float_standard_library__operator__expression_ADD__primitive_x3(__args___x55[0], __args___x55[1], __args___x55[2], __args___x55[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x56 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_ADD__primitive_x3(__args___x56[0], __args___x56[1], __args___x56[2], __args___x56[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_ADD_$primitive",
+				new TinymoeFunction(__args___x57 => TinymoeObject___dispatch__standard_library__operator__expression_ADD__primitive_x3(__args___x57[0], __args___x57[1], __args___x57[2], __args___x57[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x58 => TinymoeInteger___dispatch__standard_library__operator__expression_SUB__primitive(__args___x58[0], __args___x58[1], __args___x58[2], __args___x58[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x59 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_SUB__primitive(__args___x59[0], __args___x59[1], __args___x59[2], __args___x59[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x60 => TinymoeFloat___dispatch__standard_library__operator__expression_SUB__primitive_x2(__args___x60[0], __args___x60[1], __args___x60[2], __args___x60[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x61 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_SUB__primitive(__args___x61[0], __args___x61[1], __args___x61[2], __args___x61[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x62 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_SUB__primitive_x2(__args___x62[0], __args___x62[1], __args___x62[2], __args___x62[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x63 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_SUB__primitive_x2(__args___x63[0], __args___x63[1], __args___x63[2], __args___x63[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x64 => TinymoeObject___dispatch__Float_standard_library__operator__expression_SUB__primitive_x3(__args___x64[0], __args___x64[1], __args___x64[2], __args___x64[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x65 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_SUB__primitive_x3(__args___x65[0], __args___x65[1], __args___x65[2], __args___x65[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_SUB_$primitive",
+				new TinymoeFunction(__args___x66 => TinymoeObject___dispatch__standard_library__operator__expression_SUB__primitive_x3(__args___x66[0], __args___x66[1], __args___x66[2], __args___x66[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x67 => TinymoeInteger___dispatch__standard_library__operator__expression_MUL__primitive(__args___x67[0], __args___x67[1], __args___x67[2], __args___x67[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x68 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_MUL__primitive(__args___x68[0], __args___x68[1], __args___x68[2], __args___x68[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x69 => TinymoeFloat___dispatch__standard_library__operator__expression_MUL__primitive_x2(__args___x69[0], __args___x69[1], __args___x69[2], __args___x69[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x70 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_MUL__primitive(__args___x70[0], __args___x70[1], __args___x70[2], __args___x70[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x71 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_MUL__primitive_x2(__args___x71[0], __args___x71[1], __args___x71[2], __args___x71[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x72 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_MUL__primitive_x2(__args___x72[0], __args___x72[1], __args___x72[2], __args___x72[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x73 => TinymoeObject___dispatch__Float_standard_library__operator__expression_MUL__primitive_x3(__args___x73[0], __args___x73[1], __args___x73[2], __args___x73[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x74 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_MUL__primitive_x3(__args___x74[0], __args___x74[1], __args___x74[2], __args___x74[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_MUL_$primitive",
+				new TinymoeFunction(__args___x75 => TinymoeObject___dispatch__standard_library__operator__expression_MUL__primitive_x3(__args___x75[0], __args___x75[1], __args___x75[2], __args___x75[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x76 => TinymoeInteger___dispatch__standard_library__operator__expression_DIV__primitive(__args___x76[0], __args___x76[1], __args___x76[2], __args___x76[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x77 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_DIV__primitive(__args___x77[0], __args___x77[1], __args___x77[2], __args___x77[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x78 => TinymoeFloat___dispatch__standard_library__operator__expression_DIV__primitive_x2(__args___x78[0], __args___x78[1], __args___x78[2], __args___x78[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x79 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_DIV__primitive(__args___x79[0], __args___x79[1], __args___x79[2], __args___x79[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x80 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_DIV__primitive_x2(__args___x80[0], __args___x80[1], __args___x80[2], __args___x80[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x81 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_DIV__primitive_x2(__args___x81[0], __args___x81[1], __args___x81[2], __args___x81[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x82 => TinymoeObject___dispatch__Float_standard_library__operator__expression_DIV__primitive_x3(__args___x82[0], __args___x82[1], __args___x82[2], __args___x82[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x83 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_DIV__primitive_x3(__args___x83[0], __args___x83[1], __args___x83[2], __args___x83[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_DIV_$primitive",
+				new TinymoeFunction(__args___x84 => TinymoeObject___dispatch__standard_library__operator__expression_DIV__primitive_x3(__args___x84[0], __args___x84[1], __args___x84[2], __args___x84[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x85 => TinymoeInteger___dispatch__standard_library__operator__expression_INTDIV__primitive(__args___x85[0], __args___x85[1], __args___x85[2], __args___x85[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x86 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive(__args___x86[0], __args___x86[1], __args___x86[2], __args___x86[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x87 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive_x2(__args___x87[0], __args___x87[1], __args___x87[2], __args___x87[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x88 => TinymoeFloat___dispatch__standard_library__operator__expression_INTDIV__primitive_x2(__args___x88[0], __args___x88[1], __args___x88[2], __args___x88[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x89 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_INTDIV__primitive(__args___x89[0], __args___x89[1], __args___x89[2], __args___x89[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x90 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_INTDIV__primitive_x2(__args___x90[0], __args___x90[1], __args___x90[2], __args___x90[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x91 => TinymoeObject___dispatch__Float_standard_library__operator__expression_INTDIV__primitive_x3(__args___x91[0], __args___x91[1], __args___x91[2], __args___x91[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x92 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_INTDIV__primitive_x3(__args___x92[0], __args___x92[1], __args___x92[2], __args___x92[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_INTDIV_$primitive",
+				new TinymoeFunction(__args___x93 => TinymoeObject___dispatch__standard_library__operator__expression_INTDIV__primitive_x3(__args___x93[0], __args___x93[1], __args___x93[2], __args___x93[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x94 => TinymoeInteger___dispatch__standard_library__operator__expression_MOD__primitive(__args___x94[0], __args___x94[1], __args___x94[2], __args___x94[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x95 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_MOD__primitive(__args___x95[0], __args___x95[1], __args___x95[2], __args___x95[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x96 => TinymoeFloat___dispatch__standard_library__operator__expression_MOD__primitive_x2(__args___x96[0], __args___x96[1], __args___x96[2], __args___x96[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x97 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_MOD__primitive(__args___x97[0], __args___x97[1], __args___x97[2], __args___x97[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x98 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_MOD__primitive_x2(__args___x98[0], __args___x98[1], __args___x98[2], __args___x98[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x99 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_MOD__primitive_x2(__args___x99[0], __args___x99[1], __args___x99[2], __args___x99[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x100 => TinymoeObject___dispatch__Float_standard_library__operator__expression_MOD__primitive_x3(__args___x100[0], __args___x100[1], __args___x100[2], __args___x100[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x101 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_MOD__primitive_x3(__args___x101[0], __args___x101[1], __args___x101[2], __args___x101[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_MOD_$primitive",
+				new TinymoeFunction(__args___x102 => TinymoeObject___dispatch__standard_library__operator__expression_MOD__primitive_x3(__args___x102[0], __args___x102[1], __args___x102[2], __args___x102[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x103 => TinymoeInteger___dispatch__standard_library__operator__expression_EQUAL__primitive(__args___x103[0], __args___x103[1], __args___x103[2], __args___x103[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x104 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive(__args___x104[0], __args___x104[1], __args___x104[2], __args___x104[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x105 => TinymoeFloat___dispatch__standard_library__operator__expression_EQUAL__primitive_x2(__args___x105[0], __args___x105[1], __args___x105[2], __args___x105[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x106 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_EQUAL__primitive(__args___x106[0], __args___x106[1], __args___x106[2], __args___x106[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x107 => TinymoeString___dispatch__standard_library__operator__expression_EQUAL__primitive_x3(__args___x107[0], __args___x107[1], __args___x107[2], __args___x107[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x108 => TinymoeString___dispatch__Function_standard_library__operator__expression_EQUAL__primitive(__args___x108[0], __args___x108[1], __args___x108[2], __args___x108[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x109 => TinymoeBoolean___dispatch__standard_library__operator__expression_EQUAL__primitive_x4(__args___x109[0], __args___x109[1], __args___x109[2], __args___x109[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeBoolean),
+				"$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x110 => TinymoeBoolean___dispatch__Boolean_standard_library__operator__expression_EQUAL__primitive(__args___x110[0], __args___x110[1], __args___x110[2], __args___x110[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x111 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive_x2(__args___x111[0], __args___x111[1], __args___x111[2], __args___x111[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x112 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_EQUAL__primitive_x2(__args___x112[0], __args___x112[1], __args___x112[2], __args___x112[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x113 => TinymoeObject___dispatch__Function_standard_library__operator__expression_EQUAL__primitive_x2(__args___x113[0], __args___x113[1], __args___x113[2], __args___x113[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x114 => TinymoeObject___dispatch__standard_library__operator__expression_EQUAL__primitive_x5(__args___x114[0], __args___x114[1], __args___x114[2], __args___x114[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x115 => TinymoeString___dispatch__Object_standard_library__operator__expression_EQUAL__primitive(__args___x115[0], __args___x115[1], __args___x115[2], __args___x115[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x116 => TinymoeObject___dispatch__Boolean_standard_library__operator__expression_EQUAL__primitive_x2(__args___x116[0], __args___x116[1], __args___x116[2], __args___x116[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x117 => TinymoeObject___dispatch__Float_standard_library__operator__expression_EQUAL__primitive_x3(__args___x117[0], __args___x117[1], __args___x117[2], __args___x117[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x118 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_EQUAL__primitive_x3(__args___x118[0], __args___x118[1], __args___x118[2], __args___x118[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive",
+				new TinymoeFunction(__args___x119 => TinymoeObject___dispatch__Object_standard_library__operator__expression_EQUAL__primitive_x2(__args___x119[0], __args___x119[1], __args___x119[2], __args___x119[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x120 => TinymoeInteger___dispatch__standard_library__operator__expression_COMPARE__primitive(__args___x120[0], __args___x120[1], __args___x120[2], __args___x120[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x121 => TinymoeInteger___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive(__args___x121[0], __args___x121[1], __args___x121[2], __args___x121[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x122 => TinymoeFloat___dispatch__standard_library__operator__expression_COMPARE__primitive_x2(__args___x122[0], __args___x122[1], __args___x122[2], __args___x122[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x123 => TinymoeFloat___dispatch__Float_standard_library__operator__expression_COMPARE__primitive(__args___x123[0], __args___x123[1], __args___x123[2], __args___x123[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x124 => TinymoeString___dispatch__standard_library__operator__expression_COMPARE__primitive_x3(__args___x124[0], __args___x124[1], __args___x124[2], __args___x124[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x125 => TinymoeString___dispatch__Function_standard_library__operator__expression_COMPARE__primitive(__args___x125[0], __args___x125[1], __args___x125[2], __args___x125[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeFloat),
+				"$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x126 => TinymoeFloat___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive_x2(__args___x126[0], __args___x126[1], __args___x126[2], __args___x126[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeInteger),
+				"$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x127 => TinymoeInteger___dispatch__Float_standard_library__operator__expression_COMPARE__primitive_x2(__args___x127[0], __args___x127[1], __args___x127[2], __args___x127[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x128 => TinymoeObject___dispatch__Function_standard_library__operator__expression_COMPARE__primitive_x2(__args___x128[0], __args___x128[1], __args___x128[2], __args___x128[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x129 => TinymoeObject___dispatch__standard_library__operator__expression_COMPARE__primitive_x4(__args___x129[0], __args___x129[1], __args___x129[2], __args___x129[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeString),
+				"$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x130 => TinymoeString___dispatch__Object_standard_library__operator__expression_COMPARE__primitive(__args___x130[0], __args___x130[1], __args___x130[2], __args___x130[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x131 => TinymoeObject___dispatch__Float_standard_library__operator__expression_COMPARE__primitive_x3(__args___x131[0], __args___x131[1], __args___x131[2], __args___x131[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x132 => TinymoeObject___dispatch__Integer_standard_library__operator__expression_COMPARE__primitive_x3(__args___x132[0], __args___x132[1], __args___x132[2], __args___x132[3]))
+				); 
+			TinymoeObject.SetExtension(
+				typeof(TinymoeObject),
+				"$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive",
+				new TinymoeFunction(__args___x133 => TinymoeObject___dispatch__Object_standard_library__operator__expression_COMPARE__primitive_x2(__args___x133[0], __args___x133[1], __args___x133[2], __args___x133[3]))
 				); 
 		}
 

@@ -1,3 +1,9 @@
+$symbol standard_library::breaking_repeating;
+
+$symbol standard_library::continuing_repeating;
+
+$symbol standard_library::raising_exception;
+
 $symbol standard_library::exiting_program;
 
 $symbol standard_library::exiting_block;
@@ -1196,10 +1202,39 @@ $procedure standard_library::substract_$expression_from_assignable($state, value
         );
 }
 
-$procedure standard_library::boolean_of_$primitive($state, value, $continuation)
+$procedure standard_library::number_of_$primitive($state, value, $continuation)
+{
+    value.$dispatch<>standard_library::number_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure standard_library::number_of_$primitive<integer>($state, value, $continuation)
 {
     $symbol $the_result;
-    $external ("CastToBoolean")(
+    $the_result = value;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::number_of_$primitive<float>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $the_result = value;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::number_of_$primitive<string>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("s_to_n")(
         $state, 
         value, 
         $lambda ($state_0, $result_1)
@@ -1214,8 +1249,27 @@ $procedure standard_library::boolean_of_$primitive($state, value, $continuation)
 
 $procedure standard_library::integer_of_$primitive($state, value, $continuation)
 {
+    value.$dispatch<>standard_library::integer_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure standard_library::integer_of_$primitive<integer>($state, value, $continuation)
+{
     $symbol $the_result;
-    $external ("CastToInteger")(
+    $the_result = value;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::integer_of_$primitive<float>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("f_to_i")(
         $state, 
         value, 
         $lambda ($state_0, $result_1)
@@ -1228,10 +1282,61 @@ $procedure standard_library::integer_of_$primitive($state, value, $continuation)
         );
 }
 
-$procedure standard_library::floating_point_of_$primitive($state, value, $continuation)
+$procedure standard_library::integer_of_$primitive<string>($state, value, $continuation)
 {
     $symbol $the_result;
-    $external ("CastToFloat")(
+    $external ("s_to_i")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::float_of_$primitive($state, value, $continuation)
+{
+    value.$dispatch<>standard_library::float_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure standard_library::float_of_$primitive<integer>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("i_to_f")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::float_of_$primitive<float>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $the_result = value;
+    $continuation(
+        $state, 
+        $the_result
+        );
+}
+
+$procedure standard_library::float_of_$primitive<string>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("s_to_f")(
         $state, 
         value, 
         $lambda ($state_0, $result_1)
@@ -1247,7 +1352,7 @@ $procedure standard_library::floating_point_of_$primitive($state, value, $contin
 $procedure standard_library::string_of_$primitive($state, value, $continuation)
 {
     $symbol $the_result;
-    $external ("CastToString")(
+    $external ("to_s")(
         $state, 
         value, 
         $lambda ($state_0, $result_1)
@@ -1260,11 +1365,1144 @@ $procedure standard_library::string_of_$primitive($state, value, $continuation)
         );
 }
 
-$symbol standard_library::breaking_repeating;
+$procedure standard_library::operator_POS_$primitive($state, value, $continuation)
+{
+    value.$dispatch<>standard_library::operator_POS_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
 
-$symbol standard_library::continuing_repeating;
+$procedure standard_library::operator_POS_$primitive<integer>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("+i")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
 
-$symbol standard_library::raising_exception;
+$procedure standard_library::operator_POS_$primitive<float>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("+f")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_NEG_$primitive($state, value, $continuation)
+{
+    value.$dispatch<>standard_library::operator_NEG_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_NEG_$primitive<integer>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("-i")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_NEG_$primitive<float>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("-f")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_NOT_$primitive($state, value, $continuation)
+{
+    value.$dispatch<>standard_library::operator_NOT_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_NOT_$primitive<boolean>($state, value, $continuation)
+{
+    $symbol $the_result;
+    $external ("!b")(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_CONCAT_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<string>_CONCAT_$primitive<string>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("s&s")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_ADD_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i+i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_ADD_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f+f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_ADD_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 + b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_ADD_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 + $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_SUB_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i-i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_SUB_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f-f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_SUB_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 - b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_SUB_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 - $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_MUL_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i*i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_MUL_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f*f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_MUL_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 * b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_MUL_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 * $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_DIV_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i/i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_DIV_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f/f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_DIV_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 / b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_DIV_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 / $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_INTDIV_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("ii")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_INTDIV_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("ff")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_INTDIV_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 \ b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_INTDIV_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 \ $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_MOD_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i%i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_MOD_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f%f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_MOD_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 % b);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_MOD_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($var_2 % $result_1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_EQUAL_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i_e_i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_EQUAL_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f_e_f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<string>_EQUAL_$primitive<string>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("s_e_s")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<boolean>_EQUAL_$primitive<boolean>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("b_e_b")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_EQUAL_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_EQUAL_$primitive;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $result_1, 
+                    b, 
+                    $lambda ($state_3, $result_4)
+                        {
+                            $the_result = $result_4;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_EQUAL_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_EQUAL_$primitive;
+    $symbol $var_3;
+    $var_3 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $var_3, 
+                    $result_1, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<string>_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_EQUAL_$primitive;
+    $symbol $var_3;
+    $var_3 = a;
+    standard_library::string_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $var_3, 
+                    $result_1, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_EQUAL_$primitive<string>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_EQUAL_$primitive;
+    standard_library::string_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $result_1, 
+                    b, 
+                    $lambda ($state_3, $result_4)
+                        {
+                            $the_result = $result_4;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_COMPARE_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("i_c_i")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_COMPARE_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("f_c_f")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<string>_COMPARE_$primitive<string>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("s_c_s")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<integer>_COMPARE_$primitive<float>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_COMPARE_$primitive;
+    standard_library::float_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $result_1, 
+                    b, 
+                    $lambda ($state_3, $result_4)
+                        {
+                            $the_result = $result_4;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<float>_COMPARE_$primitive<integer>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_COMPARE_$primitive;
+    $symbol $var_3;
+    $var_3 = a;
+    standard_library::float_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $var_3, 
+                    $result_1, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression<string>_COMPARE_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_COMPARE_$primitive;
+    $symbol $var_3;
+    $var_3 = a;
+    standard_library::string_of_$primitive(
+        $state, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $var_3, 
+                    $result_1, 
+                    $lambda ($state_4, $result_5)
+                        {
+                            $the_result = $result_5;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_COMPARE_$primitive<string>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $symbol $var_2;
+    $var_2 = standard_library::operator_$expression_COMPARE_$primitive;
+    standard_library::string_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $var_2(
+                    $state_0, 
+                    $result_1, 
+                    b, 
+                    $lambda ($state_3, $result_4)
+                        {
+                            $the_result = $result_4;
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_LT_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 == -1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_GT_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 == 1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_LE_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 != 1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_GE_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = ($result_1 != -1);
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_EQ_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = $result_1;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_NE_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = !$result_1;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_AND_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<boolean>_AND_$primitive<boolean>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("b&&b")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    a.$dispatch<>standard_library::operator_$expression_OR_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure standard_library::operator_$expression<boolean>_OR_$primitive<boolean>($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("b||b")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
 
 $symbol enumerable::yielding_return;
 
@@ -1645,6 +2883,1501 @@ $procedure ($Object).$dispatch<>standard_library::repeat_with_$argument_in_$expr
         $state, 
         deal_with_$expression, 
         items, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::number_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (("number of " & value) & " is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::number_of_$primitive($state, value, $continuation)
+{
+    standard_library::number_of_$primitive<integer>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::number_of_$primitive($state, value, $continuation)
+{
+    standard_library::number_of_$primitive<float>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::number_of_$primitive($state, value, $continuation)
+{
+    standard_library::number_of_$primitive<string>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::number_of_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::number_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (("integer of " & value) & " is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    standard_library::integer_of_$primitive<integer>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    standard_library::integer_of_$primitive<float>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    standard_library::integer_of_$primitive<string>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::integer_of_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::integer_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::float_of_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (("float of " & value) & " is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::float_of_$primitive($state, value, $continuation)
+{
+    standard_library::float_of_$primitive<integer>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::float_of_$primitive($state, value, $continuation)
+{
+    standard_library::float_of_$primitive<float>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::float_of_$primitive($state, value, $continuation)
+{
+    standard_library::float_of_$primitive<string>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::float_of_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::float_of_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_POS_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = +$result_1;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_POS_$primitive($state, value, $continuation)
+{
+    standard_library::operator_POS_$primitive<float>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_POS_$primitive($state, value, $continuation)
+{
+    standard_library::operator_POS_$primitive<integer>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_POS_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_POS_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_NEG_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        value, 
+        $lambda ($state_0, $result_1)
+            {
+                $the_result = -$result_1;
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_NEG_$primitive($state, value, $continuation)
+{
+    standard_library::operator_NEG_$primitive<integer>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_NEG_$primitive($state, value, $continuation)
+{
+    standard_library::operator_NEG_$primitive<float>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_NEG_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_NEG_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_NOT_$primitive($state, value, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (("not " & value) & " is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Boolean).$dispatch<>standard_library::operator_NOT_$primitive($state, value, $continuation)
+{
+    standard_library::operator_NOT_$primitive<boolean>(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_NOT_$primitive($state, value, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_NOT_$primitive(
+        $state, 
+        value, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::string_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::string_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 & $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<string>_CONCAT_$primitive<string>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Function>standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_CONCAT_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_CONCAT_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_CONCAT_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 + $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_ADD_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_ADD_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_ADD_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_ADD_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_ADD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_ADD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 - $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_SUB_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_SUB_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_SUB_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_SUB_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_SUB_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_SUB_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 * $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_MUL_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_MUL_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_MUL_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_MUL_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_MUL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MUL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 / $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_DIV_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_DIV_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_DIV_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_DIV_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_DIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_DIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 \ $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_INTDIV_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_INTDIV_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_INTDIV_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_INTDIV_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_INTDIV_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_INTDIV_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::number_of_$primitive(
+        $state, 
+        a, 
+        $lambda ($state_0, $result_1)
+            {
+                $symbol $var_4;
+                $var_4 = $result_1;
+                standard_library::number_of_$primitive(
+                    $state_0, 
+                    b, 
+                    $lambda ($state_2, $result_3)
+                        {
+                            $the_result = ($var_4 % $result_3);
+                            $continuation(
+                                $state, 
+                                $the_result
+                                );
+                        }
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_MOD_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_MOD_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_MOD_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_MOD_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_MOD_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_MOD_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    $external ("o_e_o")(
+        $state, 
+        a, 
+        b, 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_EQUAL_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_EQUAL_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<string>_EQUAL_$primitive<string>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Boolean).$dispatch<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Boolean).$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<boolean>_EQUAL_$primitive<boolean>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_EQUAL_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_EQUAL_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Function>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<string>_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression_EQUAL_$primitive<string>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Boolean>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Object>standard_library::operator_$expression_EQUAL_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_EQUAL_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (((a & " compare ") & b) & " is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Integer).$dispatch<>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_COMPARE_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_COMPARE_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<string>_COMPARE_$primitive<string>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Float).$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<integer>_COMPARE_$primitive<float>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Integer).$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<float>_COMPARE_$primitive<integer>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Function>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<string>_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Function).$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression_COMPARE_$primitive<string>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Float>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Integer>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Object>standard_library::operator_$expression_COMPARE_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_COMPARE_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (((a & " and ") & b) & "is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Boolean).$dispatch<>standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Boolean).$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<boolean>_AND_$primitive<boolean>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Boolean>standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_AND_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_AND_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_AND_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure $dispatch_fail<>standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    $symbol $the_result;
+    standard_library::raise_$expression(
+        $state, 
+        (((a & " or ") & b) & "is illegal."), 
+        $lambda ($state_0, $result_1)
+            {
+                $continuation(
+                    $state, 
+                    $the_result
+                    );
+            }
+        );
+}
+
+$procedure ($Boolean).$dispatch<>standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    b.$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Boolean).$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    standard_library::operator_$expression<boolean>_OR_$primitive<boolean>(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<$Boolean>standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_OR_$primitive(
+        $state, 
+        a, 
+        b, 
+        $continuation
+        );
+}
+
+$procedure ($Object).$dispatch<>standard_library::operator_$expression_OR_$primitive($state, a, b, $continuation)
+{
+    $dispatch_fail<>standard_library::operator_$expression_OR_$primitive(
+        $state, 
+        a, 
+        b, 
         $continuation
         );
 }

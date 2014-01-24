@@ -470,18 +470,362 @@ sentence substract (value) from (assignable variable)
 	set variable to variable - value
 end
 
-phrase boolean of (value)
-	redirect to "CastToBoolean"
+-------------------------------------------------------------------------------
+--	Operators
+-------------------------------------------------------------------------------
+
+phrase number of (value)
+	raise "number of " & value & " is illegal."
 end
+
+phrase number of (value : integer)
+	set the result to value
+end
+
+phrase number of (value : float)
+	set the result to value
+end
+
+phrase number of (value : string)
+	redirect to "s_to_n"
+end
+
+-------------------------------------------------------------------------------
 
 phrase integer of (value)
-	redirect to "CastToInteger"
+	raise "integer of " & value & " is illegal."
 end
 
-phrase floating point of (value)
-	redirect to "CastToFloat"
+phrase integer of (value : integer)
+	set the result to value
 end
+
+phrase integer of (value : float)
+	redirect to "f_to_i"
+end
+
+phrase integer of (value : string)
+	redirect to "s_to_i"
+end
+
+-------------------------------------------------------------------------------
+
+phrase float of (value)
+	raise "float of " & value & " is illegal."
+end
+
+phrase float of (value : integer)
+	redirect to "i_to_f"
+end
+
+phrase float of (value : float)
+	set the result to value
+end
+
+phrase float of (value : string)
+	redirect to "s_to_f"
+end
+
+-------------------------------------------------------------------------------
 
 phrase string of (value)
-	redirect to "CastToString"
+	redirect to "to_s"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator POS (value)
+	set the result to + number of value
+end
+
+phrase operator POS (value : integer)
+	redirect to "+i"
+end
+
+phrase operator POS (value : float)
+	redirect to "+f"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator NEG (value)
+	set the result to - number of value
+end
+
+phrase operator NEG (value : integer)
+	redirect to "-i"
+end
+
+phrase operator NEG (value : float)
+	redirect to "-f"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator NOT (value)
+	raise "not " & value & " is illegal."
+end
+
+phrase operator NOT (value : boolean)
+	redirect to "!b"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) CONCAT (b)
+	set the result to (string of a) & (string of b)
+end
+
+phrase operator (a : string) CONCAT (b : string)
+	redirect to "s&s"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) ADD (b)
+	set the result to (number of a) + (number of b)
+end
+
+phrase operator (a : integer) ADD (b : integer)
+	redirect to "i+i"
+end
+
+phrase operator (a : float) ADD (b : float)
+	redirect to "f+f"
+end
+
+phrase operator (a : integer) ADD (b : float)
+	set the result to (float of a) + b
+end
+
+phrase operator (a : float) ADD (b : integer)
+	set the result to a + (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) SUB (b)
+	set the result to (number of a) - (number of b)
+end
+
+phrase operator (a : integer) SUB (b : integer)
+	redirect to "i-i"
+end
+
+phrase operator (a : float) SUB (b : float)
+	redirect to "f-f"
+end
+
+phrase operator (a : integer) SUB (b : float)
+	set the result to (float of a) - b
+end
+
+phrase operator (a : float) SUB (b : integer)
+	set the result to a - (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) MUL (b)
+	set the result to (number of a) * (number of b)
+end
+
+phrase operator (a : integer) MUL (b : integer)
+	redirect to "i*i"
+end
+
+phrase operator (a : float) MUL (b : float)
+	redirect to "f*f"
+end
+
+phrase operator (a : integer) MUL (b : float)
+	set the result to (float of a) * b
+end
+
+phrase operator (a : float) MUL (b : integer)
+	set the result to a * (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) DIV (b)
+	set the result to (number of a) / (number of b)
+end
+
+phrase operator (a : integer) DIV (b : integer)
+	redirect to "i/i"
+end
+
+phrase operator (a : float) DIV (b : float)
+	redirect to "f/f"
+end
+
+phrase operator (a : integer) DIV (b : float)
+	set the result to (float of a) / b
+end
+
+phrase operator (a : float) DIV (b : integer)
+	set the result to a / (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) INTDIV (b)
+	set the result to (number of a) \ (number of b)
+end
+
+phrase operator (a : integer) INTDIV (b : integer)
+	redirect to "i\i"
+end
+
+phrase operator (a : float) INTDIV (b : float)
+	redirect to "f\f"
+end
+
+phrase operator (a : integer) INTDIV (b : float)
+	set the result to (float of a) \ b
+end
+
+phrase operator (a : float) INTDIV (b : integer)
+	set the result to a \ (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) MOD (b)
+	set the result to (number of a) % (number of b)
+end
+
+phrase operator (a : integer) MOD (b : integer)
+	redirect to "i%i"
+end
+
+phrase operator (a : float) MOD (b : float)
+	redirect to "f%f"
+end
+
+phrase operator (a : integer) MOD (b : float)
+	set the result to (float of a) % b
+end
+
+phrase operator (a : float) MOD (b : integer)
+	set the result to a % (float of b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) EQUAL (b)
+	redirect to "o_e_o"
+end
+
+phrase operator (a : integer) EQUAL (b : integer)
+	redirect to "i_e_i"
+end
+
+phrase operator (a : float) EQUAL (b : float)
+	redirect to "f_e_f"
+end
+
+phrase operator (a : string) EQUAL (b : string)
+	redirect to "s_e_s"
+end
+
+phrase operator (a : boolean) EQUAL (b : boolean)
+	redirect to "b_e_b"
+end
+
+phrase operator (a : integer) EQUAL (b : float)
+	set the result to operator (float of a) EQUAL b
+end
+
+phrase operator (a : float) EQUAL (b : integer)
+	set the result to operator a EQUAL (float of b)
+end
+
+phrase operator (a : string) EQUAL (b)
+	set the result to operator a EQUAL (string of b)
+end
+
+phrase operator (a) EQUAL (b : string)
+	set the result to operator (string of a) EQUAL b
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) COMPARE (b)
+	raise a & " compare " & b & " is illegal."
+end
+
+phrase operator (a : integer) COMPARE (b : integer)
+	redirect to "i_c_i"
+end
+
+phrase operator (a : float) COMPARE (b : float)
+	redirect to "f_c_f"
+end
+
+phrase operator (a : string) COMPARE (b : string)
+	redirect to "s_c_s"
+end
+
+phrase operator (a : integer) COMPARE (b : float)
+	set the result to operator (float of a) COMPARE b
+end
+
+phrase operator (a : float) COMPARE (b : integer)
+	set the result to operator a COMPARE (float of b)
+end
+
+phrase operator (a : string) COMPARE (b)
+	set the result to operator a COMPARE (string of b)
+end
+
+phrase operator (a) COMPARE (b : string)
+	set the result to operator (string of a) COMPARE b
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) LT (b)
+	set the result to (operator a COMPARE b) = -1
+end
+
+phrase operator (a) GT (b)
+	set the result to (operator a COMPARE b) = 1
+end
+
+phrase operator (a) LE (b)
+	set the result to (operator a COMPARE b) <> 1
+end
+
+phrase operator (a) GE (b)
+	set the result to (operator a COMPARE b) <> -1
+end
+
+phrase operator (a) EQ (b)
+	set the result to operator a EQUAL b
+end
+
+phrase operator (a) NE (b)
+	set the result to not (operator a EQUAL b)
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) AND (b)
+	raise a & " and " & b & "is illegal."
+end
+
+phrase operator (a : boolean) AND (b : boolean)
+	redirect to "b&&b"
+end
+
+-------------------------------------------------------------------------------
+
+phrase operator (a) OR (b)
+	raise a & " or " & b & "is illegal."
+end
+
+phrase operator (a : boolean) OR (b : boolean)
+	redirect to "b||b"
 end
