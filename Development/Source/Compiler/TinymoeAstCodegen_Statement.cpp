@@ -464,7 +464,23 @@ namespace tinymoe
 					auto ast = make_shared<AstReferenceExpression>();
 					ast->reference = lambda->arguments[1];
 
-					return SymbolAstResult(ast, stat, lambda);
+					SymbolAstResult result(ast, stat, lambda);
+
+					{
+						auto setStat = make_shared<AstAssignmentStatement>();
+						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->reference = context.function->resultVariable;
+							setStat->target = arg;
+						}
+						{
+							auto arg = make_shared<AstReferenceExpression>();
+							arg->reference = lambda->arguments[1];
+							setStat->value = arg;
+						}
+						result.AppendStatement(setStat);
+					}
+					return result;
 				}
 			case GrammarSymbolTarget::Assign:
 				{

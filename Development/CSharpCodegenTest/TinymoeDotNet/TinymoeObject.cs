@@ -189,12 +189,15 @@ namespace TinymoeDotNet
         public TinymoeObject GetField(TinymoeObject target, string name)
         {
             TinymoeObject value = null;
-            if (target.fields.TryGetValue(name, out value))
+            if (target != null)
             {
-                return value;
+                if (target.fields.TryGetValue(name, out value))
+                {
+                    return value;
+                }
             }
 
-            Type type = target.GetType();
+            Type type = target == null ? typeof(TinymoeObject) : target.GetType();
             while (type != null)
             {
                 if (extensions.TryGetValue(Tuple.Create(type, name), out value))
@@ -552,6 +555,10 @@ namespace TinymoeDotNet
 
         private static TinymoeString CastToString(TinymoeObject a)
         {
+            if (a == null)
+            {
+                return new TinymoeString("<null>");
+            }
             if (a is TinymoeInteger)
             {
                 return new TinymoeString(((TinymoeInteger)a).Value.ToString());

@@ -327,35 +327,35 @@ phrase main
 
 	test case "Break should stop the repeating (1)"
 		set sum to 0
-		repeat with i from 1 to 100
-			if i > 10
+		repeat with i from 1 to 10
+			if i > 5
 				break
 			end
 			add i to sum
 		end
-		assert sum should be 55
+		assert sum should be 15
 	end
 
 	test case "Break should stop the repeating (2)"
 		set sum to 0
-		repeat with i from 1 to 100
+		repeat with i from 1 to 10
 			add i to sum
-			if i >= 10
+			if i >= 5
 				break
 			end
 		end
-		assert sum should be 55
+		assert sum should be 15
 	end
 
 	test case "Continue should restart the next repeating"
 		set sum to 0
-		repeat with i from 1 to 100
-			if i > 10
+		repeat with i from 1 to 10
+			if i > 5
 				continue
 			end
 			add i to sum
 		end
-		assert sum should be 55
+		assert sum should be 15
 	end
 
 	test case "Only one branch of the if-else statement will be executed"
