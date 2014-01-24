@@ -158,32 +158,6 @@ namespace tinymoe
 			False,
 		};
 
-		enum class AstUnaryOperator
-		{
-			Positive,
-			Negative,
-			Not,
-		};
-
-		enum class AstBinaryOperator
-		{
-			Concat,
-			Add,
-			Sub,
-			Mul,
-			Div,
-			IntDiv,
-			Mod,
-			LT,
-			GT,
-			LE,
-			GE,
-			EQ,
-			NE,
-			And,
-			Or,
-		};
-
 		class AstLiteralExpression : public AstExpression
 		{
 		public:
@@ -247,7 +221,7 @@ namespace tinymoe
 		class AstExternalSymbolExpression : public AstExpression
 		{
 		public:
-			AstExpression::Ptr						name;
+			string_t								name;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
@@ -272,39 +246,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
-		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
-			void									SetParentInternal()override;
-		};
-
-		class AstUnaryExpression : public AstExpression
-		{
-		public:
-			AstExpression::Ptr						operand;
-			AstUnaryOperator						op;
-			
-			void									Accept(AstExpressionVisitor* visitor)override;
-			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
-			void									SetParentInternal()override;
-		};
-
-		class AstBinaryExpression : public AstExpression
-		{
-		public:
-			AstExpression::Ptr						first;
-			AstExpression::Ptr						second;
-			AstBinaryOperator						op;
-			
-			void									Accept(AstExpressionVisitor* visitor)override;
-			void									CollectSideEffectExpressions(AstExpression::List& exprs)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
 			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
@@ -620,8 +561,6 @@ namespace tinymoe
 			virtual void							Visit(AstStringExpression* node) = 0;
 			virtual void							Visit(AstExternalSymbolExpression* node) = 0;
 			virtual void							Visit(AstReferenceExpression* node) = 0;
-			virtual void							Visit(AstUnaryExpression* node) = 0;
-			virtual void							Visit(AstBinaryExpression* node) = 0;
 			virtual void							Visit(AstNewTypeExpression* node) = 0;
 			virtual void							Visit(AstTestTypeExpression* node) = 0;
 			virtual void							Visit(AstNewArrayExpression* node) = 0;

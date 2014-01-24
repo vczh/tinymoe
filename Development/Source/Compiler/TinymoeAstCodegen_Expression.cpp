@@ -150,7 +150,7 @@ namespace tinymoe
 						}
 
 						auto ast = make_shared<AstNewTypeExpression>();
-						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[0])->symbol, ast);
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[0])->symbol);
 						ast->fields = exprs;
 						return result.ReplaceValue(ast);
 					}
@@ -188,20 +188,36 @@ namespace tinymoe
 						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state);
 						auto ast = make_shared<AstTestTypeExpression>();
 						ast->target = result.value;
-						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
+						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol);
 						return result.ReplaceValue(ast);
 					}
 				case GrammarSymbolTarget::IsNotType:
 					{
 						SymbolAstResult result = arguments[0]->GenerateAst(scope, context, state);
-						auto ast = make_shared<AstTestTypeExpression>();
-						ast->target = result.value;
-						ast->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol, ast);
+						
+						auto stat = make_shared<AstExpressionStatement>();
 
-						auto unary = make_shared<AstUnaryExpression>();
-						unary->op = AstUnaryOperator::Not;
-						unary->operand = ast;
-						return result.ReplaceValue(unary);
+						auto invoke = make_shared<AstInvokeExpression>();
+						stat->expression = invoke;
+						{
+							auto ref = make_shared<AstReferenceExpression>();
+							ref->reference = scope->opNot;
+							invoke->function = ref;
+						}
+						{
+							auto arg = make_shared<AstTestTypeExpression>();
+							arg->target = result.value;
+							arg->type = scope->GetType(dynamic_pointer_cast<ReferenceExpression>(arguments[1])->symbol);
+						}
+
+						auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+						invoke->arguments.push_back(lambda);
+			
+						auto ast = make_shared<AstReferenceExpression>();
+						ast->reference = lambda->arguments[1];
+
+						result.AppendStatement(stat);
+						return result.ReplaceValue(ast, lambda);
 					}
 				case GrammarSymbolTarget::GetField:
 					{
@@ -293,82 +309,95 @@ namespace tinymoe
 
 		SymbolAstResult UnaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)
 		{
-			AstUnaryOperator astOp = AstUnaryOperator::Not;
+			AstDeclaration::Ptr astOp;
 			switch (op)
 			{
 			case UnaryOperator::Not:
-				astOp = AstUnaryOperator::Not;
+				astOp = scope->opNot;
 				break;
 			case UnaryOperator::Positive:
-				astOp = AstUnaryOperator::Positive;
+				astOp = scope->opPos;
 				break;
 			case UnaryOperator::Negative:
-				astOp = AstUnaryOperator::Negative;
+				astOp = scope->opNeg;
 				break;
 			}
 
 			SymbolAstResult result;
 			vector<AstExpression::Ptr> exprs;
 			int exprStart = 0;
-
 			result.MergeForExpression(operand->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 
-			auto ast = make_shared<AstUnaryExpression>();
-			ast->op = astOp;
-			ast->operand = exprs[0];
-			return result.ReplaceValue(ast);
+			auto stat = make_shared<AstExpressionStatement>();
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			stat->expression = invoke;
+			{
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->reference = astOp;
+				invoke->function = ref;
+			}
+			invoke->arguments.push_back(exprs[0]);
+
+			auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+			invoke->arguments.push_back(lambda);
+			
+			auto ast = make_shared<AstReferenceExpression>();
+			ast->reference = lambda->arguments[1];
+
+			result.AppendStatement(stat);
+			return result.ReplaceValue(ast, lambda);
 		}
 
 		SymbolAstResult BinaryExpression::GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state)
 		{
-			AstBinaryOperator astOp = AstBinaryOperator::Concat;
-			
+			AstDeclaration::Ptr astOp;
 			switch (op)
 			{
 			case BinaryOperator::Concat:
-				astOp = AstBinaryOperator::Concat;
+				astOp = scope->opConcat;
 				break;
 			case BinaryOperator::Add:
-				astOp = AstBinaryOperator::Add;
+				astOp = scope->opAdd;
 				break;
 			case BinaryOperator::Sub:
-				astOp = AstBinaryOperator::Sub;
+				astOp = scope->opSub;
 				break;
 			case BinaryOperator::Mul:
-				astOp = AstBinaryOperator::Mul;
+				astOp = scope->opMul;
 				break;
 			case BinaryOperator::Div:
-				astOp = AstBinaryOperator::Div;
+				astOp = scope->opDiv;
 				break;
 			case BinaryOperator::IntDiv:
-				astOp = AstBinaryOperator::IntDiv;
+				astOp = scope->opIntDiv;
 				break;
 			case BinaryOperator::Mod:
-				astOp = AstBinaryOperator::Mod;
+				astOp = scope->opMod;
 				break;
 			case BinaryOperator::LT:
-				astOp = AstBinaryOperator::LT;
+				astOp = scope->opLT;
 				break;
 			case BinaryOperator::GT:
-				astOp = AstBinaryOperator::GT;
+				astOp = scope->opGT;
 				break;
 			case BinaryOperator::LE:
-				astOp = AstBinaryOperator::LE;
+				astOp = scope->opLE;
 				break;
 			case BinaryOperator::GE:
-				astOp = AstBinaryOperator::GE;
+				astOp = scope->opGE;
 				break;
 			case BinaryOperator::EQ:
-				astOp = AstBinaryOperator::EQ;
+				astOp = scope->opEQ;
 				break;
 			case BinaryOperator::NE:
-				astOp = AstBinaryOperator::NE;
+				astOp = scope->opNE;
 				break;
 			case BinaryOperator::And:
-				astOp = AstBinaryOperator::And;
+				astOp = scope->opAnd;
 				break;
 			case BinaryOperator::Or:
-				astOp = AstBinaryOperator::Or;
+				astOp = scope->opOr;
 				break;
 			}
 
@@ -379,11 +408,26 @@ namespace tinymoe
 			result.MergeForExpression(first->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 			result.MergeForExpression(second->GenerateAst(scope, context, state), context, exprs, exprStart, state);
 
-			auto ast = make_shared<AstBinaryExpression>();
-			ast->op = astOp;
-			ast->first = exprs[0];
-			ast->second = exprs[1];
-			return result.ReplaceValue(ast);
+			auto stat = make_shared<AstExpressionStatement>();
+
+			auto invoke = make_shared<AstInvokeExpression>();
+			stat->expression = invoke;
+			{
+				auto ref = make_shared<AstReferenceExpression>();
+				ref->reference = astOp;
+				invoke->function = ref;
+			}
+			invoke->arguments.push_back(exprs[0]);
+			invoke->arguments.push_back(exprs[1]);
+
+			auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+			invoke->arguments.push_back(lambda);
+			
+			auto ast = make_shared<AstReferenceExpression>();
+			ast->reference = lambda->arguments[1];
+
+			result.AppendStatement(stat);
+			return result.ReplaceValue(ast, lambda);
 		}
 	}
 }

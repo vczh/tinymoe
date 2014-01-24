@@ -11,7 +11,7 @@ namespace tinymoe
 		SymbolAstScope
 		*************************************************************/
 
-		AstType::Ptr SymbolAstScope::GetType(GrammarSymbol::Ptr symbol, AstNode::Ptr parent)
+		AstType::Ptr SymbolAstScope::GetType(GrammarSymbol::Ptr symbol)
 		{
 			if (symbol->target == GrammarSymbolTarget::Custom)
 			{
@@ -361,7 +361,7 @@ namespace tinymoe
 						if (typeDecl->parent)
 						{
 							auto type = scope->readAsts.find(sdp.first)->second;
-							auto baseType = scope->GetType(module->baseTypes.find(typeDecl)->second, type);
+							auto baseType = scope->GetType(module->baseTypes.find(typeDecl)->second);
 						}
 					}
 				}
@@ -487,7 +487,7 @@ namespace tinymoe
 						}
 						else
 						{
-							ast->ownerType = scope->GetType(ita->second, ast);
+							ast->ownerType = scope->GetType(ita->second);
 							typeFunctions.insert(methodName);
 						}
 
@@ -549,6 +549,34 @@ namespace tinymoe
 			map<SymbolFunction::Ptr, AstFunctionDeclaration::Ptr> functionAsts;
 			GenerateStaticAst(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
 			GenerateMultipleDispatchAsts(symbolAssembly, assembly, scope, multipleDispatchChildren, functionModules, functionAsts);
+
+			map<string_t, AstDeclaration::Ptr*> opAsts;
+			opAsts.insert(make_pair(T("standard_library::operator_POS_$primitive"), &scope->opPos));
+			opAsts.insert(make_pair(T("standard_library::operator_NEG_$primitive"), &scope->opNeg));
+			opAsts.insert(make_pair(T("standard_library::operator_NOT_$primitive"), &scope->opNot));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_CONCAT_$primitive"), &scope->opConcat));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_ADD_$primitive"), &scope->opAdd));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_SUB_$primitive"), &scope->opSub));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_MUL_$primitive"), &scope->opMul));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_DIV_$primitive"), &scope->opDiv));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_INTDIV_$primitive"), &scope->opIntDiv));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_MOD_$primitive"), &scope->opMod));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_LT_$primitive"), &scope->opLT));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_LE_$primitive"), &scope->opLE));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_GT_$primitive"), &scope->opGT));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_GE_$primitive"), &scope->opGE));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_EQ_$primitive"), &scope->opEQ));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_NE_$primitive"), &scope->opNE));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_AND_$primitive"), &scope->opAnd));
+			opAsts.insert(make_pair(T("standard_library::operator_$expression_OR_$primitive"), &scope->opOr));
+			for (auto decl : assembly->declarations)
+			{
+				auto it = opAsts.find(decl->composedName);
+				if (it != opAsts.end())
+				{
+					*(it->second) = decl;
+				}
+			}
 
 			for (auto fap : functionAsts)
 			{

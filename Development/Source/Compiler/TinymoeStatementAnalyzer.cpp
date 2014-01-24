@@ -610,6 +610,30 @@ namespace tinymoe
 								};
 								errors.push_back(error);
 							}
+							break;
+						case GrammarSymbolTarget::RedirectTo:
+							if (auto value = dynamic_pointer_cast<LiteralExpression>(invoke->arguments[0]))
+							{
+								if (value->token.type != CodeTokenType::String)
+								{
+									CodeError error =
+									{
+										line->tokens[0],
+										T("A string constant is required after \"redirect to\"."),
+									};
+									errors.push_back(error);
+								}
+							}
+							else
+							{
+								CodeError error =
+								{
+									line->tokens[0],
+									T("A string constant is required after \"redirect to\"."),
+								};
+								errors.push_back(error);
+							}
+							break;
 						}
 
 						auto newStatement = make_shared<Statement>();

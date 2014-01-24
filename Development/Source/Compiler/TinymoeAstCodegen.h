@@ -18,8 +18,9 @@ namespace tinymoe
 			SymbolAstDeclarationMap					readAsts;
 			SymbolAstDeclarationMap					writeAsts;
 			SymbolAstFunctionDeclarationMap			functionPrototypes;
+			ast::AstDeclaration::Ptr				opPos, opNeg, opNot, opConcat, opAdd, opSub, opMul, opDiv, opIntDiv, opMod, opLT, opGT, opLE, opGE, opEQ, opNE, opAnd, opOr;
 
-			ast::AstType::Ptr						GetType(GrammarSymbol::Ptr symbol, ast::AstNode::Ptr parent);
+			ast::AstType::Ptr						GetType(GrammarSymbol::Ptr symbol);
 		};
 
 		struct SymbolAstContext

@@ -336,18 +336,31 @@ namespace tinymoe
 							state = caseResult.continuation->arguments[0];
 						}
 
+						{
+							auto stat = make_shared<AstExpressionStatement>();
+
+							auto invoke = make_shared<AstInvokeExpression>();
+							stat->expression = invoke;
+							{
+								auto ref = make_shared<AstReferenceExpression>();
+								ref->reference = scope->opEQ;
+								invoke->function = ref;
+							}
+							invoke->arguments.push_back(caseResult.value);
+
+							auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
+							invoke->arguments.push_back(lambda);
+			
+							auto ast = make_shared<AstReferenceExpression>();
+							ast->reference = lambda->arguments[1];
+
+							caseResult.AppendStatement(stat);
+							caseResult = caseResult.ReplaceValue(ast, lambda);
+						}
+
 						auto ifstat = make_shared<AstIfStatement>();
 						{
-							auto binary = make_shared<AstBinaryExpression>();
-							binary->op = AstBinaryOperator::EQ;
-							
-							auto value = make_shared<AstReferenceExpression>();
-							value->reference = selectValue;
-							binary->first = value;
-
-							binary->second = caseResult.value;
-
-							ifstat->condition = binary;
+							ifstat->condition = caseResult.value;
 						}
 						caseResult.AppendStatement(ifstat);
 
@@ -357,12 +370,12 @@ namespace tinymoe
 						if (lastIfStat)
 						{
 							lastIfStat->falseBranch = ifstat;
-							result.continuation = caseResult.continuation;
 						}
 						else
 						{
 							result.AppendStatement(ifstat);
 						}
+						result.continuation = caseResult.continuation;
 						lastIfStat = ifstat;
 					}
 
@@ -416,16 +429,13 @@ namespace tinymoe
 				}
 			case GrammarSymbolTarget::RedirectTo:
 				{
-					SymbolAstResult result = statementExpression->arguments[0]->GenerateAst(scope, context, state);
-
 					auto stat = make_shared<AstExpressionStatement>();
-
 
 					auto invoke = make_shared<AstInvokeExpression>();
 					stat->expression = invoke;
 
 					auto external = make_shared<AstExternalSymbolExpression>();
-					external->name = result.value;
+					external->name = dynamic_pointer_cast<LiteralExpression>(statementExpression->arguments[0])->token.value;
 					invoke->function = external;
 
 					for (auto decl : context.function->arguments)
@@ -440,8 +450,11 @@ namespace tinymoe
 
 					auto lambda = Expression::GenerateContinuationLambdaAst(scope, context, state);
 					invoke->arguments.push_back(lambda);
-					result.MergeForStatement(SymbolAstResult(nullptr, stat, lambda), state);
-					return result;
+			
+					auto ast = make_shared<AstReferenceExpression>();
+					ast->reference = lambda->arguments[1];
+
+					return SymbolAstResult(ast, stat, lambda);
 				}
 			case GrammarSymbolTarget::Assign:
 				{

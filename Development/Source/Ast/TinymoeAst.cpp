@@ -127,16 +127,6 @@ namespace tinymoe
 			visitor->Visit(this);
 		}
 
-		void AstUnaryExpression::Accept(AstExpressionVisitor* visitor)
-		{
-			visitor->Visit(this);
-		}
-
-		void AstBinaryExpression::Accept(AstExpressionVisitor* visitor)
-		{
-			visitor->Visit(this);
-		}
-
 		void AstNewTypeExpression::Accept(AstExpressionVisitor* visitor)
 		{
 			visitor->Visit(this);
@@ -320,87 +310,12 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::PrintInternal(ostream_t& o, int indentation)
 		{
-			o << T("$external (");
-			name->Print(o, indentation);
-			o << T(")");
+			o << T("$external (\"") << name << T("\")");
 		}
 
 		void AstReferenceExpression::PrintInternal(ostream_t& o, int indentation)
 		{
 			o << reference.lock()->composedName;
-		}
-
-		void AstUnaryExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			switch (op)
-			{
-			case AstUnaryOperator::Not:
-				o << T("!");
-				break;
-			case AstUnaryOperator::Positive:
-				o << T("+");
-				break;
-			case AstUnaryOperator::Negative:
-				o << T("-");
-				break;
-			}
-			operand->Print(o, indentation, shared_from_this());
-		}
-
-		void AstBinaryExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("(");
-			first->Print(o, indentation, shared_from_this());
-			switch (op)
-			{
-			case AstBinaryOperator::Concat:
-				o << T(" & ");
-				break;
-			case AstBinaryOperator::Add:
-				o << T(" + ");
-				break;
-			case AstBinaryOperator::Sub:
-				o << T(" - ");
-				break;
-			case AstBinaryOperator::Mul:
-				o << T(" * ");
-				break;
-			case AstBinaryOperator::Div:
-				o << T(" / ");
-				break;
-			case AstBinaryOperator::IntDiv:
-				o << T(" \\ ");
-				break;
-			case AstBinaryOperator::Mod:
-				o << T(" % ");
-				break;
-			case AstBinaryOperator::LT:
-				o << T(" < ");
-				break;
-			case AstBinaryOperator::GT:
-				o << T(" > ");
-				break;
-			case AstBinaryOperator::LE:
-				o << T(" <= ");
-				break;
-			case AstBinaryOperator::GE:
-				o << T(" >= ");
-				break;
-			case AstBinaryOperator::EQ:
-				o << T(" == ");
-				break;
-			case AstBinaryOperator::NE:
-				o << T(" != ");
-				break;
-			case AstBinaryOperator::And:
-				o << T(" && ");
-				break;
-			case AstBinaryOperator::Or:
-				o << T(" || ");
-				break;
-			}
-			second->Print(o, indentation, shared_from_this());
-			o << T(")");
 		}
 
 		void AstNewTypeExpression::PrintInternal(ostream_t& o, int indentation)
@@ -657,22 +572,10 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::SetParentInternal()
 		{
-			name->SetParent(shared_from_this());
 		}
 
 		void AstReferenceExpression::SetParentInternal()
 		{
-		}
-
-		void AstUnaryExpression::SetParentInternal()
-		{
-			operand->SetParent(shared_from_this());
-		}
-
-		void AstBinaryExpression::SetParentInternal()
-		{
-			first->SetParent(shared_from_this());
-			second->SetParent(shared_from_this());
 		}
 
 		void AstNewTypeExpression::SetParentInternal()
@@ -852,22 +755,10 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
 		{
-			name->CollectSideEffectExpressions(exprs);
 		}
 
 		void AstReferenceExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
 		{
-		}
-
-		void AstUnaryExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			operand->CollectSideEffectExpressions(exprs);
-		}
-
-		void AstBinaryExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			first->CollectSideEffectExpressions(exprs);
-			second->CollectSideEffectExpressions(exprs);
 		}
 
 		void AstNewTypeExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
@@ -943,22 +834,10 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-			name->RoughlyOptimize(name);
 		}
 
 		void AstReferenceExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
 		{
-		}
-
-		void AstUnaryExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
-		{
-			operand->RoughlyOptimize(operand);
-		}
-
-		void AstBinaryExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
-		{
-			first->RoughlyOptimize(first);
-			second->RoughlyOptimize(second);
 		}
 
 		void AstNewTypeExpression::RoughlyOptimize(AstExpression::Ptr& replacement)
@@ -1092,7 +971,6 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			name->CollectUsedVariables(true, defined, used);
 		}
 
 		void AstReferenceExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
@@ -1101,17 +979,6 @@ namespace tinymoe
 			{
 				used.insert(reference.lock());
 			}
-		}
-
-		void AstUnaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			operand->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstBinaryExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			first->CollectUsedVariables(true, defined, used);
-			second->CollectUsedVariables(true, defined, used);
 		}
 
 		void AstNewTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
@@ -1195,22 +1062,10 @@ namespace tinymoe
 
 		void AstExternalSymbolExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-			name->RemoveUnnecessaryVariables(defined, used);
 		}
 
 		void AstReferenceExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
 		{
-		}
-
-		void AstUnaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			operand->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstBinaryExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			first->RemoveUnnecessaryVariables(defined, used);
-			second->RemoveUnnecessaryVariables(defined, used);
 		}
 
 		void AstNewTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)

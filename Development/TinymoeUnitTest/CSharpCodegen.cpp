@@ -220,9 +220,7 @@ public:
 
 	void Visit(AstExternalSymbolExpression* node)
 	{
-		o << T("GetExternalFunction(");
-		PrintExpression(node->name, scope, resolver, o, prefix);
-		o << T(")");
+		o << T("GetExternalFunction(\"") << node->name << T("\")");
 	}
 
 	void Visit(AstReferenceExpression* node)
@@ -236,80 +234,6 @@ public:
 		{
 			o << resolver.Resolve(decl.get());
 		}
-	}
-
-	void Visit(AstUnaryExpression* node)
-	{
-		switch (node->op)
-		{
-		case AstUnaryOperator::Positive:
-			o << T("Positive(");
-			break;
-		case AstUnaryOperator::Negative:
-			o << T("Negative(");
-			break;
-		case AstUnaryOperator::Not:
-			o << T("Not(");
-			break;
-		}
-		PrintExpression(node->operand, scope, resolver, o, prefix);
-		o << T(")");
-	}
-
-	void Visit(AstBinaryExpression* node)
-	{
-		switch (node->op)
-		{
-		case AstBinaryOperator::Concat:
-			o << T("Concat(");
-			break;
-		case AstBinaryOperator::Add:
-			o << T("Add(");
-			break;
-		case AstBinaryOperator::Sub:
-			o << T("Sub(");
-			break;
-		case AstBinaryOperator::Mul:
-			o << T("Mul(");
-			break;
-		case AstBinaryOperator::Div:
-			o << T("Div(");
-			break;
-		case AstBinaryOperator::IntDiv:
-			o << T("IntDiv(");
-			break;
-		case AstBinaryOperator::Mod:
-			o << T("Mod(");
-			break;
-		case AstBinaryOperator::LT:
-			o << T("LT(");
-			break;
-		case AstBinaryOperator::GT:
-			o << T("GT(");
-			break;
-		case AstBinaryOperator::LE:
-			o << T("LE(");
-			break;
-		case AstBinaryOperator::GE:
-			o << T("GE(");
-			break;
-		case AstBinaryOperator::EQ:
-			o << T("EQ(");
-			break;
-		case AstBinaryOperator::NE:
-			o << T("NE(");
-			break;
-		case AstBinaryOperator::And:
-			o << T("And(");
-			break;
-		case AstBinaryOperator::Or:
-			o << T("Or(");
-			break;
-		}
-		PrintExpression(node->first, scope, resolver, o, prefix);
-		o << T(", ");
-		PrintExpression(node->second, scope, resolver, o, prefix);
-		o << T(")");
 	}
 
 	void Visit(AstNewTypeExpression* node)
@@ -471,16 +395,6 @@ public:
 		o << T(" = ");
 		PrintExpression(value, scope, resolver, o, prefix);
 		o << T(";");
-	}
-
-	void Visit(AstUnaryExpression* node)
-	{
-		throw 0;
-	}
-
-	void Visit(AstBinaryExpression* node)
-	{
-		throw 0;
 	}
 
 	void Visit(AstNewTypeExpression* node)
