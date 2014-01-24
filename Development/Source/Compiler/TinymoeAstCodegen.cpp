@@ -438,7 +438,7 @@ namespace tinymoe
 			while (it != mdc.end())
 			{
 				auto lower = mdc.lower_bound(it->first);
-				auto upper = mdc.lower_bound(it->second);
+				auto upper = mdc.upper_bound(it->first);
 				auto module = functionModules.find(it->first)->second;
 				auto rootFunc = it->first;
 				auto rootAst = functionAsts.find(rootFunc)->second;

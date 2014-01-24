@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace TinymoeDotNet
 {
@@ -232,6 +233,230 @@ namespace TinymoeDotNet
             });
         }
 
+        #region STRONG TYPED EXTERNAL FUNCTIONS
+
+        private static int f_to_i(double v)
+        {
+            return (int)v;
+        }
+
+        private static int s_to_i(string v)
+        {
+            return int.Parse(v);
+        }
+
+        private static double i_to_f(int v)
+        {
+            return (double)v;
+        }
+
+        private static double s_to_f(string v)
+        {
+            return double.Parse(v);
+        }
+
+        private static int pos_i(int v)
+        {
+            return v;
+        }
+
+        private static double pos_f(double v)
+        {
+            return v;
+        }
+
+        private static int neg_i(int v)
+        {
+            return -v;
+        }
+
+        private static double neg_f(double v)
+        {
+            return -v;
+        }
+
+        private static bool not_b(bool v)
+        {
+            return !v;
+        }
+
+        private static string s_concat_s(string a, string b)
+        {
+            return a + b;
+        }
+
+        private static int i_add_i(int a, int b)
+        {
+            return a + b;
+        }
+
+        private static double f_add_f(double a, double b)
+        {
+            return a + b;
+        }
+
+        private static int i_sub_i(int a, int b)
+        {
+            return a - b;
+        }
+
+        private static double f_sub_f(double a, double b)
+        {
+            return a - b;
+        }
+
+        private static int i_mul_i(int a, int b)
+        {
+            return a * b;
+        }
+
+        private static double f_mul_f(double a, double b)
+        {
+            return a * b;
+        }
+
+        private static double i_div_i(int a, int b)
+        {
+            return (double)a / (double)b;
+        }
+
+        private static double f_div_f(double a, double b)
+        {
+            return a / b;
+        }
+
+        private static int i_intdiv_i(int a, int b)
+        {
+            return a / b;
+        }
+
+        private static int i_mod_i(int a, int b)
+        {
+            return a % b;
+        }
+
+        private static bool o_e_o(TinymoeObject a, TinymoeObject b)
+        {
+            return a == b;
+        }
+
+        private static bool i_e_i(int a, int b)
+        {
+            return a == b;
+        }
+
+        private static bool f_e_f(double a, double b)
+        {
+            return a == b;
+        }
+
+        private static bool s_e_s(string a, string b)
+        {
+            return a == b;
+        }
+
+        private static bool b_e_b(bool a, bool b)
+        {
+            return a == b;
+        }
+
+        private static int i_c_i(int a, int b)
+        {
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
+
+        private static int f_c_f(double a, double b)
+        {
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
+
+        private static int s_c_s(string a, string b)
+        {
+            return i_c_i(a.CompareTo(b), 0);
+        }
+
+        private static bool b_and_b(bool a, bool b)
+        {
+            return a && b;
+        }
+
+        private static bool b_or_b(bool a, bool b)
+        {
+            return a || b;
+        }
+
+        private static object FromTinymoe(TinymoeObject v, Type type)
+        {
+            if (type == typeof(bool))
+            {
+                return ((TinymoeBoolean)v).Value;
+            }
+            else if (type == typeof(int))
+            {
+                return ((TinymoeInteger)v).Value;
+            }
+            else if (type == typeof(double))
+            {
+                return ((TinymoeFloat)v).Value;
+            }
+            else if (type == typeof(string))
+            {
+                return ((TinymoeString)v).Value;
+            }
+            else if (type == typeof(TinymoeObject))
+            {
+                return v;
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("A TinymoeObject cannot be converted to A value of {0}.", v.GetType().FullName));
+            }
+        }
+
+        private static TinymoeObject ToTinymoe(object v)
+        {
+            if (v is bool)
+            {
+                return new TinymoeBoolean((bool)v);
+            }
+            else if (v is int)
+            {
+                return new TinymoeInteger((int)v);
+            }
+            else if (v is double)
+            {
+                return new TinymoeFloat((double)v);
+            }
+            else if (v is string)
+            {
+                return new TinymoeString((string)v);
+            }
+            else if (v is TinymoeObject)
+            {
+                return (TinymoeObject)v;
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("A value of {0} cannot be converted to a TinymoeObject", v.GetType().FullName));
+            }
+        }
+
+        private static TinymoeObject BuildStringTypedExternalFunction(MethodInfo function)
+        {
+            return new TinymoeFunction(__args__ =>
+            {
+                var arguments = __args__
+                    .Skip(1)
+                    .Take(__args__.Length - 2)
+                    .Select((v, i) => FromTinymoe(v, function.GetParameters()[i].ParameterType))
+                    .ToArray();
+                var result = function.Invoke(null, arguments);
+                Invoke(__args__.Last(), new TinymoeObject[] { __args__[0], ToTinymoe(result) });
+            });
+        }
+
+        #endregion
+
         public static TinymoeObject GetExternalFunction(string name)
         {
             TinymoeObject function;
@@ -239,14 +464,8 @@ namespace TinymoeDotNet
             {
                 switch (name)
                 {
-                    case "to_n":
+                    case "s_to_n":
                         function = BuildExternalFunction(__args__ => CastToNumber(__args__[0]));
-                        break;
-                    case "to_i":
-                        function = BuildExternalFunction(__args__ => CastToInteger(__args__[0]));
-                        break;
-                    case "to_f":
-                        function = BuildExternalFunction(__args__ => CastToFloat(__args__[0]));
                         break;
                     case "to_s":
                         function = BuildExternalFunction(__args__ => CastToString(__args__[0]));
@@ -258,7 +477,15 @@ namespace TinymoeDotNet
                         function = BuildExternalFunction(__args__ => Sqrt(__args__[0]));
                         break;
                     default:
-                        throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", name));
+                        {
+                            var method = typeof(TinymoeOperations).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
+                            if (method == null)
+                            {
+                                throw new IndexOutOfRangeException(string.Format("External function \"{0}\" does not exist.", name));
+                            }
+                            function = BuildStringTypedExternalFunction(method);
+                        }
+                        break;
                 }
                 externalFunctions.Add(name, function);
             }
@@ -270,7 +497,7 @@ namespace TinymoeDotNet
             return (TinymoeBoolean)a;
         }
 
-        public static TinymoeObject CastToNumber(TinymoeObject a)
+        private static TinymoeObject CastToNumber(TinymoeObject a)
         {
             if (a is TinymoeInteger || a is TinymoeFloat)
             {
@@ -291,7 +518,7 @@ namespace TinymoeDotNet
             }
         }
 
-        public static TinymoeInteger CastToInteger(TinymoeObject a)
+        private static TinymoeInteger CastToInteger(TinymoeObject a)
         {
             if (a is TinymoeInteger)
             {
@@ -307,7 +534,7 @@ namespace TinymoeDotNet
             }
         }
 
-        public static TinymoeFloat CastToFloat(TinymoeObject a)
+        private static TinymoeFloat CastToFloat(TinymoeObject a)
         {
             if (a is TinymoeInteger)
             {
@@ -323,7 +550,7 @@ namespace TinymoeDotNet
             }
         }
 
-        public static TinymoeString CastToString(TinymoeObject a)
+        private static TinymoeString CastToString(TinymoeObject a)
         {
             if (a is TinymoeInteger)
             {
@@ -333,20 +560,40 @@ namespace TinymoeDotNet
             {
                 return new TinymoeString(((TinymoeFloat)a).Value.ToString());
             }
-            else
+            else if (a is TinymoeBoolean)
+            {
+                return new TinymoeString(((TinymoeBoolean)a).Value.ToString());
+            }
+            else if (a is TinymoeSymbol)
+            {
+                return new TinymoeString(((TinymoeSymbol)a).Value.ToString());
+            }
+            else if (a is TinymoeString)
             {
                 return (TinymoeString)a;
             }
+            else if (a is TinymoeArray)
+            {
+                return new TinymoeString("<array>");
+            }
+            else if (a is TinymoeFunction)
+            {
+                return new TinymoeString("<function>");
+            }
+            else
+            {
+                return new TinymoeString(string.Format("<{0}>", a.GetType().Name));
+            }
         }
 
-        public static TinymoeObject Print(TinymoeObject a)
+        private static TinymoeObject Print(TinymoeObject a)
         {
             var value = CastToString(a);
             Console.WriteLine(value.Value);
             return null;
         }
 
-        public static TinymoeObject Sqrt(TinymoeObject a)
+        private static TinymoeObject Sqrt(TinymoeObject a)
         {
             var value = CastToFloat(a);
             return new TinymoeFloat(Math.Sqrt(value.Value));

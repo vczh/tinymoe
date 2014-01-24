@@ -539,11 +539,11 @@ phrase operator POS (value)
 end
 
 phrase operator POS (value : integer)
-	redirect to "+i"
+	redirect to "pos_i"
 end
 
 phrase operator POS (value : float)
-	redirect to "+f"
+	redirect to "pos_f"
 end
 
 -------------------------------------------------------------------------------
@@ -553,11 +553,11 @@ phrase operator NEG (value)
 end
 
 phrase operator NEG (value : integer)
-	redirect to "-i"
+	redirect to "neg_i"
 end
 
 phrase operator NEG (value : float)
-	redirect to "-f"
+	redirect to "neg_f"
 end
 
 -------------------------------------------------------------------------------
@@ -567,7 +567,7 @@ phrase operator NOT (value)
 end
 
 phrase operator NOT (value : boolean)
-	redirect to "!b"
+	redirect to "not_b"
 end
 
 -------------------------------------------------------------------------------
@@ -577,7 +577,7 @@ phrase operator (a) CONCAT (b)
 end
 
 phrase operator (a : string) CONCAT (b : string)
-	redirect to "s&s"
+	redirect to "s_concat_s"
 end
 
 -------------------------------------------------------------------------------
@@ -587,11 +587,11 @@ phrase operator (a) ADD (b)
 end
 
 phrase operator (a : integer) ADD (b : integer)
-	redirect to "i+i"
+	redirect to "i_add_i"
 end
 
 phrase operator (a : float) ADD (b : float)
-	redirect to "f+f"
+	redirect to "f_add_f"
 end
 
 phrase operator (a : integer) ADD (b : float)
@@ -609,11 +609,11 @@ phrase operator (a) SUB (b)
 end
 
 phrase operator (a : integer) SUB (b : integer)
-	redirect to "i-i"
+	redirect to "i_sub_i"
 end
 
 phrase operator (a : float) SUB (b : float)
-	redirect to "f-f"
+	redirect to "f_sub_f"
 end
 
 phrase operator (a : integer) SUB (b : float)
@@ -631,11 +631,11 @@ phrase operator (a) MUL (b)
 end
 
 phrase operator (a : integer) MUL (b : integer)
-	redirect to "i*i"
+	redirect to "i_mul_i"
 end
 
 phrase operator (a : float) MUL (b : float)
-	redirect to "f*f"
+	redirect to "f_mul_f"
 end
 
 phrase operator (a : integer) MUL (b : float)
@@ -653,11 +653,11 @@ phrase operator (a) DIV (b)
 end
 
 phrase operator (a : integer) DIV (b : integer)
-	redirect to "i/i"
+	redirect to "i_div_i"
 end
 
 phrase operator (a : float) DIV (b : float)
-	redirect to "f/f"
+	redirect to "f_div_f"
 end
 
 phrase operator (a : integer) DIV (b : float)
@@ -675,11 +675,11 @@ phrase operator (a) INTDIV (b)
 end
 
 phrase operator (a : integer) INTDIV (b : integer)
-	redirect to "i\i"
+	redirect to "i_intdiv_i"
 end
 
 phrase operator (a : float) INTDIV (b : float)
-	redirect to "f\f"
+	redirect to "f_intdiv_f"
 end
 
 phrase operator (a : integer) INTDIV (b : float)
@@ -697,11 +697,11 @@ phrase operator (a) MOD (b)
 end
 
 phrase operator (a : integer) MOD (b : integer)
-	redirect to "i%i"
+	redirect to "i_mod_i"
 end
 
 phrase operator (a : float) MOD (b : float)
-	redirect to "f%f"
+	redirect to "f_mod_f"
 end
 
 phrase operator (a : integer) MOD (b : float)
@@ -817,7 +817,7 @@ phrase operator (a) AND (b)
 end
 
 phrase operator (a : boolean) AND (b : boolean)
-	redirect to "b&&b"
+	redirect to "b_and_b"
 end
 
 -------------------------------------------------------------------------------
@@ -827,5 +827,5 @@ phrase operator (a) OR (b)
 end
 
 phrase operator (a : boolean) OR (b : boolean)
-	redirect to "b||b"
+	redirect to "b_or_b"
 end
