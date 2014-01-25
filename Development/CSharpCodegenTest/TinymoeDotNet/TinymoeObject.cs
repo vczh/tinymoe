@@ -5,6 +5,8 @@ using System.Reflection;
 
 namespace TinymoeDotNet
 {
+    public delegate TinymoeContinuation TinymoeContinuation();
+
     public class TinymoeObject
     {
         private static UInt64 counter = 0;
@@ -156,9 +158,9 @@ namespace TinymoeDotNet
 
     public class TinymoeFunction : TinymoeObject
     {
-        public Action<TinymoeObject[]> Handler { get; private set; }
+        public Func<TinymoeObject[], TinymoeContinuation> Handler { get; private set; }
 
-        public TinymoeFunction(Action<TinymoeObject[]> value)
+        public TinymoeFunction(Func<TinymoeObject[], TinymoeContinuation> value)
         {
             this.Handler = value;
         }
@@ -176,9 +178,17 @@ namespace TinymoeDotNet
         {
         }
 
-        public static void Invoke(TinymoeObject function, TinymoeObject[] arguments)
+        public static void RunContinuation(TinymoeContinuation continuation)
         {
-            ((TinymoeFunction)function).Handler(arguments);
+            while (continuation != null)
+            {
+                continuation = continuation();
+            }
+        }
+
+        public static TinymoeContinuation Invoke(TinymoeObject function, TinymoeObject[] arguments)
+        {
+            return ((TinymoeFunction)function).Handler(arguments);
         }
 
         public static void SetExtension(Type type, string name, TinymoeObject value)
@@ -232,7 +242,7 @@ namespace TinymoeDotNet
             return new TinymoeFunction(__args__ =>
             {
                 var result = function(__args__.Skip(1).Take(__args__.Length - 2).ToArray());
-                Invoke(__args__[2], new TinymoeObject[] { __args__[0], result });
+                return () => Invoke(__args__[2], new TinymoeObject[] { __args__[0], result });
             });
         }
 
@@ -454,7 +464,7 @@ namespace TinymoeDotNet
                     .Select((v, i) => FromTinymoe(v, function.GetParameters()[i].ParameterType))
                     .ToArray();
                 var result = function.Invoke(null, arguments);
-                Invoke(__args__.Last(), new TinymoeObject[] { __args__[0], ToTinymoe(result) });
+                return () => Invoke(__args__.Last(), new TinymoeObject[] { __args__[0], ToTinymoe(result) });
             });
         }
 

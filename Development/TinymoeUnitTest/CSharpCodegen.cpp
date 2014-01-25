@@ -157,7 +157,7 @@ string_t FunctionToValue(CSharpNameResolver& resolver, AstFunctionDeclaration* d
 }
 
 void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix);
-void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block);
+void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block, bool last);
 
 class CSharpExpressionCodegen :public AstExpressionVisitor
 {
@@ -334,7 +334,7 @@ public:
 			resolver.Scope(it->get(), scope);
 			o << prefix << T("\tTinymoeObject ") << resolver.Resolve(it->get()) << T(" = ") << argumentName << T("[") << it - node->arguments.begin() << T("];") << endl;
 		}
-		PrintStatement(node->statement, scope, resolver, o, prefix + T("\t"), true);
+		PrintStatement(node->statement, scope, resolver, o, prefix + T("\t"), true, true);
 		o << endl << prefix << T("})");
 	}
 };
@@ -458,15 +458,17 @@ class CSharpStatementCodegen :public AstStatementVisitor
 public:
 	CSharpNameResolver&		resolver;
 	ostream_t&				o;
-	string_t					prefix;
+	string_t				prefix;
 	bool					block;
+	bool					last;
 	AstDeclaration*			scope;
 
-	CSharpStatementCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix, bool _block, AstDeclaration* _scope)
+	CSharpStatementCodegen(CSharpNameResolver& _resolver, ostream_t& _o, string_t _prefix, bool _block, bool _last, AstDeclaration* _scope)
 		:resolver(_resolver)
 		, o(_o)
 		, prefix(_prefix)
 		, block(_block)
+		, last(_last)
 		, scope(_scope)
 	{
 	}
@@ -477,8 +479,9 @@ public:
 		{
 			for (auto it = node->statements.begin(); it != node->statements.end(); it++)
 			{
-				PrintStatement(*it, scope, resolver, o, prefix, false);
-				if (it + 1 != node->statements.end())
+				bool lastStatement = it + 1 == node->statements.end();
+				PrintStatement(*it, scope, resolver, o, prefix, false, lastStatement && last);
+				if (!lastStatement)
 				{
 					o << endl;
 				}
@@ -487,9 +490,10 @@ public:
 		else
 		{
 			o << prefix << T("{") << endl;
-			for (auto stat : node->statements)
+			for (auto it = node->statements.begin(); it != node->statements.end(); it++)
 			{
-				PrintStatement(stat, scope, resolver, o, prefix + T("\t"), false);
+				bool lastStatement = it + 1 == node->statements.end();
+				PrintStatement(*it, scope, resolver, o, prefix + T("\t"), false, lastStatement && last);
 				o << endl;
 			}
 			o << prefix << T("}");
@@ -499,6 +503,10 @@ public:
 	void Visit(AstExpressionStatement* node)
 	{
 		o << prefix;
+		if (last)
+		{
+			o << "return () => ";
+		}
 		PrintExpression(node->expression, scope, resolver, o, prefix);
 		o << T(";");
 	}
@@ -526,7 +534,7 @@ public:
 			PrintExpression(current->condition, scope, resolver, o, prefix);
 			o << T(")).Value)") << endl;
 			o << prefix << T("{") << endl;
-			PrintStatement(current->trueBranch, scope, resolver, o, prefix + T("\t"), true);
+			PrintStatement(current->trueBranch, scope, resolver, o, prefix + T("\t"), true, last);
 			o << endl << prefix << T("}");
 
 			auto nextCurrent = dynamic_cast<AstIfStatement*>(current->falseBranch.get());
@@ -539,7 +547,7 @@ public:
 		{
 			o << endl << prefix << T("else") << endl;
 			o << prefix << T("{") << endl;
-			PrintStatement(current->falseBranch, scope, resolver, o, prefix + T("\t"), true);
+			PrintStatement(current->falseBranch, scope, resolver, o, prefix + T("\t"), true, last);
 			o << endl << prefix << T("}");
 		}
 	}
@@ -551,9 +559,9 @@ void PrintExpression(AstExpression::Ptr expression, AstDeclaration* scope, CShar
 	expression->Accept(&codegen);
 }
 
-void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block)
+void PrintStatement(AstStatement::Ptr statement, AstDeclaration* scope, CSharpNameResolver& resolver, ostream_t& o, string_t prefix, bool block, bool last)
 {
-	CSharpStatementCodegen codegen(resolver, o, prefix, block, scope);
+	CSharpStatementCodegen codegen(resolver, o, prefix, block, last, scope);
 	statement->Accept(&codegen);
 }
 
@@ -601,7 +609,7 @@ public:
 
 	void Visit(AstFunctionDeclaration* node)override
 	{
-		o << prefix << T("public void ") << FunctionToTypedName(resolver, node) << T("(");
+		o << prefix << T("public TinymoeContinuation ") << FunctionToTypedName(resolver, node) << T("(");
 		for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
 		{
 			resolver.Scope(it->get(), node);
@@ -616,7 +624,7 @@ public:
 			}
 		}
 		o << prefix << T("{") << endl;
-		PrintStatement(node->statement, node, resolver, o, prefix + T("\t"), true);
+		PrintStatement(node->statement, node, resolver, o, prefix + T("\t"), true, true);
 		o << endl;
 		o << prefix << T("}") << endl << endl;
 	}
@@ -711,12 +719,13 @@ void GenerateCSharpCode(AstAssembly::Ptr assembly, ostream_t& o)
 		o << T("\t\t\tvar program = new TinymoeProgram();") << endl;
 		o << T("\t\t\tvar continuation = new TinymoeFunction((TinymoeObject[] arguments) =>") << endl;
 		o << T("\t\t\t{") << endl;
+		o << T("\t\t\t\treturn null;") << endl;
 		o << T("\t\t\t});") << endl;
 		o << T("\t\t\tvar trap = new TinymoeProgram.standard_library__continuation_trap();") << endl;
 		o << T("\t\t\ttrap.SetField(\"continuation\", continuation);") << endl;
 		o << T("\t\t\tvar state = new TinymoeProgram.standard_library__continuation_state();") << endl;
 		o << T("\t\t\tstate.SetField(\"trap\", trap);") << endl;
-		o << T("\t\t\tprogram.") << mainName << T("(state, continuation);") << endl;
+		o << T("\t\t\tRunContinuation(() => program.") << mainName << T("(state, continuation));") << endl;
 		o << T("\t\t}") << endl;
 	}
 	o << T("\t}") << endl;
