@@ -287,7 +287,8 @@ namespace tinymoe
 					{
 						if (auto symbol = function->bodyName->CreateSymbol())
 						{
-							symbolFunction->arguments.insert(make_pair(symbol, function->bodyName));
+							symbolFunction->arguments.push_back(symbol);
+							symbolFunction->argumentFragments.insert(make_pair(symbol, function->bodyName));
 						}
 					}
 
@@ -295,7 +296,8 @@ namespace tinymoe
 					{
 						if (auto symbol = fragment->CreateSymbol())
 						{
-							symbolFunction->arguments.insert(make_pair(symbol, fragment));
+							symbolFunction->arguments.push_back(symbol);
+							symbolFunction->argumentFragments.insert(make_pair(symbol, fragment));
 						}
 					}
 				}
@@ -915,7 +917,7 @@ namespace tinymoe
 				auto funcdecl = dynamic_pointer_cast<FunctionDeclaration>(dfp.first);
 				auto func = dfp.second;
 				func->resultVariable = stack->resultSymbol;
-				for (auto sfp : func->arguments)
+				for (auto sfp : func->argumentFragments)
 				{
 					if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(sfp.second))
 					{
@@ -966,10 +968,10 @@ namespace tinymoe
 						}
 					}
 
-					for (auto argument : func->arguments)
+					for (auto argument : func->argumentFragments)
 					{
 						item->symbols.push_back(argument.first);
-						symbolTokens.insert(make_pair(argument.first, func->arguments.find(argument.first)->second->keywordToken));
+						symbolTokens.insert(make_pair(argument.first, func->argumentFragments.find(argument.first)->second->keywordToken));
 					}
 					stack->Push(item);
 

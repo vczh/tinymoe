@@ -613,7 +613,8 @@ namespace tinymoe
 
 				for (auto arg : func->arguments)
 				{
-					if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(arg.second))
+					auto argFragment = func->argumentFragments.find(arg)->second;
+					if (auto var = dynamic_pointer_cast<VariableArgumentFragment>(argFragment))
 					{
 						if (var->type == FunctionArgumentType::Argument)
 						{
@@ -621,26 +622,26 @@ namespace tinymoe
 						}
 						else if (var->type == FunctionArgumentType::Assignable)
 						{
-							context.createdVariables.push_back(arg.first);
-							scope->readAsts.insert(make_pair(arg.first, *itdecl++));
-							scope->writeAsts.insert(make_pair(arg.first, *itdecl++));
+							context.createdVariables.push_back(arg);
+							scope->readAsts.insert(make_pair(arg, *itdecl++));
+							scope->writeAsts.insert(make_pair(arg, *itdecl++));
 							continue;
 						}
 						else if (var->type == FunctionArgumentType::Expression)
 						{
-							context.createdVariables.push_back(arg.first);
-							scope->readAsts.insert(make_pair(arg.first, *itdecl++));
-							scope->writeAsts.insert(make_pair(arg.first, nullptr));
+							context.createdVariables.push_back(arg);
+							scope->readAsts.insert(make_pair(arg, *itdecl++));
+							scope->writeAsts.insert(make_pair(arg, nullptr));
 							continue;
 						}
 					}
-					context.createdVariables.push_back(arg.first);
-					scope->readAsts.insert(make_pair(arg.first, *itdecl++));
+					context.createdVariables.push_back(arg);
+					scope->readAsts.insert(make_pair(arg, *itdecl++));
 
-					if (auto func = dynamic_pointer_cast<FunctionArgumentFragment>(arg.second))
+					if (auto func = dynamic_pointer_cast<FunctionArgumentFragment>(argFragment))
 					{
 						auto ast = dynamic_pointer_cast<AstFunctionDeclaration>(func->declaration->GenerateAst(module));
-						scope->functionPrototypes.insert(make_pair(arg.first, ast));
+						scope->functionPrototypes.insert(make_pair(arg, ast));
 					}
 				}
 
