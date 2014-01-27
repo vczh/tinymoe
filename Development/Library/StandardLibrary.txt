@@ -470,6 +470,10 @@ sentence substract (value) from (assignable variable)
 	set variable to variable - value
 end
 
+phrase array of (list items)
+	set the result to items
+end
+
 -------------------------------------------------------------------------------
 --	Operators
 -------------------------------------------------------------------------------

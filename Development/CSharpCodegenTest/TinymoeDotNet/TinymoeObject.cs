@@ -227,12 +227,12 @@ namespace TinymoeDotNet
 
         public static TinymoeObject ArrayGet(TinymoeObject array, TinymoeObject index)
         {
-            return ((TinymoeArray)array).Elements[CastToInteger(index).Value];
+            return ((TinymoeArray)array).Elements[CastToInteger(index).Value - 1];
         }
 
         public static void ArraySet(TinymoeObject array, TinymoeObject index, TinymoeObject value)
         {
-            ((TinymoeArray)array).Elements[CastToInteger(index).Value] = value;
+            ((TinymoeArray)array).Elements[CastToInteger(index).Value - 1] = value;
         }
 
         private static readonly Dictionary<string, TinymoeObject> externalFunctions = new Dictionary<string, TinymoeObject>();
@@ -510,7 +510,7 @@ namespace TinymoeDotNet
             return (TinymoeBoolean)a;
         }
 
-        private static TinymoeObject CastToNumber(TinymoeObject a)
+        public static TinymoeObject CastToNumber(TinymoeObject a)
         {
             if (a is TinymoeInteger || a is TinymoeFloat)
             {
@@ -531,7 +531,7 @@ namespace TinymoeDotNet
             }
         }
 
-        private static TinymoeInteger CastToInteger(TinymoeObject a)
+        public static TinymoeInteger CastToInteger(TinymoeObject a)
         {
             if (a is TinymoeInteger)
             {
@@ -547,7 +547,7 @@ namespace TinymoeDotNet
             }
         }
 
-        private static TinymoeFloat CastToFloat(TinymoeObject a)
+        public static TinymoeFloat CastToFloat(TinymoeObject a)
         {
             if (a is TinymoeInteger)
             {
@@ -563,7 +563,7 @@ namespace TinymoeDotNet
             }
         }
 
-        private static TinymoeString CastToString(TinymoeObject a)
+        public static TinymoeString CastToString(TinymoeObject a)
         {
             if (a == null)
             {

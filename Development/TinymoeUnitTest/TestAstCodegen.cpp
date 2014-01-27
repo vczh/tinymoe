@@ -325,6 +325,27 @@ phrase main
 		assert (1 + 1) should be 2
 	end
 
+	test case "Predefined array functions should work"
+		set numbers to new array of 10 items
+		repeat with i from 1 to length of array numbers
+			set item i of array numbers to i
+		end
+
+		set sum to 0
+		repeat with i from 1 to length of array numbers
+			add item i of array numbers to sum
+		end
+		assert sum should be 55
+
+		set the numbers to array of (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+		set sum to 0
+		repeat with i in numbers
+			add i to sum
+		end
+		assert sum should be 55
+	end
+
 	test case "Break should stop the repeating (1)"
 		set sum to 0
 		repeat with i from 1 to 10
