@@ -320,9 +320,14 @@ sentence assert fail
 	raise "AssertionFailure"
 end
 
+phrase pi
+	set the result to 3.14
+end
+
 phrase main
 	test case "1+1=2"
 		assert (1 + 1) should be 2
+		assert pi should be 3.14
 	end
 
 	test case "Predefined array functions should work"
