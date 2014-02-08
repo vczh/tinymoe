@@ -1,95 +1,131 @@
-#ifndef VCZH_TINYMOESTATEMENTANALYZER
-#define VCZH_TINYMOESTATEMENTANALYZER
+#ifndef VCZH_COMPILER_TINYMOESTATEMENTANALYZER
+#define VCZH_COMPILER_TINYMOESTATEMENTANALYZER
 
 #include "TinymoeDeclarationAnalyzer.h"
 #include "TinymoeExpressionAnalyzer.h"
 
 namespace tinymoe
 {
-	/*************************************************************
-	Statement
-	*************************************************************/
-
-	class Statement : public CodeFragment
+	namespace ast
 	{
-	public:
-		typedef shared_ptr<Statement>								Ptr;
-		typedef vector<Ptr>											List;
-		typedef map<GrammarSymbol::Ptr, Expression::Ptr>			SymbolExpressionMap;
+		class AstNode;
+		class AstDeclaration;
+		class AstSymbolDeclaration;
+		class AstStatement;
+		class AstExpression;
+	}
 
-		GrammarSymbol::Ptr				statementSymbol;
-		InvokeExpression::Ptr			statementExpression;
-		SymbolExpressionMap				newVariables;
-		SymbolExpressionMap				blockArguments;
-		Statement::List					statements;
-		bool							connectToPreviousBlock = false;
-	};
-
-	/*************************************************************
-	Symbol
-	*************************************************************/
-
-	class SymbolFunction
+	namespace compiler
 	{
-	public:
-		typedef shared_ptr<SymbolFunction>							Ptr;
-		typedef weak_ptr<SymbolFunction>							WeakPtr;
-		typedef vector<Ptr>											List;
-		typedef map<GrammarSymbol::Ptr, FunctionFragment::Ptr>		SymbolFragmentMap;
+		class SymbolModule;
+		class SymbolAstScope;
+		struct SymbolAstContext;
+		struct SymbolAstResult;
 
-		FunctionDeclaration::Ptr		function;					// the original function
-		SymbolFunction::WeakPtr			multipleDispatchingRoot;	// the multiple-dispatching root declaration
-		SymbolFragmentMap				arguments;					// all arguments
+		/*************************************************************
+		Statement
+		*************************************************************/
 
-		GrammarSymbol::Ptr				resultVariable;				// "the result"
-		GrammarSymbol::Ptr				cpsStateVariable;
-		GrammarSymbol::Ptr				cpsContinuationVariable;
-		GrammarSymbol::Ptr				categorySignalVariable;
+		class Statement : public CodeFragment
+		{
+		public:
+			typedef shared_ptr<Statement>								Ptr;
+			typedef weak_ptr<Statement>									WeakPtr;
+			typedef vector<Ptr>											List;
+			typedef map<GrammarSymbol::Ptr, Expression::Ptr>			SymbolExpressionMap;
 
-		Statement::Ptr					statement;					// the function body
-	};
+			CodeToken						keywordToken;
+			Statement::WeakPtr				parentStatement;
+			GrammarSymbol::Ptr				statementSymbol;
+			InvokeExpression::Ptr			statementExpression;
+			SymbolExpressionMap				newVariables;
+			SymbolExpressionMap				blockArguments;
+			Statement::List					statements;
+			bool							connectToPreviousBlock = false;
 
-	class SymbolModule
-	{
-	public:
-		typedef shared_ptr<SymbolModule>							Ptr;
-		typedef vector<Ptr>											List;
-		typedef weak_ptr<SymbolModule>								WeakPtr;
-		typedef vector<WeakPtr>										WeakList;
-		typedef map<GrammarSymbol::Ptr, Declaration::Ptr>			SymbolDeclarationMap;
-		typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
+			static SymbolAstResult			GenerateExitAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state);
+			static void						GenerateAssignableArgumentPairAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<Expression> assignable, vector<shared_ptr<ast::AstSymbolDeclaration>>::iterator& itvar, shared_ptr<ast::AstExpression>& reader, shared_ptr<ast::AstExpression>& writer);
+			static void						GenerateExpressionArgumentAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, shared_ptr<Expression> expression, shared_ptr<ast::AstExpression>& reader);
+			void							CreateNewVariableDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, vector<shared_ptr<ast::AstSymbolDeclaration>>& newVariableDecls, SymbolAstResult& statResult);
+			void							CreateBlockArgumentDeclarations(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal, vector<shared_ptr<ast::AstSymbolDeclaration>>& blockArgumentDecls);
+			SymbolAstResult					GeneratePredefinedAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal);
+			SymbolAstResult					GenerateAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> signal);
+			SymbolAstResult					GenerateBodyAst(shared_ptr<SymbolAstScope> scope, SymbolAstContext& context, shared_ptr<ast::AstDeclaration> state, shared_ptr<ast::AstDeclaration> continuation);
+		};
 
-		struct ParsingFailedException{};
+		/*************************************************************
+		Symbol
+		*************************************************************/
 
-		CodeFile::Ptr					codeFile;					// the original code file
-		Module::Ptr						module;						// the original module
-		WeakList						usingSymbolModules;			// all referenced modules
-		SymbolDeclarationMap			symbolDeclarations;			// map a grammar symbol to the creator declaration
-		DeclarationFunctionMap			declarationFunctions;		// map a declaration to the symbol function
+		class SymbolFunction
+		{
+		public:
+			typedef shared_ptr<SymbolFunction>							Ptr;
+			typedef weak_ptr<SymbolFunction>							WeakPtr;
+			typedef vector<Ptr>											List;
+			typedef map<GrammarSymbol::Ptr, FunctionFragment::Ptr>		SymbolFragmentMap;
+			typedef map<FunctionFragment::Ptr, GrammarSymbol::Ptr>		FragmentSymbolMap;
 
-		bool							IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b);
-		bool							IsMultipleDispatchingChild(FunctionDeclaration::Ptr func);
-		void							CheckOverloading(SymbolModule* modulea, GrammarSymbol::Ptr symbola, Declaration::Ptr decla, SymbolModule* moduleb, GrammarSymbol::Ptr symbolb, Declaration::Ptr declb, bool foreignCheck, CodeError::List& errors);
-		void							BuildSymbols(CodeError::List& errors);									// sync step: build all declaration symbols
-		void							BuildFunctions(CodeError::List& errors);								// sync step: build all symbol functions
-		void							BuildFunctionLinkings(CodeError::List& errors);							// sync step: link all multiple-dispatching functions to it's parent
+			FunctionDeclaration::Ptr		function;					// the original function
+			SymbolFunction::WeakPtr			multipleDispatchingRoot;	// the multiple-dispatching root declaration
+			GrammarSymbol::List				arguments;					// all arguments
+			SymbolFragmentMap				argumentFragments;			// map an argument symbol to it's fragment
+			FragmentSymbolMap				argumentTypes;				// map an argument to its receiving type
 
-		void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
-		void							BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token);
-		FunctionDeclaration::Ptr		FindSymbolFunction(GrammarSymbol::Ptr symbol);
-		Statement::Ptr					ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
-		void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
-	};
+			GrammarSymbol::Ptr				resultVariable;
+			GrammarSymbol::Ptr				cpsStateVariable;
+			GrammarSymbol::Ptr				cpsContinuationVariable;
+			GrammarSymbol::Ptr				categorySignalVariable;
 
-	class SymbolAssembly
-	{
-	public:
-		typedef shared_ptr<SymbolAssembly>		Ptr;
+			Statement::Ptr					statement;					// the function body
+		};
 
-		SymbolModule::List				symbolModules;
+		class SymbolModule
+		{
+		public:
+			typedef shared_ptr<SymbolModule>							Ptr;
+			typedef vector<Ptr>											List;
+			typedef weak_ptr<SymbolModule>								WeakPtr;
+			typedef vector<WeakPtr>										WeakList;
+			typedef map<GrammarSymbol::Ptr, Declaration::Ptr>			SymbolDeclarationMap;
+			typedef map<Declaration::Ptr, SymbolFunction::Ptr>			DeclarationFunctionMap;
+			typedef map<Declaration::Ptr, GrammarSymbol::Ptr>			DeclarationSymbolMap;
 
-		static SymbolAssembly::Ptr		Parse(vector<string>& codes, CodeError::List& errors);
-	};
+			struct ParsingFailedException{};
+
+			CodeFile::Ptr					codeFile;					// the original code file
+			Module::Ptr						module;						// the original module
+			WeakList						usingSymbolModules;			// all referenced modules
+			SymbolDeclarationMap			symbolDeclarations;			// map a grammar symbol to the creator declaration
+			DeclarationFunctionMap			declarationFunctions;		// map a declaration to the symbol function
+			DeclarationSymbolMap			baseTypes;					// map a type to its base type
+
+			bool							IsOverloading(GrammarSymbol::Ptr a, GrammarSymbol::Ptr b);
+			bool							IsMultipleDispatchingChild(FunctionDeclaration::Ptr func);
+			void							CheckOverloading(SymbolModule* modulea, GrammarSymbol::Ptr symbola, Declaration::Ptr decla, SymbolModule* moduleb, GrammarSymbol::Ptr symbolb, Declaration::Ptr declb, bool foreignCheck, CodeError::List& errors);
+			void							BuildSymbols(CodeError::List& errors);									// sync step: build all declaration symbols
+			void							BuildFunctions(CodeError::List& errors);								// sync step: build all symbol functions
+			void							BuildFunctionLinkings(CodeError::List& errors);							// sync step: link all multiple-dispatching functions to it's parent
+
+			void							FindOverridedSymbols(GrammarStack::Ptr stack, GrammarStackItem::Ptr item, GrammarSymbol::List& symbols);
+			void							BuildNameSymbol(vector<CodeToken>& tokens, GrammarSymbol::Ptr& symbol, CodeToken& token);
+			FunctionDeclaration::Ptr		FindSymbolFunction(GrammarSymbol::Ptr symbol, GrammarSymbolType acceptableType);
+			Statement::Ptr					ParseBlock(CodeFile::Ptr codeFile, GrammarStack::Ptr stack, Statement::Ptr statement, int& lineIndex, int endLineIndex, CodeError::List& errors);
+			GrammarSymbol::Ptr				FindType(SymbolName::Ptr name, GrammarStack::Ptr stack, CodeError::List& errors);
+			Declaration::Ptr				FindDeclaration(GrammarSymbol::Ptr symbol);
+			void							BuildStatements(GrammarStack::Ptr stack, CodeError::List& errors);		// sync step: parse all statements
+		};
+
+		class SymbolAssembly
+		{
+		public:
+			typedef shared_ptr<SymbolAssembly>		Ptr;
+
+			SymbolModule::List				symbolModules;
+
+			static SymbolAssembly::Ptr		Parse(vector<string_t>& codes, CodeError::List& errors);
+		};
+	}
 }
 
 #endif

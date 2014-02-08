@@ -1,0 +1,69 @@
+block (sentence body) do
+	try
+		body
+		print "Succeed!"
+	catch the exception
+		print the exception
+	end
+end
+
+phrase main
+	do
+		set a to 1
+		set b to 0
+		set c to a / b
+	end
+end
+
+============================================
+
+function do($state, body, $continuation)
+{
+	try(
+		$state,
+		function ($state, $continuation_1)
+		{
+			body(
+				$state,
+				function ($state)
+				{
+					print_$expression(
+						$state,
+						"Succeed!",
+						$continuation_1
+					);
+				}
+			);
+		},
+		function ($state, $signal)
+		{
+			catch_$expression(
+				$state,
+				$signal,
+				function ($state, $signal, the_exception, $continuation_2)
+				{
+					print_$expression(
+						$state,
+						the_exception,
+						$continuation_2
+					);
+				},
+				$continuation
+			);
+		}
+	);
+}
+
+function main($state, $continuation)
+{
+	do(
+		$state,
+		function ($state)
+		{
+			var a = 1;
+			var b = 0;
+			var c = a / b;
+		},
+		$continuation
+	);
+}

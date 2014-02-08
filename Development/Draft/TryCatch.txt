@@ -1,0 +1,41 @@
+phrase main
+	try
+		set a to 1
+		set b to 0
+		set c = a / b
+	catch the exception
+		print the exception
+	end
+end
+
+============================================
+
+function main($state, $continuation)
+{
+	try(
+		$state,
+		function ($state, $continuation_1)
+		{
+			var a = 1;
+			var b = 0;
+			var c = a / b;
+			$continuation_1($state);
+		},
+		function ($state, $signal)
+		{
+			catch_$expression(
+				$state,
+				$signal,
+				function ($state, $signal, the_exception, $continuation_2)
+				{
+					print_$expression(
+						$state,
+						the_exception,
+						$$continuation_2
+					);
+				},
+				$continuation
+			);
+		}
+	);
+}

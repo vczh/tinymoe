@@ -1,0 +1,42 @@
+cps (state)
+block (body) repeat : repeat statement
+	call invoke body with (state)
+	select field flag of state
+		case breaking repeating
+			reset continuation state state to null
+		case continuing repeating
+			reset continuation state state to null
+			tail call invoke repeat statement with (state, body)
+	end
+end
+
+============================================
+
+function repeat($state, body, $continuation)
+{
+	body(
+		$state,
+		function ($state)
+		{
+			if($state.flag == breaking_repeating)
+			{
+				reset_continuation_state_$expression_to_$expression(
+					&state,
+					null,
+					$continuation
+				);
+			}
+			else if($state.flag == continuing_repeating)
+			{
+				reset_continuation_state_$expression_to_$expression(
+					&state,
+					null,
+					function ($state)
+					{
+						repeat($state, body, $continuation);
+					}
+				);
+			}
+		}
+	);
+}
