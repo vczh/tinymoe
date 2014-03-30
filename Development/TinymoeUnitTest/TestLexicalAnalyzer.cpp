@@ -148,7 +148,7 @@ end and or not
 TEST_CASE(TestLexerString)
 {
 	string_t code = T(R"tinymoe(
-"First line\r\nSecond line"
+"First line\r\nSecond \"line\""
 "Unfinished line
 "Unfinished escaping\
 "Third line\r\nFourth line"
@@ -159,7 +159,7 @@ TEST_CASE(TestLexerString)
 
 	FIRST_LINE(2);
 		FIRST_TOKEN(1);
-		TOKEN(2, 2, T("First line\r\nSecond line"), CodeTokenType::String);
+		TOKEN(2, 2, T("First line\r\nSecond \"line\""), CodeTokenType::String);
 		LAST_TOKEN;
 	NEXT_LINE;
 		FIRST_TOKEN(1);
