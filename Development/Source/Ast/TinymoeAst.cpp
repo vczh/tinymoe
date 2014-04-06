@@ -16,13 +16,6 @@ namespace tinymoe
 		{
 		}
 
-		void AstNode::SetParent(AstNode::WeakPtr _parent)
-		{
-			ASSERT(parent.expired());
-			parent = _parent;
-			SetParentInternal();
-		}
-
 		/*************************************************************
 		Visitor
 		*************************************************************/
