@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Ast\TinymoeAst.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_CollectSideEffectExpressions.cpp" />
     <ClCompile Include="..\Source\Ast\TinymoeAst_CollectUsedVariables.cpp" />
     <ClCompile Include="..\Source\Ast\TinymoeAst_ExpandBlock.cpp" />
     <ClCompile Include="..\Source\Ast\TinymoeAst_GetRootLeftValue.cpp" />

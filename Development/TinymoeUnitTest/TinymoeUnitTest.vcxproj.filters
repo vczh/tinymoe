@@ -99,6 +99,9 @@
     <ClCompile Include="..\Source\Ast\TinymoeAst_ExpandBlock.cpp">
       <Filter>Tinymoe\Ast</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_CollectSideEffectExpressions.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">

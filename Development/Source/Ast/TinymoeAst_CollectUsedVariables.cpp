@@ -8,129 +8,172 @@ namespace tinymoe
 		AstExpression::CollectUsedVariables
 		*************************************************************/
 
-		void AstLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		class AstExpression_CollectUsedVariables : public AstExpressionVisitor
 		{
-		}
-
-		void AstIntegerExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstFloatExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstStringExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstExternalSymbolExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstReferenceExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			if (rightValue)
+		private:
+			bool								rightValue;
+			set<shared_ptr<AstDeclaration>>&	defined;
+			set<shared_ptr<AstDeclaration>>&	used;
+		public:
+			AstExpression_CollectUsedVariables(bool _rightValue, set<shared_ptr<AstDeclaration>>& _defined, set<shared_ptr<AstDeclaration>>& _used)
+				:rightValue(_rightValue), defined(_defined), used(_used)
 			{
-				used.insert(reference.lock());
-			}
-		}
 
-		void AstNewTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			for (auto field : fields)
+			}
+
+			void Visit(AstLiteralExpression* node)override
 			{
-				field->CollectUsedVariables(true, defined, used);
 			}
-		}
 
-		void AstTestTypeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstNewArrayExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			length->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstNewArrayLiteralExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			for (auto element : elements)
+			void Visit(AstIntegerExpression* node)override
 			{
-				element->CollectUsedVariables(true, defined, used);
 			}
-		}
 
-		void AstArrayLengthExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstArrayAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->CollectUsedVariables(rightValue, defined, used);
-			index->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstFieldAccessExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			if (rightValue)
+			void Visit(AstFloatExpression* node)override
 			{
-				target->CollectUsedVariables(true, defined, used);
 			}
-		}
 
-		void AstInvokeExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			function->CollectUsedVariables(true, defined, used);
-			for (auto argument : arguments)
+			void Visit(AstStringExpression* node)override
 			{
-				argument->CollectUsedVariables(true, defined, used);
 			}
-		}
 
-		void AstLambdaExpression::CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			statement->CollectUsedVariables(defined, used);
-		}
+			void Visit(AstExternalSymbolExpression* node)override
+			{
+			}
+
+			void Visit(AstReferenceExpression* node)override
+			{
+				if (rightValue)
+				{
+					used.insert(node->reference.lock());
+				}
+			}
+
+			void Visit(AstNewTypeExpression* node)override
+			{
+				for (auto field : node->fields)
+				{
+					CollectUsedVariables(field, true, defined, used);
+				}
+			}
+
+			void Visit(AstTestTypeExpression* node)override
+			{
+				CollectUsedVariables(node->target, true, defined, used);
+			}
+
+			void Visit(AstNewArrayExpression* node)override
+			{
+				CollectUsedVariables(node->length, true, defined, used);
+			}
+
+			void Visit(AstNewArrayLiteralExpression* node)override
+			{
+				for (auto element : node->elements)
+				{
+					CollectUsedVariables(element, true, defined, used);
+				}
+			}
+
+			void Visit(AstArrayLengthExpression* node)override
+			{
+				CollectUsedVariables(node->target, true, defined, used);
+			}
+
+			void Visit(AstArrayAccessExpression* node)override
+			{
+				CollectUsedVariables(node->target, rightValue, defined, used);
+				CollectUsedVariables(node->index, true, defined, used);
+			}
+
+			void Visit(AstFieldAccessExpression* node)override
+			{
+				if (rightValue)
+				{
+					CollectUsedVariables(node->target, true, defined, used);
+				}
+			}
+
+			void Visit(AstInvokeExpression* node)override
+			{
+				CollectUsedVariables(node->function, true, defined, used);
+				for (auto argument : node->arguments)
+				{
+					CollectUsedVariables(argument, true, defined, used);
+				}
+			}
+
+			void Visit(AstLambdaExpression* node)override
+			{
+				CollectUsedVariables(node->statement, defined, used);
+			}
+		};
 
 		/*************************************************************
 		AstStatement::CollectUsedVariables
 		*************************************************************/
 
-		void AstBlockStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		class AstStatement_CollectUsedVariables : public AstStatementVisitor
 		{
-			for (auto stat : statements)
+		private:
+			set<shared_ptr<AstDeclaration>>&	defined;
+			set<shared_ptr<AstDeclaration>>&	used;
+		public:
+			AstStatement_CollectUsedVariables(set<shared_ptr<AstDeclaration>>& _defined, set<shared_ptr<AstDeclaration>>& _used)
+				:defined(_defined), used(_used)
 			{
-				stat->CollectUsedVariables(defined, used);
+
 			}
-		}
 
-		void AstExpressionStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			expression->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstDeclarationStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			defined.insert(declaration);
-		}
-
-		void AstAssignmentStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->CollectUsedVariables(false, defined, used);
-			value->CollectUsedVariables(true, defined, used);
-		}
-
-		void AstIfStatement::CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			condition->CollectUsedVariables(true, defined, used);
-			trueBranch->CollectUsedVariables(defined, used);
-			if (falseBranch)
+			void Visit(AstBlockStatement* node)override
 			{
-				falseBranch->CollectUsedVariables(defined, used);
+				for (auto stat : node->statements)
+				{
+					CollectUsedVariables(stat, defined, used);
+				}
 			}
+
+			void Visit(AstExpressionStatement* node)override
+			{
+				CollectUsedVariables(node->expression, true, defined, used);
+			}
+
+			void Visit(AstDeclarationStatement* node)override
+			{
+				defined.insert(node->declaration);
+			}
+
+			void Visit(AstAssignmentStatement* node)override
+			{
+				CollectUsedVariables(node->target, false, defined, used);
+				CollectUsedVariables(node->value, true, defined, used);
+			}
+
+			void Visit(AstIfStatement* node)override
+			{
+				CollectUsedVariables(node->condition, true, defined, used);
+				CollectUsedVariables(node->trueBranch, defined, used);
+				if (node->falseBranch)
+				{
+					CollectUsedVariables(node->falseBranch, defined, used);
+				}
+			}
+		};
+
+		/*************************************************************
+		CollectUsedVariables
+		*************************************************************/
+
+		void CollectUsedVariables(AstExpression::Ptr node, bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		{
+			AstExpression_CollectUsedVariables visitor(rightValue, defined, used);
+			node->Accept(&visitor);
+		}
+
+		void CollectUsedVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		{
+			AstStatement_CollectUsedVariables visitor(defined, used);
+			node->Accept(&visitor);
 		}
 	}
 }
