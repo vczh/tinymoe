@@ -222,7 +222,7 @@ namespace tinymoe
 
 			{
 				AstExpression::List exprs;
-				expression->CollectSideEffectExpressions(exprs);
+				CollectSideEffectExpressions(expression, exprs);
 				if (exprs.size() == 0)
 				{
 					replacement = make_shared<AstBlockStatement>();

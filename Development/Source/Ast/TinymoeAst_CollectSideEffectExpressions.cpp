@@ -8,79 +8,101 @@ namespace tinymoe
 		AstExpression::CollectSideEffectExpressions
 		*************************************************************/
 
-		void AstLiteralExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
+		class AstExpression_CollectSideEffectExpressions : public AstExpressionVisitor
 		{
-		}
+		private:
+			AstExpression::List&			exprs;
 
-		void AstIntegerExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-		}
-
-		void AstFloatExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-		}
-
-		void AstStringExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-		}
-
-		void AstExternalSymbolExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-		}
-
-		void AstReferenceExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-		}
-
-		void AstNewTypeExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			for (auto field : fields)
+		public:
+			AstExpression_CollectSideEffectExpressions(AstExpression::List& _exprs)
+				:exprs(_exprs)
 			{
-				field->CollectSideEffectExpressions(exprs);
 			}
-		}
 
-		void AstTestTypeExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			target->CollectSideEffectExpressions(exprs);
-		}
-
-		void AstNewArrayExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			length->CollectSideEffectExpressions(exprs);
-		}
-
-		void AstNewArrayLiteralExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			for (auto element : elements)
+			void Visit(AstLiteralExpression* node)override
 			{
-				element->CollectSideEffectExpressions(exprs);
 			}
-		}
 
-		void AstArrayLengthExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			target->CollectSideEffectExpressions(exprs);
-		}
+			void Visit(AstIntegerExpression* node)override
+			{
+			}
 
-		void AstArrayAccessExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			target->CollectSideEffectExpressions(exprs);
-			index->CollectSideEffectExpressions(exprs);
-		}
+			void Visit(AstFloatExpression* node)override
+			{
+			}
 
-		void AstFieldAccessExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			target->CollectSideEffectExpressions(exprs);
-		}
+			void Visit(AstStringExpression* node)override
+			{
+			}
 
-		void AstInvokeExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
-		{
-			exprs.push_back(dynamic_pointer_cast<AstExpression>(shared_from_this()));
-		}
+			void Visit(AstExternalSymbolExpression* node)override
+			{
+			}
 
-		void AstLambdaExpression::CollectSideEffectExpressions(AstExpression::List& exprs)
+			void Visit(AstReferenceExpression* node)override
+			{
+			}
+
+			void Visit(AstNewTypeExpression* node)override
+			{
+				for (auto field : node->fields)
+				{
+					CollectSideEffectExpressions(field, exprs);
+				}
+			}
+
+			void Visit(AstTestTypeExpression* node)override
+			{
+				CollectSideEffectExpressions(node->target, exprs);
+			}
+
+			void Visit(AstNewArrayExpression* node)override
+			{
+				CollectSideEffectExpressions(node->length, exprs);
+			}
+
+			void Visit(AstNewArrayLiteralExpression* node)override
+			{
+				for (auto element : node->elements)
+				{
+					CollectSideEffectExpressions(element, exprs);
+				}
+			}
+
+			void Visit(AstArrayLengthExpression* node)override
+			{
+				CollectSideEffectExpressions(node->target, exprs);
+			}
+
+			void Visit(AstArrayAccessExpression* node)override
+			{
+				CollectSideEffectExpressions(node->target, exprs);
+				CollectSideEffectExpressions(node->index, exprs);
+			}
+
+			void Visit(AstFieldAccessExpression* node)override
+			{
+				CollectSideEffectExpressions(node->target, exprs);
+			}
+
+			void Visit(AstInvokeExpression* node)override
+			{
+				exprs.push_back(dynamic_pointer_cast<AstExpression>(node->shared_from_this()));
+			}
+
+			void Visit(AstLambdaExpression* node)override
+			{
+			}
+		};
+
+		/*************************************************************
+		AstExpression::CollectSideEffectExpressions
+		*************************************************************/
+
+		void CollectSideEffectExpressions(AstExpression::Ptr node, AstExpression::List& exprs)
 		{
+			AstExpression_CollectSideEffectExpressions visitor(exprs);
+			node->Accept(&visitor);
 		}
 	}
 }

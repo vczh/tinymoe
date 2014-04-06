@@ -119,8 +119,8 @@ namespace tinymoe
 			if (defined.find(leftValue) != defined.end() && used.find(leftValue) == used.end())
 			{
 				AstExpression::List exprs;
-				target->CollectSideEffectExpressions(exprs);
-				value->CollectSideEffectExpressions(exprs);
+				CollectSideEffectExpressions(target, exprs);
+				CollectSideEffectExpressions(value, exprs);
 
 				auto block = make_shared<AstBlockStatement>();
 				for (auto expr : exprs)
