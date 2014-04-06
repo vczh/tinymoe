@@ -115,7 +115,7 @@ namespace tinymoe
 
 		void AstAssignmentStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
-			auto leftValue = target->GetRootLeftValue();
+			auto leftValue = GetRootLeftValue(target);
 			if (defined.find(leftValue) != defined.end() && used.find(leftValue) == used.end())
 			{
 				AstExpression::List exprs;

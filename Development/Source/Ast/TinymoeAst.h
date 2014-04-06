@@ -58,7 +58,6 @@ namespace tinymoe
 			virtual void							Accept(AstExpressionVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize(AstExpression::Ptr& replacement) = 0;
 			virtual void							RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used) = 0;
-			virtual shared_ptr<AstDeclaration>		GetRootLeftValue();
 		};
 
 		class AstStatement : public AstNode
@@ -205,7 +204,6 @@ namespace tinymoe
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		};
 
 		class AstNewTypeExpression : public AstExpression
@@ -269,7 +267,6 @@ namespace tinymoe
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		};
 
 		class AstFieldAccessExpression : public AstExpression
@@ -281,7 +278,6 @@ namespace tinymoe
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
-			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -492,13 +488,14 @@ namespace tinymoe
 		Helper Functions
 		*************************************************************/
 		
-		extern void				SetParent(AstNode::Ptr node, AstNode::WeakPtr _parent = AstNode::WeakPtr());
-		extern void				Print(AstNode::Ptr node, ostream_t& o, int indentation, AstNode::WeakPtr _parent = AstNode::WeakPtr());
+		extern void						SetParent(AstNode::Ptr node, AstNode::WeakPtr _parent = AstNode::WeakPtr());
+		extern void						Print(AstNode::Ptr node, ostream_t& o, int indentation, AstNode::WeakPtr _parent = AstNode::WeakPtr());
 
-		extern void				CollectSideEffectExpressions(AstExpression::Ptr node, AstExpression::List& exprs);
-		extern void				CollectUsedVariables(AstExpression::Ptr node, bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
-		extern void				CollectUsedVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
-		extern void				ExpandBlock(AstStatement::Ptr node, AstStatement::List& stats, bool lastStatement);
+		extern void						CollectSideEffectExpressions(AstExpression::Ptr node, AstExpression::List& exprs);
+		extern void						CollectUsedVariables(AstExpression::Ptr node, bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
+		extern void						CollectUsedVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
+		extern void						ExpandBlock(AstStatement::Ptr node, AstStatement::List& stats, bool lastStatement);
+		extern AstDeclaration::Ptr		GetRootLeftValue(AstExpression::Ptr node);
 	}
 }
 
