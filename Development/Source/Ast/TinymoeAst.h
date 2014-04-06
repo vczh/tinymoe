@@ -56,7 +56,6 @@ namespace tinymoe
 			
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstExpressionVisitor* visitor) = 0;
-			virtual void							RoughlyOptimize(AstExpression::Ptr& replacement) = 0;
 		};
 
 		class AstStatement : public AstNode
@@ -68,7 +67,6 @@ namespace tinymoe
 			
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstStatementVisitor* visitor) = 0;
-			virtual void							RoughlyOptimize(AstStatement::Ptr& replacement) = 0;
 		};
 
 		class AstDeclaration : public AstNode
@@ -82,7 +80,6 @@ namespace tinymoe
 			
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstDeclarationVisitor* visitor) = 0;
-			virtual void							RoughlyOptimize();
 		};
 
 		/*************************************************************
@@ -128,7 +125,6 @@ namespace tinymoe
 			AstSymbolDeclaration::Ptr				continuationArgument;		// for function
 			
 			void									Accept(AstDeclarationVisitor* visitor)override;
-			void									RoughlyOptimize()override;
 		};
 
 		/*************************************************************
@@ -148,7 +144,6 @@ namespace tinymoe
 			AstLiteralName							literalName;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstIntegerExpression : public AstExpression
@@ -157,7 +152,6 @@ namespace tinymoe
 			int64_t									value;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstFloatExpression : public AstExpression
@@ -166,7 +160,6 @@ namespace tinymoe
 			double									value;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstStringExpression : public AstExpression
@@ -175,7 +168,6 @@ namespace tinymoe
 			string_t								value;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstExternalSymbolExpression : public AstExpression
@@ -184,7 +176,6 @@ namespace tinymoe
 			string_t								name;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstReferenceExpression : public AstExpression
@@ -195,7 +186,6 @@ namespace tinymoe
 																		//     AstFunctionDeclaration
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstNewTypeExpression : public AstExpression
@@ -205,7 +195,6 @@ namespace tinymoe
 			AstExpression::List						fields;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstTestTypeExpression : public AstExpression
@@ -215,7 +204,6 @@ namespace tinymoe
 			AstType::Ptr							type;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstNewArrayExpression : public AstExpression
@@ -224,7 +212,6 @@ namespace tinymoe
 			AstExpression::Ptr						length;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstNewArrayLiteralExpression : public AstExpression
@@ -233,7 +220,6 @@ namespace tinymoe
 			AstExpression::List						elements;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstArrayLengthExpression : public AstExpression
@@ -242,7 +228,6 @@ namespace tinymoe
 			AstExpression::Ptr						target;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstArrayAccessExpression : public AstExpression
@@ -252,7 +237,6 @@ namespace tinymoe
 			AstExpression::Ptr						index;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstFieldAccessExpression : public AstExpression
@@ -262,7 +246,6 @@ namespace tinymoe
 			string_t								composedFieldName;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -272,7 +255,6 @@ namespace tinymoe
 			AstExpression::List						arguments;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		class AstLambdaExpression : public AstExpression
@@ -282,7 +264,6 @@ namespace tinymoe
 			AstStatement::Ptr						statement;
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
-			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
 		};
 
 		/*************************************************************
@@ -295,7 +276,6 @@ namespace tinymoe
 			AstStatement::List						statements;
 			
 			void									Accept(AstStatementVisitor* visitor)override;
-			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
 		};
 
 		class AstExpressionStatement : public AstStatement
@@ -304,7 +284,6 @@ namespace tinymoe
 			AstExpression::Ptr						expression;
 			
 			void									Accept(AstStatementVisitor* visitor)override;
-			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
 		};
 
 		class AstDeclarationStatement : public AstStatement
@@ -313,7 +292,6 @@ namespace tinymoe
 			AstDeclaration::Ptr						declaration;
 			
 			void									Accept(AstStatementVisitor* visitor)override;
-			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
 		};
 
 		class AstAssignmentStatement : public AstStatement
@@ -326,7 +304,6 @@ namespace tinymoe
 			AstExpression::Ptr						value;
 			
 			void									Accept(AstStatementVisitor* visitor)override;
-			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
 		};
 
 		
@@ -338,7 +315,6 @@ namespace tinymoe
 			AstStatement::Ptr						falseBranch;		// (optional)
 			
 			void									Accept(AstStatementVisitor* visitor)override;
-			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
 		};
 
 		/*************************************************************
@@ -385,7 +361,6 @@ namespace tinymoe
 			AstDeclaration::List					declarations;
 			
 			void									Accept(AstVisitor* visitor)override;
-			void									RoughlyOptimize();
 		};
 
 		/*************************************************************
@@ -476,6 +451,11 @@ namespace tinymoe
 		extern AstDeclaration::Ptr		GetRootLeftValue(AstExpression::Ptr node);
 		extern void						RemoveUnnecessaryVariables(AstExpression::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
 		extern void						RemoveUnnecessaryVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement);
+		
+		extern void						RoughlyOptimize(AstDeclaration::Ptr node);
+		extern void						RoughlyOptimize(AstExpression::Ptr node, AstExpression::Ptr& _replacement);
+		extern void						RoughlyOptimize(AstStatement::Ptr node, AstStatement::Ptr& _replacement);
+		extern void						RoughlyOptimize(AstAssembly::Ptr node);
 	}
 }
 

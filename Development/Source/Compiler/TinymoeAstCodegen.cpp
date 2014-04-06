@@ -682,7 +682,7 @@ namespace tinymoe
 				}
 			}
 
-			assembly->RoughlyOptimize();
+			RoughlyOptimize(assembly);
 			SetParent(assembly);
 			return assembly;
 		}
