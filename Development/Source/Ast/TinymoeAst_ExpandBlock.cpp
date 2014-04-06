@@ -8,44 +8,68 @@ namespace tinymoe
 		AstStatement::ExpandBlock
 		*************************************************************/
 
-		void AstBlockStatement::ExpandBlock(AstStatement::List& stats, bool lastStatement)
+		class AstStatement_ExpandBlock : public AstStatementVisitor
 		{
-			if (!lastStatement)
+		private:
+			AstStatement::List&			stats;
+			bool						lastStatement;
+
+		public:
+			AstStatement_ExpandBlock(AstStatement::List& _stats, bool _lastStatement)
+				:stats(_stats), lastStatement(_lastStatement)
 			{
-				for (auto stat : statements)
+
+			}
+
+			void Visit(AstBlockStatement* node)override
+			{
+				if (!lastStatement)
 				{
-					if (dynamic_pointer_cast<AstDeclarationStatement>(stat))
+					for (auto stat : node->statements)
 					{
-						stats.push_back(dynamic_pointer_cast<AstStatement>(shared_from_this()));
-						return;
+						if (dynamic_pointer_cast<AstDeclarationStatement>(stat))
+						{
+							stats.push_back(dynamic_pointer_cast<AstStatement>(node->shared_from_this()));
+							return;
+						}
 					}
 				}
+
+				for (auto stat : node->statements)
+				{
+					ExpandBlock(stat, stats, stat == *(node->statements.end() - 1));
+				}
 			}
-			
-			for (auto stat : statements)
+
+			void Visit(AstExpressionStatement* node)override
 			{
-				stat->ExpandBlock(stats, stat == *(statements.end() - 1));
+				stats.push_back(dynamic_pointer_cast<AstStatement>(node->shared_from_this()));
 			}
-		}
 
-		void AstExpressionStatement::ExpandBlock(AstStatement::List& stats, bool lastStatement)
-		{
-			stats.push_back(dynamic_pointer_cast<AstStatement>(shared_from_this()));
-		}
+			void Visit(AstDeclarationStatement* node)override
+			{
+				stats.push_back(dynamic_pointer_cast<AstStatement>(node->shared_from_this()));
+			}
 
-		void AstDeclarationStatement::ExpandBlock(AstStatement::List& stats, bool lastStatement)
-		{
-			stats.push_back(dynamic_pointer_cast<AstStatement>(shared_from_this()));
-		}
+			void Visit(AstAssignmentStatement* node)override
+			{
+				stats.push_back(dynamic_pointer_cast<AstStatement>(node->shared_from_this()));
+			}
 
-		void AstAssignmentStatement::ExpandBlock(AstStatement::List& stats, bool lastStatement)
-		{
-			stats.push_back(dynamic_pointer_cast<AstStatement>(shared_from_this()));
-		}
+			void Visit(AstIfStatement* node)override
+			{
+				stats.push_back(dynamic_pointer_cast<AstStatement>(node->shared_from_this()));
+			}
+		};
 
-		void AstIfStatement::ExpandBlock(AstStatement::List& stats, bool lastStatement)
+		/*************************************************************
+		ExpandBlock
+		*************************************************************/
+
+		void ExpandBlock(AstStatement::Ptr node, AstStatement::List& stats, bool lastStatement)
 		{
-			stats.push_back(dynamic_pointer_cast<AstStatement>(shared_from_this()));
+			AstStatement_ExpandBlock visitor(stats, lastStatement);
+			node->Accept(&visitor);
 		}
 	}
 }

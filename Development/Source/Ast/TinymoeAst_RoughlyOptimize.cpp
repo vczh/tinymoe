@@ -182,7 +182,7 @@ namespace tinymoe
 			AstStatement::List stats;
 			for (auto stat : statements)
 			{
-				stat->ExpandBlock(stats, stat == *(statements.end() - 1));
+				ExpandBlock(stat, stats, stat == *(statements.end() - 1));
 			}
 			statements = std::move(stats);
 		}

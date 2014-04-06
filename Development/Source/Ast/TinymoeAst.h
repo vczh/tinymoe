@@ -71,7 +71,6 @@ namespace tinymoe
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstStatementVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize(AstStatement::Ptr& replacement) = 0;
-			virtual void							ExpandBlock(AstStatement::List& stats, bool lastStatement) = 0;
 			virtual void							RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement) = 0;
 		};
 
@@ -318,7 +317,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
@@ -329,7 +327,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
@@ -340,7 +337,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
@@ -355,7 +351,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
@@ -369,7 +364,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									ExpandBlock(AstStatement::List& stats, bool lastStatement)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
@@ -504,6 +498,7 @@ namespace tinymoe
 		extern void				CollectSideEffectExpressions(AstExpression::Ptr node, AstExpression::List& exprs);
 		extern void				CollectUsedVariables(AstExpression::Ptr node, bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
 		extern void				CollectUsedVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
+		extern void				ExpandBlock(AstStatement::Ptr node, AstStatement::List& stats, bool lastStatement);
 	}
 }
 
