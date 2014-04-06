@@ -16,22 +16,6 @@ namespace tinymoe
 		{
 		}
 
-		string_t AstNode::Indent(int indentation)
-		{
-			string_t s;
-			for (int i = 0; i < indentation; i++)
-			{
-				s += T("    ");
-			}
-			return s;
-		}
-
-		void AstNode::Print(ostream_t& o, int indentation, AstNode::WeakPtr _parent)
-		{
-			ASSERT(_parent.expired() || parent.lock() == _parent.lock());
-			PrintInternal(o, indentation);
-		}
-
 		void AstNode::SetParent(AstNode::WeakPtr _parent)
 		{
 			ASSERT(parent.expired());
@@ -42,6 +26,14 @@ namespace tinymoe
 		/*************************************************************
 		Visitor
 		*************************************************************/
+
+		AstVisitor::AstVisitor()
+		{
+		}
+
+		AstVisitor::~AstVisitor()
+		{
+		}
 
 		AstTypeVisitor::AstTypeVisitor()
 		{
@@ -73,6 +65,35 @@ namespace tinymoe
 
 		AstDeclarationVisitor::~AstDeclarationVisitor()
 		{
+		}
+
+		/*************************************************************
+		Node
+		*************************************************************/
+
+		void AstType::Accept(AstVisitor* visitor)
+		{
+			visitor->Visit(this);
+		}
+
+		void AstExpression::Accept(AstVisitor* visitor)
+		{
+			visitor->Visit(this);
+		}
+
+		void AstStatement::Accept(AstVisitor* visitor)
+		{
+			visitor->Visit(this);
+		}
+
+		void AstDeclaration::Accept(AstVisitor* visitor)
+		{
+			visitor->Visit(this);
+		}
+
+		void AstAssembly::Accept(AstVisitor* visitor)
+		{
+			visitor->Visit(this);
 		}
 
 		/*************************************************************

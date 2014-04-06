@@ -20,7 +20,7 @@ void CodeGen(vector<string_t>& codes, string_t name)
 	auto ast = GenerateAst(assembly);
 	{
 		stringstream_t o;
-		ast->Print(o, 0);
+		Print(ast, o, 0);
 		WriteAnsiFile(T("../CSharpCodegenTest/") + name + T("/GeneratedAst.txt"), o);
 	}
 	{

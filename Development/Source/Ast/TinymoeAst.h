@@ -16,12 +16,13 @@ namespace tinymoe
 		class AstStatement;
 		class AstDeclaration;
 
+		class AstVisitor;
 		class AstTypeVisitor;
 		class AstExpressionVisitor;
 		class AstStatementVisitor;
 		class AstDeclarationVisitor;
 
-		class AstNode : protected enable_shared_from_this<AstNode>
+		class AstNode : public enable_shared_from_this<AstNode>
 		{
 		public:
 			typedef shared_ptr<AstNode>				Ptr;
@@ -31,12 +32,10 @@ namespace tinymoe
 
 			AstNode();
 			virtual ~AstNode();
-
-			string_t								Indent(int indentation);
-			void									Print(ostream_t& o, int indentation, AstNode::WeakPtr _parent = AstNode::WeakPtr());
+			
+			virtual void							Accept(AstVisitor* visitor) = 0;
 			void									SetParent(AstNode::WeakPtr _parent = AstNode::WeakPtr());
 		protected:
-			virtual void							PrintInternal(ostream_t& o, int indentation) = 0;
 			virtual void							SetParentInternal() = 0;
 		};
 
@@ -47,6 +46,7 @@ namespace tinymoe
 			typedef weak_ptr<AstType>				WeakPtr;
 			typedef vector<Ptr>						List;
 
+			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstTypeVisitor* visitor) = 0;
 		};
 
@@ -57,6 +57,7 @@ namespace tinymoe
 			typedef weak_ptr<AstExpression>			WeakPtr;
 			typedef vector<Ptr>						List;
 			
+			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstExpressionVisitor* visitor) = 0;
 			virtual void							CollectSideEffectExpressions(AstExpression::List& exprs) = 0;
 			virtual void							RoughlyOptimize(AstExpression::Ptr& replacement) = 0;
@@ -72,6 +73,7 @@ namespace tinymoe
 			typedef weak_ptr<AstStatement>			WeakPtr;
 			typedef vector<Ptr>						List;
 			
+			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstStatementVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize(AstStatement::Ptr& replacement) = 0;
 			virtual void							ExpandBlock(AstStatement::List& stats, bool lastStatement) = 0;
@@ -88,6 +90,7 @@ namespace tinymoe
 
 			string_t								composedName;
 			
+			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstDeclarationVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize();
 		};
@@ -104,7 +107,6 @@ namespace tinymoe
 			
 			void									Accept(AstDeclarationVisitor* visitor)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -118,7 +120,6 @@ namespace tinymoe
 			
 			void									Accept(AstDeclarationVisitor* visitor)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -142,7 +143,6 @@ namespace tinymoe
 			
 			void									Accept(AstDeclarationVisitor* visitor)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 			void									RoughlyOptimize()override;
 		};
@@ -169,7 +169,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -184,7 +183,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -199,7 +197,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -214,7 +211,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -229,7 +225,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -247,7 +242,6 @@ namespace tinymoe
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -263,7 +257,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -279,7 +272,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -294,7 +286,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -309,7 +300,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -324,7 +314,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -341,7 +330,6 @@ namespace tinymoe
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -358,7 +346,6 @@ namespace tinymoe
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			shared_ptr<AstDeclaration>				GetRootLeftValue()override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -374,7 +361,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -390,7 +376,6 @@ namespace tinymoe
 			void									CollectUsedVariables(bool rightValue, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -409,7 +394,6 @@ namespace tinymoe
 			void									CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -424,7 +408,6 @@ namespace tinymoe
 			void									CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -439,7 +422,6 @@ namespace tinymoe
 			void									CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -458,7 +440,6 @@ namespace tinymoe
 			void									CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -476,7 +457,6 @@ namespace tinymoe
 			void									CollectUsedVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -503,7 +483,6 @@ namespace tinymoe
 			
 			void									Accept(AstTypeVisitor* visitor)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -514,7 +493,6 @@ namespace tinymoe
 			
 			void									Accept(AstTypeVisitor* visitor)override;
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
@@ -529,15 +507,28 @@ namespace tinymoe
 
 			AstDeclaration::List					declarations;
 			
+			void									Accept(AstVisitor* visitor)override;
 			void									RoughlyOptimize();
 		protected:
-			void									PrintInternal(ostream_t& o, int indentation)override;
 			void									SetParentInternal()override;
 		};
 
 		/*************************************************************
 		Visitors
 		*************************************************************/
+
+		class AstVisitor
+		{
+		public:
+			AstVisitor();
+			virtual ~AstVisitor();
+			
+			virtual void							Visit(AstType* node) = 0;
+			virtual void							Visit(AstExpression* node) = 0;
+			virtual void							Visit(AstStatement* node) = 0;
+			virtual void							Visit(AstDeclaration* node) = 0;
+			virtual void							Visit(AstAssembly* node) = 0;
+		};
 
 		class AstTypeVisitor
 		{
@@ -595,6 +586,12 @@ namespace tinymoe
 			virtual void							Visit(AstTypeDeclaration* node) = 0;
 			virtual void							Visit(AstFunctionDeclaration* node) = 0;
 		};
+
+		/*************************************************************
+		Helper Functions
+		*************************************************************/
+
+		extern void				Print(AstNode::Ptr node, ostream_t& o, int indentation, AstNode::WeakPtr _parent = AstNode::WeakPtr());
 	}
 }
 

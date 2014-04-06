@@ -1,299 +1,407 @@
 #include "TinymoeAst.h"
 
+// find:	void (\w+)::PrintInternal\(ostream_t& o, int indentation\)
+// replace:	void Visit($1* node)override
+
 namespace tinymoe
 {
 	namespace ast
 	{
+		string_t Indent(int indentation)
+		{
+			string_t s;
+			for (int i = 0; i < indentation; i++)
+			{
+				s += T("    ");
+			}
+			return s;
+		}
+
 		/*************************************************************
 		AstDeclaration::Print
 		*************************************************************/
 
-		void AstSymbolDeclaration::PrintInternal(ostream_t& o, int indentation)
+		class AstDeclaration_Print : public AstDeclarationVisitor
 		{
-			o << Indent(indentation) << T("$symbol ") << composedName << T(";");
-		}
+		private:
+			ostream_t&			o;
+			int					indentation;
+		public:
+			AstDeclaration_Print(ostream_t& _o, int _indentation)
+				:o(_o), indentation(_indentation)
+			{
+			}
 
-		void AstTypeDeclaration::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << Indent(indentation) << T("$type ") << composedName;
-			if (!baseType.expired())
+			void Visit(AstSymbolDeclaration* node)override
 			{
-				o << T(" : ");
-				baseType.lock()->Print(o, indentation);
+				o << Indent(indentation) << T("$symbol ") << node->composedName << T(";");
 			}
-			o << endl << Indent(indentation) << T("{") << endl;
-			for (auto field : fields)
-			{
-				field->Print(o, indentation + 1, shared_from_this());
-				o << endl;
-			}
-			o << Indent(indentation) << T("}");
-		}
 
-		void AstFunctionDeclaration::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << Indent(indentation) << T("$procedure ");
-			if (ownerType)
+			void Visit(AstTypeDeclaration* node)override
 			{
-				o << T("(");
-				ownerType->Print(o, indentation, shared_from_this());
-				o << T(").");
-			}
-			o << composedName << T("(");
-			for (auto it = arguments.begin(); it != arguments.end(); it++)
-			{
-				o << (*it)->composedName;
-				if (it + 1 != arguments.end())
+				o << Indent(indentation) << T("$type ") << node->composedName;
+				if (!node->baseType.expired())
 				{
-					o << T(", ");
+					o << T(" : ");
+					Print(node->baseType.lock(), o, indentation);
 				}
+				o << endl << Indent(indentation) << T("{") << endl;
+				for (auto field : node->fields)
+				{
+					Print(field, o, indentation + 1, node->shared_from_this());
+					o << endl;
+				}
+				o << Indent(indentation) << T("}");
 			}
 
-			o << T(")") << endl;
-			statement->Print(o, indentation, shared_from_this());
-		}
+			void Visit(AstFunctionDeclaration* node)override
+			{
+				o << Indent(indentation) << T("$procedure ");
+				if (node->ownerType)
+				{
+					o << T("(");
+					Print(node->ownerType, o, indentation, node->shared_from_this());
+					o << T(").");
+				}
+				o << node->composedName << T("(");
+				for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
+				{
+					o << (*it)->composedName;
+					if (it + 1 != node->arguments.end())
+					{
+						o << T(", ");
+					}
+				}
+
+				o << T(")") << endl;
+				Print(node->statement, o, indentation, node->shared_from_this());
+			}
+		};
 
 		/*************************************************************
 		AstExpression::Print
 		*************************************************************/
 
-		void AstLiteralExpression::PrintInternal(ostream_t& o, int indentation)
+		class AstExpression_Print : public AstExpressionVisitor
 		{
-			switch (literalName)
+		private:
+			ostream_t&			o;
+			int					indentation;
+		public:
+			AstExpression_Print(ostream_t& _o, int _indentation)
+				:o(_o), indentation(_indentation)
 			{
-			case AstLiteralName::Null:
-				o << T("$null");
-				break;
-			case AstLiteralName::True:
-				o << T("$true");
-				break;
-			case AstLiteralName::False:
-				o << T("$false");
-				break;
 			}
-		}
 
-		void AstIntegerExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << value;
-		}
-
-		void AstFloatExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << value;
-		}
-
-		void AstStringExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("\"") << value << T("\"");
-		}
-
-		void AstExternalSymbolExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("$external (\"") << name << T("\")");
-		}
-
-		void AstReferenceExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << reference.lock()->composedName;
-		}
-
-		void AstNewTypeExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("new ");
-			type->Print(o, indentation, shared_from_this());
-			o << T("(");
-			for (auto it = fields.begin(); it != fields.end(); it++)
+			void Visit(AstLiteralExpression* node)override
 			{
-				(*it)->Print(o, indentation, shared_from_this());
-				if (it + 1 != fields.end())
+				switch (node->literalName)
 				{
-					o << T(", ");
+				case AstLiteralName::Null:
+					o << T("$null");
+					break;
+				case AstLiteralName::True:
+					o << T("$true");
+					break;
+				case AstLiteralName::False:
+					o << T("$false");
+					break;
 				}
 			}
-			o << T(")");
-		}
 
-		void AstTestTypeExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("(");
-			target->Print(o, indentation, shared_from_this());
-			o << T(" is ");
-			type->Print(o, indentation, shared_from_this());
-			o << T(")");
-		}
-
-		void AstNewArrayExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("new $Array(");
-			length->Print(o, indentation, shared_from_this());
-			o << T(")");
-		}
-
-		void AstNewArrayLiteralExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("[");
-			for (auto it = elements.begin(); it != elements.end(); it++)
+			void Visit(AstIntegerExpression* node)override
 			{
-				(*it)->Print(o, indentation, shared_from_this());
-				if (it + 1 != elements.end())
-				{
-					o << T(", ");
-				}
+				o << node->value;
 			}
-			o << T("]");
-		}
 
-		void AstArrayLengthExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("$ArrayLength(");
-			target->Print(o, indentation, shared_from_this());
-			o << T(")");
-		}
-
-		void AstArrayAccessExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			target->Print(o, indentation, shared_from_this());
-			o << T("[");
-			index->Print(o, indentation, shared_from_this());
-			o << T("]");
-		}
-
-		void AstFieldAccessExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			target->Print(o, indentation, shared_from_this());
-			o << T(".") << composedFieldName;
-		}
-
-		void AstInvokeExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			function->Print(o, indentation, shared_from_this());
-			o << T("(") << endl;
-			for (auto it = arguments.begin(); it != arguments.end(); it++)
+			void Visit(AstFloatExpression* node)override
 			{
-				o << Indent(indentation + 1);
-				(*it)->Print(o, indentation + 1, shared_from_this());
-				if (it + 1 != arguments.end())
-				{
-					o << T(", ");
-				}
-				o << endl;
+				o << node->value;
 			}
-			o << Indent(indentation + 1) << T(")");
-		}
 
-		void AstLambdaExpression::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << T("$lambda (");
-			for (auto it = arguments.begin(); it != arguments.end(); it++)
+			void Visit(AstStringExpression* node)override
 			{
-				o << (*it)->composedName;
-				if (it + 1 != arguments.end())
-				{
-					o << T(", ");
-				}
+				o << T("\"") << node->value << T("\"");
 			}
-			o << T(")") << endl;
-			statement->Print(o, indentation + 1, shared_from_this());
-		}
+
+			void Visit(AstExternalSymbolExpression* node)override
+			{
+				o << T("$external (\"") << node->name << T("\")");
+			}
+
+			void Visit(AstReferenceExpression* node)override
+			{
+				o << node->reference.lock()->composedName;
+			}
+
+			void Visit(AstNewTypeExpression* node)override
+			{
+				o << T("new ");
+				Print(node->type, o, indentation, node->shared_from_this());
+				o << T("(");
+				for (auto it = node->fields.begin(); it != node->fields.end(); it++)
+				{
+					Print((*it), o, indentation, node->shared_from_this());
+					if (it + 1 != node->fields.end())
+					{
+						o << T(", ");
+					}
+				}
+				o << T(")");
+			}
+
+			void Visit(AstTestTypeExpression* node)override
+			{
+				o << T("(");
+				Print(node->target, o, indentation, node->shared_from_this());
+				o << T(" is ");
+				Print(node->type, o, indentation, node->shared_from_this());
+				o << T(")");
+			}
+
+			void Visit(AstNewArrayExpression* node)override
+			{
+				o << T("new $Array(");
+				Print(node->length, o, indentation, node->shared_from_this());
+				o << T(")");
+			}
+
+			void Visit(AstNewArrayLiteralExpression* node)override
+			{
+				o << T("[");
+				for (auto it = node->elements.begin(); it != node->elements.end(); it++)
+				{
+					Print((*it), o, indentation, node->shared_from_this());
+					if (it + 1 != node->elements.end())
+					{
+						o << T(", ");
+					}
+				}
+				o << T("]");
+			}
+
+			void Visit(AstArrayLengthExpression* node)override
+			{
+				o << T("$ArrayLength(");
+				Print(node->target, o, indentation, node->shared_from_this());
+				o << T(")");
+			}
+
+			void Visit(AstArrayAccessExpression* node)override
+			{
+				Print(node->target, o, indentation, node->shared_from_this());
+				o << T("[");
+				Print(node->index, o, indentation, node->shared_from_this());
+				o << T("]");
+			}
+
+			void Visit(AstFieldAccessExpression* node)override
+			{
+				Print(node->target, o, indentation, node->shared_from_this());
+				o << T(".") << node->composedFieldName;
+			}
+
+			void Visit(AstInvokeExpression* node)override
+			{
+				Print(node->function, o, indentation, node->shared_from_this());
+				o << T("(") << endl;
+				for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
+				{
+					o << Indent(indentation + 1);
+					Print((*it), o, indentation + 1, node->shared_from_this());
+					if (it + 1 != node->arguments.end())
+					{
+						o << T(", ");
+					}
+					o << endl;
+				}
+				o << Indent(indentation + 1) << T(")");
+			}
+
+			void Visit(AstLambdaExpression* node)override
+			{
+				o << T("$lambda (");
+				for (auto it = node->arguments.begin(); it != node->arguments.end(); it++)
+				{
+					o << (*it)->composedName;
+					if (it + 1 != node->arguments.end())
+					{
+						o << T(", ");
+					}
+				}
+				o << T(")") << endl;
+				Print(node->statement, o, indentation + 1, node->shared_from_this());
+			}
+		};
 
 		/*************************************************************
 		AstStatement::Print
 		*************************************************************/
 
-		void AstBlockStatement::PrintInternal(ostream_t& o, int indentation)
+		class AstStatement_Print : public AstStatementVisitor
 		{
-			o << Indent(indentation) << T("{") << endl;
-			for (auto statement : statements)
+		private:
+			ostream_t&			o;
+			int					indentation;
+		public:
+			AstStatement_Print(ostream_t& _o, int _indentation)
+				:o(_o), indentation(_indentation)
 			{
-				statement->Print(o, indentation + 1, shared_from_this());
+			}
+
+			void Visit(AstBlockStatement* node)override
+			{
+				o << Indent(indentation) << T("{") << endl;
+				for (auto statement : node->statements)
+				{
+					Print(statement, o, indentation + 1, node->shared_from_this());
+					o << endl;
+				}
+				o << Indent(indentation) << T("}");
+			}
+
+			void Visit(AstExpressionStatement* node)override
+			{
+				o << Indent(indentation);
+				Print(node->expression, o, indentation, node->shared_from_this());
+				o << T(";");
+			}
+
+			void Visit(AstDeclarationStatement* node)override
+			{
+				Print(node->declaration, o, indentation, node->shared_from_this());
+			}
+
+			void Visit(AstAssignmentStatement* node)override
+			{
+				o << Indent(indentation);
+				Print(node->target, o, indentation, node->shared_from_this());
+				o << T(" = ");
+				Print(node->value, o, indentation, node->shared_from_this());
+				o << T(";");
+			}
+
+			void Visit(AstIfStatement* node)override
+			{
+				o << Indent(indentation) << T("if (");
+				Print(node->condition, o, indentation, node->shared_from_this());
 				o << endl;
+				Print(node->trueBranch, o, indentation + 1, node->shared_from_this());
+				if (node->falseBranch)
+				{
+					o << endl << Indent(indentation) << T("else") << endl;
+					Print(node->falseBranch, o, indentation + 1, node->shared_from_this());
+				}
 			}
-			o << Indent(indentation) << T("}");
-		}
-
-		void AstExpressionStatement::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << Indent(indentation);
-			expression->Print(o, indentation, shared_from_this());
-			o << T(";");
-		}
-
-		void AstDeclarationStatement::PrintInternal(ostream_t& o, int indentation)
-		{
-			declaration->Print(o, indentation, shared_from_this());
-		}
-
-		void AstAssignmentStatement::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << Indent(indentation);
-			target->Print(o, indentation, shared_from_this());
-			o << T(" = ");
-			value->Print(o, indentation, shared_from_this());
-			o << T(";");
-		}
-
-		void AstIfStatement::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << Indent(indentation) << T("if (");
-			condition->Print(o, indentation, shared_from_this());
-			o << endl;
-			trueBranch->Print(o, indentation + 1, shared_from_this());
-			if (falseBranch)
-			{
-				o << endl << Indent(indentation) << T("else") << endl;
-				falseBranch->Print(o, indentation + 1, shared_from_this());
-			}
-		}
+		};
 
 		/*************************************************************
 		AstType::Print
 		*************************************************************/
 
-		void AstPredefinedType::PrintInternal(ostream_t& o, int indentation)
+		class AstType_Print : public AstTypeVisitor
 		{
-			switch (typeName)
+		private:
+			ostream_t&			o;
+			int					indentation;
+		public:
+			AstType_Print(ostream_t& _o, int _indentation)
+				:o(_o), indentation(_indentation)
 			{
-			case AstPredefinedTypeName::Object:
-				o << T("$Object");
-				break;
-			case AstPredefinedTypeName::Symbol:
-				o << T("$Symbol");
-				break;
-			case AstPredefinedTypeName::Array:
-				o << T("$Array");
-				break;
-			case AstPredefinedTypeName::Boolean:
-				o << T("$Boolean");
-				break;
-			case AstPredefinedTypeName::Integer:
-				o << T("$Integer");
-				break;
-			case AstPredefinedTypeName::Float:
-				o << T("$Float");
-				break;
-			case AstPredefinedTypeName::String:
-				o << T("$Function");
-				break;
 			}
-		}
 
-		void AstReferenceType::PrintInternal(ostream_t& o, int indentation)
-		{
-			o << typeDeclaration.lock()->composedName;
-		}
+			void Visit(AstPredefinedType* node)override
+			{
+				switch (node->typeName)
+				{
+				case AstPredefinedTypeName::Object:
+					o << T("$Object");
+					break;
+				case AstPredefinedTypeName::Symbol:
+					o << T("$Symbol");
+					break;
+				case AstPredefinedTypeName::Array:
+					o << T("$Array");
+					break;
+				case AstPredefinedTypeName::Boolean:
+					o << T("$Boolean");
+					break;
+				case AstPredefinedTypeName::Integer:
+					o << T("$Integer");
+					break;
+				case AstPredefinedTypeName::Float:
+					o << T("$Float");
+					break;
+				case AstPredefinedTypeName::String:
+					o << T("$Function");
+					break;
+				}
+			}
+
+			void Visit(AstReferenceType* node)override
+			{
+				o << node->typeDeclaration.lock()->composedName;
+			}
+		};
 
 		/*************************************************************
 		AstAssembly::Print
 		*************************************************************/
 
-		void AstAssembly::PrintInternal(ostream_t& o, int indentation)
+		class AstNode_Print : public AstVisitor
 		{
-			for (auto decl : declarations)
+		private:
+			ostream_t&			o;
+			int					indentation;
+		public:
+			AstNode_Print(ostream_t& _o, int _indentation)
+				:o(_o), indentation(_indentation)
 			{
-				decl->Print(o, indentation, shared_from_this());
-				o << endl << endl;
 			}
+			
+			void Visit(AstType* node)override
+			{
+				AstType_Print visitor(o, indentation);
+				node->Accept(&visitor);
+			}
+
+			void Visit(AstExpression* node)override
+			{
+				AstExpression_Print visitor(o, indentation);
+				node->Accept(&visitor);
+			}
+
+			void Visit(AstStatement* node)override
+			{
+				AstStatement_Print visitor(o, indentation);
+				node->Accept(&visitor);
+			}
+
+			void Visit(AstDeclaration* node)override
+			{
+				AstDeclaration_Print visitor(o, indentation);
+				node->Accept(&visitor);
+			}
+
+			void Visit(AstAssembly* node)override
+			{
+				for (auto decl : node->declarations)
+				{
+					Print(decl, o, indentation, node->shared_from_this());
+					o << endl << endl;
+				}
+			}
+		};
+
+		/*************************************************************
+		Print
+		*************************************************************/
+
+		void Print(AstNode::Ptr node, ostream_t& o, int indentation, AstNode::WeakPtr _parent)
+		{
+			ASSERT(_parent.expired() || node->parent.lock() == _parent.lock());
+			AstNode_Print visitor(o, indentation);
+			node->Accept(&visitor);
 		}
 	}
 }

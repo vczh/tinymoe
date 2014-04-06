@@ -497,7 +497,7 @@ namespace tinymoe
 						}
 						{
 							stringstream_t o;
-							ast->ownerType->Print(o, 0);
+							Print(ast->ownerType, o, 0);
 							signature += o.str();
 						}
 
