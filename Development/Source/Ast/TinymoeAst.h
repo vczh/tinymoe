@@ -57,7 +57,6 @@ namespace tinymoe
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstExpressionVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize(AstExpression::Ptr& replacement) = 0;
-			virtual void							RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used) = 0;
 		};
 
 		class AstStatement : public AstNode
@@ -70,7 +69,6 @@ namespace tinymoe
 			void									Accept(AstVisitor* visitor)override;
 			virtual void							Accept(AstStatementVisitor* visitor) = 0;
 			virtual void							RoughlyOptimize(AstStatement::Ptr& replacement) = 0;
-			virtual void							RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement) = 0;
 		};
 
 		class AstDeclaration : public AstNode
@@ -151,7 +149,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstIntegerExpression : public AstExpression
@@ -161,7 +158,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstFloatExpression : public AstExpression
@@ -171,7 +167,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstStringExpression : public AstExpression
@@ -181,7 +176,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstExternalSymbolExpression : public AstExpression
@@ -191,7 +185,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstReferenceExpression : public AstExpression
@@ -203,7 +196,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstNewTypeExpression : public AstExpression
@@ -214,7 +206,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstTestTypeExpression : public AstExpression
@@ -225,7 +216,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstNewArrayExpression : public AstExpression
@@ -235,7 +225,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstNewArrayLiteralExpression : public AstExpression
@@ -245,7 +234,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstArrayLengthExpression : public AstExpression
@@ -255,7 +243,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstArrayAccessExpression : public AstExpression
@@ -266,7 +253,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstFieldAccessExpression : public AstExpression
@@ -277,7 +263,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstInvokeExpression : public AstExpression
@@ -288,7 +273,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		class AstLambdaExpression : public AstExpression
@@ -299,7 +283,6 @@ namespace tinymoe
 			
 			void									Accept(AstExpressionVisitor* visitor)override;
 			void									RoughlyOptimize(AstExpression::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)override;
 		};
 
 		/*************************************************************
@@ -313,7 +296,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
 		class AstExpressionStatement : public AstStatement
@@ -323,7 +305,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
 		class AstDeclarationStatement : public AstStatement
@@ -333,7 +314,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
 		class AstAssignmentStatement : public AstStatement
@@ -347,7 +327,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
 		
@@ -360,7 +339,6 @@ namespace tinymoe
 			
 			void									Accept(AstStatementVisitor* visitor)override;
 			void									RoughlyOptimize(AstStatement::Ptr& replacement)override;
-			void									RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)override;
 		};
 
 		/*************************************************************
@@ -496,6 +474,8 @@ namespace tinymoe
 		extern void						CollectUsedVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
 		extern void						ExpandBlock(AstStatement::Ptr node, AstStatement::List& stats, bool lastStatement);
 		extern AstDeclaration::Ptr		GetRootLeftValue(AstExpression::Ptr node);
+		extern void						RemoveUnnecessaryVariables(AstExpression::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used);
+		extern void						RemoveUnnecessaryVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement);
 	}
 }
 

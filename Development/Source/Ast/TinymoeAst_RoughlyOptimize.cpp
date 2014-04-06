@@ -18,7 +18,7 @@ namespace tinymoe
 
 			set<AstDeclaration::Ptr> defined, used;
 			CollectUsedVariables(statement, defined, used);
-			statement->RemoveUnnecessaryVariables(defined, used, statement);
+			RemoveUnnecessaryVariables(statement, defined, used, statement);
 
 			statement->RoughlyOptimize(statement);
 		}

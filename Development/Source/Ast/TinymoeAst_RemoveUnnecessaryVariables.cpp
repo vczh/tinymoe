@@ -8,138 +8,179 @@ namespace tinymoe
 		AstExpression::RemoveUnnecessaryVariables
 		*************************************************************/
 
-		void AstLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		class AstExpression_RemoveUnnecessaryVariables : public AstExpressionVisitor
 		{
-		}
-
-		void AstIntegerExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstFloatExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstStringExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstExternalSymbolExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstReferenceExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-		}
-
-		void AstNewTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			for (auto field : fields)
+		private:
+			set<shared_ptr<AstDeclaration>>&	defined;
+			set<shared_ptr<AstDeclaration>>&	used;
+		public:
+			AstExpression_RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& _defined, set<shared_ptr<AstDeclaration>>& _used)
+				:defined(_defined), used(_used)
 			{
-				field->RemoveUnnecessaryVariables(defined, used);
 			}
-		}
 
-		void AstTestTypeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstNewArrayExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			length->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstNewArrayLiteralExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			for (auto element : elements)
+			void Visit(AstLiteralExpression* node)override
 			{
-				element->RemoveUnnecessaryVariables(defined, used);
 			}
-		}
 
-		void AstArrayLengthExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstArrayAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->RemoveUnnecessaryVariables(defined, used);
-			index->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstFieldAccessExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			target->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstInvokeExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			function->RemoveUnnecessaryVariables(defined, used);
-			for (auto argument : arguments)
+			void Visit(AstIntegerExpression* node)override
 			{
-				argument->RemoveUnnecessaryVariables(defined, used);
 			}
-		}
 
-		void AstLambdaExpression::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
-		{
-			statement->RemoveUnnecessaryVariables(defined, used, statement);
-		}
+			void Visit(AstFloatExpression* node)override
+			{
+			}
+
+			void Visit(AstStringExpression* node)override
+			{
+			}
+
+			void Visit(AstExternalSymbolExpression* node)override
+			{
+			}
+
+			void Visit(AstReferenceExpression* node)override
+			{
+			}
+
+			void Visit(AstNewTypeExpression* node)override
+			{
+				for (auto field : node->fields)
+				{
+					RemoveUnnecessaryVariables(field, defined, used);
+				}
+			}
+
+			void Visit(AstTestTypeExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->target, defined, used);
+			}
+
+			void Visit(AstNewArrayExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->length, defined, used);
+			}
+
+			void Visit(AstNewArrayLiteralExpression* node)override
+			{
+				for (auto element : node->elements)
+				{
+					RemoveUnnecessaryVariables(element, defined, used);
+				}
+			}
+
+			void Visit(AstArrayLengthExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->target, defined, used);
+			}
+
+			void Visit(AstArrayAccessExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->target, defined, used);
+				RemoveUnnecessaryVariables(node->index, defined, used);
+			}
+
+			void Visit(AstFieldAccessExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->target, defined, used);
+			}
+
+			void Visit(AstInvokeExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->function, defined, used);
+				for (auto argument : node->arguments)
+				{
+					RemoveUnnecessaryVariables(argument, defined, used);
+				}
+			}
+
+			void Visit(AstLambdaExpression* node)override
+			{
+				RemoveUnnecessaryVariables(node->statement, defined, used, node->statement);
+			}
+		};
 
 		/*************************************************************
 		AstStatement::RemoveUnnecessaryVariables
 		*************************************************************/
 
-		void AstBlockStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
+		class AstStatement_RemoveUnnecessaryVariables : public AstStatementVisitor
 		{
-			for (int i = statements.size() - 1; i >= 0; i--)
+		private:
+			set<shared_ptr<AstDeclaration>>&	defined;
+			set<shared_ptr<AstDeclaration>>&	used;
+			AstStatement::Ptr&					replacement;
+		public:
+			AstStatement_RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& _defined, set<shared_ptr<AstDeclaration>>& _used, AstStatement::Ptr& _replacement)
+				:defined(_defined), used(_used), replacement(_replacement)
 			{
-				statements[i]->RemoveUnnecessaryVariables(defined, used, statements[i]);
 			}
-		}
 
-		void AstExpressionStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
-		{
-			expression->RemoveUnnecessaryVariables(defined, used);
-		}
-
-		void AstDeclarationStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
-		{
-			if (defined.find(declaration) != defined.end() && used.find(declaration) == used.end())
+			void Visit(AstBlockStatement* node)override
 			{
-				replacement = make_shared<AstBlockStatement>();
-			}
-		}
-
-		void AstAssignmentStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
-		{
-			auto leftValue = GetRootLeftValue(target);
-			if (defined.find(leftValue) != defined.end() && used.find(leftValue) == used.end())
-			{
-				AstExpression::List exprs;
-				CollectSideEffectExpressions(target, exprs);
-				CollectSideEffectExpressions(value, exprs);
-
-				auto block = make_shared<AstBlockStatement>();
-				for (auto expr : exprs)
+				for (int i = node->statements.size() - 1; i >= 0; i--)
 				{
-					auto stat = make_shared<AstExpressionStatement>();
-					stat->expression = expr;
-					block->statements.push_back(stat);
+					RemoveUnnecessaryVariables(node->statements[i], defined, used, node->statements[i]);
 				}
-				replacement = block;
 			}
+
+			void Visit(AstExpressionStatement* node)override
+			{
+				RemoveUnnecessaryVariables(node->expression, defined, used);
+			}
+
+			void Visit(AstDeclarationStatement* node)override
+			{
+				if (defined.find(node->declaration) != defined.end() && used.find(node->declaration) == used.end())
+				{
+					replacement = make_shared<AstBlockStatement>();
+				}
+			}
+
+			void Visit(AstAssignmentStatement* node)override
+			{
+				auto leftValue = GetRootLeftValue(node->target);
+				if (defined.find(leftValue) != defined.end() && used.find(leftValue) == used.end())
+				{
+					AstExpression::List exprs;
+					CollectSideEffectExpressions(node->target, exprs);
+					CollectSideEffectExpressions(node->value, exprs);
+
+					auto block = make_shared<AstBlockStatement>();
+					for (auto expr : exprs)
+					{
+						auto stat = make_shared<AstExpressionStatement>();
+						stat->expression = expr;
+						block->statements.push_back(stat);
+					}
+					replacement = block;
+				}
+			}
+
+			void Visit(AstIfStatement* node)override
+			{
+				RemoveUnnecessaryVariables(node->trueBranch, defined, used, node->trueBranch);
+				if (node->falseBranch)
+				{
+					RemoveUnnecessaryVariables(node->falseBranch, defined, used, node->falseBranch);
+				}
+			}
+		};
+		
+		/*************************************************************
+		RemoveUnnecessaryVariables
+		*************************************************************/
+
+		void RemoveUnnecessaryVariables(AstExpression::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used)
+		{
+			AstExpression_RemoveUnnecessaryVariables visitor(defined, used);
+			node->Accept(&visitor);
 		}
 
-		void AstIfStatement::RemoveUnnecessaryVariables(set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
+		void RemoveUnnecessaryVariables(AstStatement::Ptr node, set<shared_ptr<AstDeclaration>>& defined, set<shared_ptr<AstDeclaration>>& used, AstStatement::Ptr& replacement)
 		{
-			trueBranch->RemoveUnnecessaryVariables(defined, used, trueBranch);
-			if (falseBranch)
-			{
-				falseBranch->RemoveUnnecessaryVariables(defined, used, falseBranch);
-			}
+			AstStatement_RemoveUnnecessaryVariables visitor(defined, used, replacement);
+			node->Accept(&visitor);
 		}
 	}
 }
