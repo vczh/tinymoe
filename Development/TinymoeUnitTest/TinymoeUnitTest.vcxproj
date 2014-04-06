@@ -83,6 +83,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Ast\TinymoeAst.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_CollectUsedVariables.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_ExpandBlock.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_GetRootLeftValue.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_Print.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_RemoveUnnecessaryVariables.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_RoughlyOptimize.cpp" />
+    <ClCompile Include="..\Source\Ast\TinymoeAst_SetParent.cpp" />
     <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen.cpp" />
     <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Declaration.cpp" />
     <ClCompile Include="..\Source\Compiler\TinymoeAstCodegen_Expression.cpp" />

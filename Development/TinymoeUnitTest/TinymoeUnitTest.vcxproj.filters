@@ -78,6 +78,27 @@
     <ClCompile Include="CSharpCodegen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_Print.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_SetParent.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_RoughlyOptimize.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_CollectUsedVariables.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_RemoveUnnecessaryVariables.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_GetRootLeftValue.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Ast\TinymoeAst_ExpandBlock.cpp">
+      <Filter>Tinymoe\Ast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTest.h">
