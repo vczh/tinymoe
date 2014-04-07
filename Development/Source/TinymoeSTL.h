@@ -14,6 +14,10 @@
 #include <fstream>
 #include <iostream>
 
+#ifndef _MSC_VER
+#define abstract
+#endif
+
 using namespace std;
 
 namespace tinymoe

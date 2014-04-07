@@ -40,7 +40,7 @@ namespace tinymoe
 			Sub,				// -
 			Mul,				// *
 			Div,				// /
-			IntDiv,				// \ 
+			IntDiv,				// \ (can apply on floats)
 			Mod,				// %
 			LT,					// <
 			GT,					// >
