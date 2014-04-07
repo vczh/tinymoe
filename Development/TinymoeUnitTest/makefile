@@ -13,12 +13,13 @@ COM_OBJS = $(BIN)TinymoeAstCodegen.o $(BIN)TinymoeAstCodegen_Declaration.o $(BIN
 
 UNITTEST_OBJS = $(BIN)CSharpCodegen.o $(BIN)UnitTest.o $(BIN)Main.o
 
-TESTCASE_OBJS = $(BIN)TestAstCodegen.o $(BIN)TestDeclarationAnalyzer.o $(BIN)TestExpressionAnalyzer.o $(BIN)TestLexicalAnalyzer.o $(BIN)TestStatementAnalyzer.o
+TESTCASE_OBJS = $(BIN)TestAstCodegen.o
+#$(BIN)TestDeclarationAnalyzer.o $(BIN)TestExpressionAnalyzer.o $(BIN)TestLexicalAnalyzer.o $(BIN)TestStatementAnalyzer.o
 
 all:	
 	mkdir -p $(BIN)
 	$(CPP)	-o $(BIN)CSharpCodegen.o				-c CSharpCodegen.cpp
-	#$(CPP)	-o $(BIN)TestAstCodegen.o				-c TestAstCodegen.cpp
+	$(CPP)	-o $(BIN)TestAstCodegen.o				-c TestAstCodegen.cpp
 	#$(CPP)	-o $(BIN)TestDeclarationAnalyzer.o			-c TestDeclarationAnalyzer.cpp
 	#$(CPP)	-o $(BIN)TestExpressionAnalyzer.o			-c TestExpressionAnalyzer.cpp
 	#$(CPP)	-o $(BIN)TestLexicalAnalyzer.o				-c TestLexicalAnalyzer.cpp
@@ -43,7 +44,7 @@ all:
 	$(CPP)	-o $(BIN)TinymoeExpressionAnalyzer.o			-c $(COM)TinymoeExpressionAnalyzer.cpp
 	$(CPP)	-o $(BIN)TinymoeLexicalAnalyzer.o			-c $(COM)TinymoeLexicalAnalyzer.cpp
 	$(CPP)	-o $(BIN)TinymoeStatementAnalyzer.o			-c $(COM)TinymoeStatementAnalyzer.cpp
-	$(CPP)	-o $(BIN)UnitTest $(TIN_OBJS) $(AST_OBJS) $(COM_OBJS) $(UNITTEST_OBJS)
+	$(CPP)	-o $(BIN)UnitTest $(TIN_OBJS) $(AST_OBJS) $(COM_OBJS) $(UNITTEST_OBJS) $(TESTCASE_OBJS)
 
 clean:
 	rm $(BIN)*
