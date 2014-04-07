@@ -122,6 +122,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Library\StandardLibrary.txt" />
+    <Text Include="..\TestCases\Coroutine.txt" />
+    <Text Include="..\TestCases\HelloWorld.txt" />
+    <Text Include="..\TestCases\MultipleDispatch.txt" />
+    <Text Include="..\TestCases\UnitTest.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

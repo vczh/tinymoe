@@ -1,0 +1,100 @@
+module enumerable
+using standard library
+
+symbol yielding return
+symbol yielding break
+ 
+type enumerable collection
+    body
+end
+ 
+type collection enumerator
+    value
+	coroutine
+end
+ 
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield return (value)
+	pause coroutine to yielding return with continuation and value
+end
+
+cps (state) (continuation)
+category
+    inside ENUMERATING
+sentence yield break
+	pause coroutine to yielding break with continuation and null
+end
+ 
+phrase new enumerator from (enumerable)
+	set coroutine to new coroutine from (field body of enumerable)
+    set the result to new collection enumerator of (null, coroutine)
+end
+
+cps (state) (continuation)
+sentence move (enumerator) to the next
+	set coroutine to field coroutine of enumerator
+	if not (coroutine coroutine stopped)
+		run coroutine coroutine
+
+		select field flag of state
+			case yielding return
+				set field value of enumerator to field argument of state
+				continue coroutine coroutine
+			case yielding break
+				set field value of enumerator to null
+				stop coroutine coroutine
+			case null
+				set field value of enumerator to null
+				stop coroutine coroutine
+			case else
+				fall into the previous trap
+		end
+	end
+end
+ 
+phrase (enumerator) reaches the end
+    set the result to coroutine field coroutine of enumerator stopped
+end
+
+phrase current value of (enumerator)
+	set the result to field value of (field value of enumerator)
+end
+ 
+cps (state)
+category
+    start ENUMERATING
+    closable
+block (body) create enumerable to (assignable receiver)
+    set receiver to new enumerable collection of ()
+    set field body of receiver to body
+end
+
+block (sentence deal with (item)) repeat with (argument item) in (items : enumerable collection)
+    set enumerator to new enumerator from items
+    repeat while not (enumerator reaches the end)
+        move enumerator to the next
+        deal with current value of enumerator
+    end
+end
+
+sentence print (message)
+	redirect to "Print"
+end
+ 
+phrase main
+    create enumerable to numbers
+        repeat with i from 1 to 10
+            print "Enumerating " & i
+            yield return i
+        end
+    end
+    
+	repeat with number in numbers
+		if number >= 5
+			break
+		end
+		print "Printing " & number
+	end
+end

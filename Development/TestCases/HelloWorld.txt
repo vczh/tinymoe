@@ -1,0 +1,32 @@
+module hello world
+using standard library
+
+sentence print (message)
+	redirect to "Print"
+end
+
+phrase sum from (first number) to (last number)
+    set the result to 0
+    repeat with the current number from first number to last number
+        add the current number to the result
+    end
+end
+
+phrase main
+    print "1+ ... +10 = " & sum from 1 to 10
+
+	try
+		print "I will raise an exception."
+		raise "exception"
+		print "The world is mad!"
+	catch exception
+		print "So the exception will be caught"
+	end
+
+	try
+		print "I will not raise an exception."
+		print "So there is no exception to catch"
+	catch exception
+		print "The world is mad!"
+	end
+end
