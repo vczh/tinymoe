@@ -6,12 +6,24 @@ AST = ../Source/Ast/
 COM = ../Source/Compiler/
 
 TIN_OBJS = $(BIN)Tinymoe.o
+
 AST_OBJS = $(BIN)TinymoeAst.o $(BIN)TinymoeAst_CollectSideEffectExpressions.o $(BIN)TinymoeAst_CollectUsedVariables.o $(BIN)TinymoeAst_ExpandBlock.o $(BIN)TinymoeAst_GetRootLeftValue.o $(BIN)TinymoeAst_Print.o $(BIN)TinymoeAst_RemoveUnnecessaryVariables.o $(BIN)TinymoeAst_RoughlyOptimize.o $(BIN)TinymoeAst_SetParent.o
+
 COM_OBJS = $(BIN)TinymoeAstCodegen.o $(BIN)TinymoeAstCodegen_Declaration.o $(BIN)TinymoeAstCodegen_Expression.o $(BIN)TinymoeAstCodegen_Statement.o $(BIN)TinymoeDeclarationAnalyzer.o $(BIN)TinymoeExpressionAnalyzer.o $(BIN)TinymoeLexicalAnalyzer.o $(BIN)TinymoeStatementAnalyzer.o
+
+UNITTEST_OBJS = $(BIN)CSharpCodegen.o $(BIN)TestAstCodegen.o $(BIN)TestDeclarationAnalyzer.o $(BIN)TestExpressionAnalyzer.o $(BIN)TestLexicalAnalyzer.o $(BIN)TestStatementAnalyzer.o $(BIN)UnitTest.o $(BIN)Main.o
 
 all:	
 	mkdir -p $(BIN)
-	$(CPP)	-o $(BIN)Tinymoe.o	-c $(TIN)Tinymoe.cpp
+	$(CPP)	-o $(BIN)CSharpCodegen.o				-c CSharpCodegen.cpp
+	$(CPP)	-o $(BIN)TestAstCodegen.o				-c TestAstCodegen.cpp
+	$(CPP)	-o $(BIN)TestDeclarationAnalyzer.o			-c TestDeclarationAnalyzer.cpp
+	$(CPP)	-o $(BIN)TestExpressionAnalyzer.o			-c TestExpressionAnalyzer.cpp
+	$(CPP)	-o $(BIN)TestLexicalAnalyzer.o				-c TestLexicalAnalyzer.cpp
+	$(CPP)	-o $(BIN)TestStatementAnalyzer.o			-c TestStatementAnalyzer.cpp
+	$(CPP)	-o $(BIN)UnitTest.o					-c UnitTest.cpp
+	$(CPP)	-o $(BIN)Main.o						-c Main.cpp
+	$(CPP)	-o $(BIN)Tinymoe.o					-c $(TIN)Tinymoe.cpp
 	$(CPP)	-o $(BIN)TinymoeAst.o					-c $(AST)TinymoeAst.cpp
 	$(CPP)	-o $(BIN)TinymoeAst_CollectSideEffectExpressions.o	-c $(AST)TinymoeAst_CollectSideEffectExpressions.cpp
 	$(CPP)	-o $(BIN)TinymoeAst_CollectUsedVariables.o		-c $(AST)TinymoeAst_CollectUsedVariables.cpp
@@ -29,7 +41,7 @@ all:
 	$(CPP)	-o $(BIN)TinymoeExpressionAnalyzer.o			-c $(COM)TinymoeExpressionAnalyzer.cpp
 	$(CPP)	-o $(BIN)TinymoeLexicalAnalyzer.o			-c $(COM)TinymoeLexicalAnalyzer.cpp
 	$(CPP)	-o $(BIN)TinymoeStatementAnalyzer.o			-c $(COM)TinymoeStatementAnalyzer.cpp
-	$(CPP)	-o $(BIN)UnitTest $(TIN_OBJS) $(AST_OBJS) $(COM_OBJS)
+	$(CPP)	-o $(BIN)UnitTest $(TIN_OBJS) $(AST_OBJS) $(COM_OBJS) $(UNITTEST_OBJS)
 
 clean:
 	rm $(BIN)*

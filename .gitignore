@@ -3,8 +3,11 @@
 *.opensdf
 **/Debug/**
 **/Release/**
+**/Bin/**
 *.test.txt
 ~$*.docx
 ~*.tmp
+*~
+*.o
 GeneratedAst.txt
 TinymoeProgram.cs

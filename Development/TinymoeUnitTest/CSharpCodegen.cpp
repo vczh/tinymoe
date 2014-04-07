@@ -2,6 +2,23 @@
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
 
+#ifndef _MSC_VER
+#include <stdlib.h>
+
+template<int Size>
+void _itoa(int value, char (&buffer)[Size], int base)
+{
+	sprintf(buffer, "%d", value);
+}
+
+template<int Size>
+void _itow(int value, char (&buffer)[Size], int base)
+{
+	sqprintf(buffer, Size - 1, "%d", value);
+}
+
+#endif
+
 using namespace tinymoe;
 using namespace tinymoe::compiler;
 using namespace tinymoe::ast;

@@ -1,7 +1,9 @@
+#ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#endif
 
 #include "UnitTest.h"
 #include "../Source/Tinymoe.h"
@@ -61,6 +63,8 @@ string_t GetCodeForStandardLibrary()
 
 int wmain(int argc, wchar_t* args[])
 {
+#ifdef _MSC_VER
 	_CrtDumpMemoryLeaks();
+#endif
 	return 0;
 }
