@@ -61,7 +61,11 @@ string_t GetCodeForStandardLibrary()
 	return ReadAnsiFile(T("../Library/StandardLibrary.txt"));
 }
 
+#ifdef _MSC_VER
 int wmain(int argc, wchar_t* args[])
+#else
+int main()
+#endif
 {
 #ifdef _MSC_VER
 	_CrtDumpMemoryLeaks();
