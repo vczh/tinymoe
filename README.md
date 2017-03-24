@@ -1,12 +1,12 @@
 tinymoe
 =======
 
-###English-like programming language
-######For DSL (Domain Specific Language) building and embedding, with dynamic typing, multiple dispatching and build-in continuation.
+### English-like programming language
+###### For DSL (Domain Specific Language) building and embedding, with dynamic typing, multiple dispatching and build-in continuation.
 
 Here are several samples to introduce this language:
 
-####Hello world
+#### Hello world
 
 	module hello world
 	using standard library
@@ -26,7 +26,7 @@ Here are several samples to introduce this language:
 		print "1+ ... +100 = " & sum from 1 to 100
 	end
 
-####Geometry (Multiple dispatching)
+#### Geometry (Multiple dispatching)
 
 	module geometry
 	using standard library
@@ -101,7 +101,7 @@ Here are several samples to introduce this language:
 		end
 	end
 
-####Make your own "yield return" (coroutine)
+#### Make your own "yield return" (coroutine)
 
 	module enumerable
 	using standard library
@@ -204,7 +204,7 @@ Here are several samples to introduce this language:
 		end
 	end
 
-####Make your tinymoe-unit (Unit test and assertion)
+#### Make your tinymoe-unit (Unit test and assertion)
 
 	module unit test
 	using standard library
