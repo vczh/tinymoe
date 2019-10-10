@@ -1,6 +1,5 @@
 tinymoe
 =======
-
 ### English-like programming language
 ###### For DSL (Domain Specific Language) building and embedding, with dynamic typing, multiple dispatching and build-in continuation.
 
@@ -72,7 +71,7 @@ Here are several samples to introduce this language:
 
 	phrase area of (shape : circle)
 		set r to field radius of shape
-		set the result to r * r * 3.14
+		set the result to r * r * 22/7
 	end
 
 	phrase (a) and (b) are the same shape
